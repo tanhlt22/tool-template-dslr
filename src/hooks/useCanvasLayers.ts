@@ -7,41 +7,9 @@ interface UseCanvasLayersOptions {
 }
 
 export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
-  const [slots, setSlots] = useState<FrameSlot[]>([
-    {
-      id: 'slot_default_1',
-      x: 400,
-      y: 500,
-      width: 400,
-      height: 600,
-      rotation: 0,
-      order: 1,
-      visible: true,
-      locked: false
-    }
-  ]);
+  const [slots, setSlots] = useState<FrameSlot[]>([]);
 
-  const [elements, setElements] = useState<FrameElement[]>([
-    {
-      id: 'text_default_1',
-      type: 'text',
-      content: 'TÊN CÔ DÂU & CHÚ RỂ',
-      x: 300,
-      y: 1200,
-      width: 600,
-      height: 60,
-      rotation: 0,
-      visible: true,
-      locked: false,
-      style: {
-        color: '#ffffff',
-        fontSize: 36,
-        fontFamily: 'Outfit',
-        fontWeight: 'bold',
-        order: 0
-      }
-    }
-  ]);
+  const [elements, setElements] = useState<FrameElement[]>([]);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<'slot' | 'text' | 'icon' | 'image' | 'qr' | null>(null);
