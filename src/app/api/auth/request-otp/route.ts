@@ -26,6 +26,8 @@ export async function POST(req: Request) {
       let isMatch = false;
       let userRole = 'user';
 
+      console.log(`[auth/request-otp] Login request received for user: "${trimmedUser}"`);
+
       // Check database
       if (SUPABASE_URL && SUPABASE_KEY) {
         try {
@@ -37,20 +39,22 @@ export async function POST(req: Request) {
             .eq('password', trimmedPass)
             .maybeSingle();
 
-          if (!error && data) {
+          if (error) {
+            console.error('[auth/request-otp] Supabase returned query error:', error);
+          } else if (data) {
+            console.log(`[auth/request-otp] Login match successful for "${trimmedUser}" with role: "${data.role}"`);
             isMatch = true;
             userRole = data.role || 'user';
+          } else {
+            console.log(`[auth/request-otp] No matching user/password found for: "${trimmedUser}"`);
           }
         } catch (err: any) {
-          console.error('[auth/request-otp] Login Supabase query error:', err.message);
+          console.error('[auth/request-otp] Login Supabase exception caught:', err.message);
         }
+      } else {
+        console.warn('[auth/request-otp] Supabase keys are not configured in environment variables!');
       }
 
-      // 1.1 Local fail-safe fallback for admin account
-      if (!isMatch && trimmedUser === 'admin' && trimmedPass === 'admin123') {
-        isMatch = true;
-        userRole = 'admin';
-      }
 
       if (isMatch) {
         // Direct Login: generate token immediately, no OTP needed for already active/registered accounts!
