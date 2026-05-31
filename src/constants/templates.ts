@@ -22,6 +22,50 @@ export const STICKER_TEMPLATES = [
   {
     name: 'Music Note',
     url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>'
+  },
+  {
+    name: 'Y2K Ribbon Bow',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M12 10C8.5 6 4 6 4 10c0 3.5 4.5 4 8 2"/><path d="M12 10c3.5-4 8-4 8 0c0 3.5-4.5 4-8 2"/><path d="M10 13l-4 8"/><path d="M14 13l4 8"/></svg>'
+  },
+  {
+    name: 'Double Hearts',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16c1-1.3 2-2.8 2-4.8A4.5 4.5 0 0 0 13.5 7c-1.4 0-2.4.4-3.5 1.5C8.9 7.4 7.9 7 6.5 7A4.5 4.5 0 0 0 2 11.5c0 2 1 3.5 2 4.8l6 5.7Z"/><path d="M22 9c0 1.5-1 2.8-2 3.8l-4 3.7c.3-.5.5-1.1.5-1.8A4.5 4.5 0 0 0 12 10.2c.4-.6.9-1.2 1.5-1.2A4.5 4.5 0 0 1 18 13.5"/></svg>'
+  },
+  {
+    name: 'Diamond Ring',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%233b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="7"/><path d="M12 7V3l-3 1.5L12 7zm0-4l3 1.5L12 3z"/></svg>'
+  },
+  {
+    name: 'Party Popper',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"/><path d="M14 8.5C14 5.5 17 3 20 3c0 3-2.5 6-5.5 6"/><path d="m19 8.5 2.5 2.5"/><path d="m11.5 14-2.5-2.5"/><circle cx="17" cy="14" r="1" fill="%23f97316"/><circle cx="13" cy="10" r="1" fill="%23f97316"/></svg>'
+  },
+  {
+    name: 'Disco Ball',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2306b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4 12h16"/><path d="M12 4a8 8 0 0 0 0 16"/><path d="M12 4a8 8 0 0 1 0 16"/></svg>'
+  },
+  {
+    name: 'Princess Crown',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M5 20h14"/></svg>'
+  },
+  {
+    name: 'Rainbow Arch',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20a8 8 0 0 1 16 0"/><path d="M7 20a5 5 0 0 1 10 0"/><path d="M10 20a2 2 0 0 1 4 0"/></svg>'
+  },
+  {
+    name: 'Celebration Toast',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23dfb26b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h5v5c0 1.5-1 3-2.5 3S6 9.5 6 8V3Z"/><path d="M18 3h-5v5c0 1.5 1 3 2.5 3s2.5-1.5 2.5-3V3Z"/><path d="M8.5 11v7"/><path d="M15.5 11v7"/><path d="M6 18h12"/></svg>'
+  },
+  {
+    name: 'Sweet Cherry',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="4" fill="%23ef4444" stroke="none"/><circle cx="18" cy="16" r="4" fill="%23ef4444" stroke="none"/><path d="M6 14c2-5 6-7 12-6"/><path d="M18 10V4l-4 1.5"/></svg>'
+  },
+  {
+    name: 'Party Balloon',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12Zm0 0v5c0 1.5-1 2-2 3"/></svg>'
+  },
+  {
+    name: 'Teddy Bear',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="6"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="7" r="2.5"/><circle cx="9" cy="11.5" r="0.5" fill="%23b45309"/><circle cx="15" cy="11.5" r="0.5" fill="%23b45309"/><path d="M10 14.5s1 1 2 1 2-1 2-1"/></svg>'
   }
 ];
 
