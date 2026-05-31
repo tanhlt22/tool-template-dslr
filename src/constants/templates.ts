@@ -92,6 +92,46 @@ export const STICKER_TEMPLATES = [
     category: 'wedding',
     url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ca8a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9Zm-3 9a3 3 0 0 1-6 0"/></svg>'
   },
+  {
+    name: 'Wedding Arch',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V10a8 8 0 0 1 16 0v12"/><path d="M12 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/><path d="M6 8a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/><path d="M18 8a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/></svg>'
+  },
+  {
+    name: 'Champagne Bottle',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23dfb26b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2h2v4h-2V2Z"/><path d="M10 6h6v4l-2 3v7a2 2 0 0 1-2 2h-2v-9l-2-3V6Z"/><path d="M11 20h4"/><path d="M11 16h4"/></svg>'
+  },
+  {
+    name: 'Love Dove',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2338bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3c-1.5 2-4 3-7 3a9 9 0 0 0-8 6l2 1a4 4 0 0 1 3-1l-3 4 5-1a4 4 0 0 1 3 3l1-4a9 9 0 0 0 6-8c0-3-1-4.5-3-3Z"/><path d="M11 10.5c.5.5.5 1.5 0 2"/></svg>'
+  },
+  {
+    name: 'Wedding Dress',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l1 3-3 2-3-2 1-3Z"/><path d="M6 10c2-2 10-2 12 0l2 11H4L6 10Z"/><path d="M12 10v11"/></svg>'
+  },
+  {
+    name: 'Groom Suit',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18H4V3Z"/><path d="M12 3v18"/><path d="m4 3 8 7 8-7"/><path d="m9 10 3 3 3-3"/></svg>'
+  },
+  {
+    name: 'Save The Date',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M12 14c-1.5 0-3.5 1-3.5 3s2 3 3.5 3 3.5-1 3.5-3-2-3-3.5-3Z"/></svg>'
+  },
+  {
+    name: 'Flower Bouquet',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2310b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2.5-3 5-4.5 5-7.5s-2.5-4-5-4-5 1-5 4 2.5 4.5 5 7.5Z"/><path d="M8 12c-2.5-2.5-4.5-4.5-4.5-7.5s2.5-4 5-4 4.5 2 4.5 4.5S10.5 9.5 8 12Z"/><path d="M16 12c2.5-2.5 4.5-4.5 4.5-7.5s-2.5-4-5-4-4.5 2-4.5 4.5 2 5.5 5 7.5Z"/><path d="M12 12v9"/><path d="M10 15h4"/><path d="M9 18h6"/></svg>'
+  },
+  {
+    name: 'Heart Arrow',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M2 22 9 15M22 2 15 9M22 2l-3 1.5L22 2.5v3Z"/></svg>'
+  },
 
   // === Party & Celebration (party) ===
   {
