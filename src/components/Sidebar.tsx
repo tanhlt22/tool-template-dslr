@@ -101,6 +101,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onAutoDetectSlots
 }) => {
   const [detectType, setDetectType] = useState<'transparency' | 'solid-green' | 'solid-white'>('transparency');
+  const [selectedStickerCat, setSelectedStickerCat] = useState<string>('all');
 
   // Unified list of all layers (ordered by rendering stack)
   // Slots are drawn first, then elements
@@ -458,22 +459,53 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <hr className="border-[#dee8ff]" />
 
             {/* Thư viện sticker */}
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-3">
               <span className="text-[10px] text-[#0058be] font-black uppercase tracking-wider flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5" />
                 Thư Viện Nhãn Trang Trí
               </span>
-              <div className="grid grid-cols-3 gap-2">
-                {STICKER_TEMPLATES.map((st, idx) => (
+
+              {/* Nhãn loại sticker (Category tabs) */}
+              <div className="flex flex-wrap gap-1 bg-[#f0f3ff]/65 p-1 rounded-xl border border-[#dee8ff]">
+                {[
+                  { id: 'all', label: 'Tất cả' },
+                  { id: 'y2k', label: 'Y2K/Dễ thương' },
+                  { id: 'wedding', label: 'Wedding/Love' },
+                  { id: 'party', label: 'Party/Event' },
+                  { id: 'frames', label: 'Khung/Sparks' }
+                ].map(cat => (
                   <button
-                    key={idx}
-                    onClick={() => onAddSticker(st.url)}
-                    className="bg-white hover:bg-[#f0f3ff] aspect-square rounded-xl p-2.5 flex flex-col items-center justify-center gap-1 transition-all hover:scale-[1.04] active:scale-95 group border border-[#dee8ff] hover:border-[#0058be]/30 shadow-xs"
+                    key={cat.id}
+                    onClick={() => setSelectedStickerCat(cat.id)}
+                    className={`px-2 py-1 text-[9px] font-black uppercase rounded-lg transition-all ${selectedStickerCat === cat.id
+                      ? 'bg-white text-[#0058be] border border-[#dee8ff] shadow-xs font-bold'
+                      : 'text-slate-500 hover:text-[#0058be] hover:bg-white/20'
+                    }`}
                   >
-                    <img src={st.url} alt={st.name} className="w-10 h-10 group-hover:scale-110 transition-transform" />
-                    <span className="text-[9px] text-slate-500 font-semibold text-center truncate w-full group-hover:text-[#0058be]">{st.name}</span>
+                    {cat.label}
                   </button>
                 ))}
+              </div>
+
+              {/* Grid hiển thị nhãn trang trí */}
+              <div className="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                {(() => {
+                  const filtered = selectedStickerCat === 'all'
+                    ? STICKER_TEMPLATES
+                    : STICKER_TEMPLATES.filter(st => (st as any).category === selectedStickerCat);
+
+                  return filtered.map((st, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => onAddSticker(st.url)}
+                      className="bg-white hover:bg-[#f0f3ff] aspect-square rounded-xl p-2 flex flex-col items-center justify-center gap-1 transition-all hover:scale-[1.04] active:scale-95 group border border-[#dee8ff] hover:border-[#0058be]/30 shadow-xs"
+                      title={st.name}
+                    >
+                      <img src={st.url} alt={st.name} className="w-8 h-8 group-hover:scale-110 transition-transform object-contain" />
+                      <span className="text-[8px] text-slate-500 font-semibold text-center truncate w-full group-hover:text-[#0058be]">{st.name}</span>
+                    </button>
+                  ));
+                })()}
               </div>
             </div>
           </div>
