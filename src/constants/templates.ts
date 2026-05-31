@@ -132,6 +132,21 @@ export const STICKER_TEMPLATES = [
     category: 'wedding',
     url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M2 22 9 15M22 2 15 9M22 2l-3 1.5L22 2.5v3Z"/></svg>'
   },
+  {
+    name: 'Bride Silhouette',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4c0 1 .5 2 1.5 2.5C6.5 9 5 11 5 13.5v1.5h14v-1.5c0-2.5-1.5-4.5-4.5-5 .5-.5 1.5-1.5 1.5-2.5a4 4 0 0 0-4-4Z"/><path d="M6 15c0 3 3 6 6 6s6-3 6-6"/></svg>'
+  },
+  {
+    name: 'Groom Silhouette',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%233b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4c0 2 2 3 4 3s4-1 4-3a4 4 0 0 0-4-4Z"/><path d="M6 14v2c0 2.5 2 4.5 4.5 4.5h3c2.5 0 4.5-2 4.5-4.5v-2"/><path d="m9 10 3 3 3-3"/><path d="M12 13v4"/></svg>'
+  },
+  {
+    name: 'Wedding Love',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path d="M8 7a2 2 0 1 0 4 0 2 2 0 1 0-4 0Z"/><path d="M12 7a2 2 0 1 0 4 0 2 2 0 1 0-4 0Z"/></svg>'
+  },
 
   // === Party & Celebration (party) ===
   {

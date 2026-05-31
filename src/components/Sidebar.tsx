@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   Sparkles, Image as ImageIcon, Settings, Layers,
   Eye, EyeOff, Lock, Unlock, GripVertical, Printer, Trash,
-  X, Camera
+  X, Camera, Type
 } from 'lucide-react';
 import { STICKER_TEMPLATES, PROMPT_PRESETS, PAPER_SIZES, BACKGROUND_PRESETS } from '../constants/templates';
 import { FrameSlot, FrameElement } from '../types/canvas';
@@ -505,7 +505,73 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <span className="text-[8px] text-slate-500 font-semibold text-center truncate w-full group-hover:text-[#0058be]">{st.name}</span>
                     </button>
                   ));
-                })()}
+              </div>
+            </div>
+
+            <hr className="border-[#dee8ff]" />
+
+            {/* Mẫu chữ nghệ thuật */}
+            <div className="flex flex-col gap-3">
+              <span className="text-[10px] text-[#0058be] font-black uppercase tracking-wider flex items-center gap-1">
+                <Type className="w-3.5 h-3.5" />
+                Mẫu Chữ Nghệ Thuật
+              </span>
+              <div className="grid grid-cols-2 gap-2 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar">
+                {[
+                  { label: 'Happy Wedding', text: 'Happy Wedding', font: 'Great Vibes', color: '#e11d48' },
+                  { label: 'Save The Date', text: 'SAVE THE DATE', font: 'Outfit', color: '#1e293b' },
+                  { label: 'Best Day Ever', text: 'BEST DAY EVER', font: 'Bungee', color: '#eab308' },
+                  { label: 'Our Love Story', text: 'Our Love Story', font: 'Playfair Display', color: '#ba1a1a', italic: true },
+                  { label: 'Just Married', text: 'Just Married', font: 'Pacifico', color: '#db2777' },
+                  { label: 'Sweet Memories', text: 'Sweet Memories', font: 'Great Vibes', color: '#0f766e' },
+                  { label: 'Happy Birthday', text: 'HAPPY BIRTHDAY', font: 'Bungee', color: '#8b5cf6' },
+                  { label: 'Together Forever', text: 'Together Forever', font: 'Pacifico', color: '#0284c7' }
+                ].map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      const newText: FrameElement = {
+                        id: `text_${Date.now()}_${idx}`,
+                        type: 'text',
+                        content: item.text,
+                        x: width / 2 - 150,
+                        y: height / 2 - 30,
+                        width: 300,
+                        height: 60,
+                        rotation: 0,
+                        visible: true,
+                        locked: false,
+                        style: {
+                          color: item.color,
+                          fontSize: 36,
+                          fontFamily: item.font,
+                          fontWeight: 'bold',
+                          fontStyle: item.italic ? 'italic' : 'normal',
+                          order: elements.length
+                        }
+                      };
+                      onElementsChange([...elements, newText]);
+                      onSelectElement(newText.id, 'text');
+                      onActiveTabChange('layers');
+                    }}
+                    className="bg-white hover:bg-[#f0f3ff] rounded-xl p-2.5 flex flex-col items-center justify-center gap-1 transition-all hover:scale-[1.03] active:scale-95 border border-[#dee8ff] hover:border-[#0058be]/30 shadow-xs h-15 group text-center"
+                  >
+                    <span 
+                      className="text-xs truncate w-full text-center leading-none"
+                      style={{ 
+                        fontFamily: item.font,
+                        color: item.color,
+                        fontStyle: item.italic ? 'italic' : 'normal',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {item.text}
+                    </span>
+                    <span className="text-[7px] text-slate-400 font-bold uppercase tracking-wider group-hover:text-[#0058be]/70 transition-colors">
+                      {item.font}
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
