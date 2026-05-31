@@ -13,7 +13,7 @@ const AUTH_SECRET = process.env.AUTH_SECRET || 'lumibooth-ai-secret-key-2026';
 export async function POST(req: Request) {
   try {
     const { username, password, type = 'login' } = await req.json();
-    
+
     if (!username || !password) {
       return NextResponse.json({ error: 'Tài khoản và mật khẩu không được để trống' }, { status: 400 });
     }
@@ -26,8 +26,6 @@ export async function POST(req: Request) {
       let isMatch = false;
       let userRole = 'user';
 
-      console.log(`[auth/request-otp] Login request received for user: "${trimmedUser}"`);
-
       // Check database
       if (SUPABASE_URL && SUPABASE_KEY) {
         try {
@@ -39,22 +37,14 @@ export async function POST(req: Request) {
             .eq('password', trimmedPass)
             .maybeSingle();
 
-          if (error) {
-            console.error('[auth/request-otp] Supabase returned query error:', error);
-          } else if (data) {
-            console.log(`[auth/request-otp] Login match successful for "${trimmedUser}" with role: "${data.role}"`);
+          if (!error && data) {
             isMatch = true;
             userRole = data.role || 'user';
-          } else {
-            console.log(`[auth/request-otp] No matching user/password found for: "${trimmedUser}"`);
           }
         } catch (err: any) {
-          console.error('[auth/request-otp] Login Supabase exception caught:', err.message);
+          console.error('[auth/request-otp] Login Supabase query error:', err.message);
         }
-      } else {
-        console.warn('[auth/request-otp] Supabase keys are not configured in environment variables!');
       }
-
 
       if (isMatch) {
         // Direct Login: generate token immediately, no OTP needed for already active/registered accounts!
@@ -120,7 +110,7 @@ export async function POST(req: Request) {
       // Send activation request to Admin via Telegram
       if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
         const message = `🔔 *Yêu cầu Đăng ký & Kích hoạt Tài khoản Mới*\n\n👤 *Tài khoản đăng ký:* \`${trimmedUser}\`\n🔑 *Mã kích hoạt (OTP):* \`${otp}\`\n⏱️ *Thời gian hiệu lực:* 5 phút\n\n_Hãy gửi mã này cho người dùng để kích hoạt tài khoản của họ._`;
-        
+
         const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
         const res = await fetch(telegramUrl, {
           method: 'POST',
