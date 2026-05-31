@@ -85,7 +85,7 @@ export const Inspector: React.FC<InspectorProps> = ({
       iconBgClass = 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
     } else if (selectedType === 'text') {
       IconComp = Type;
-      title = activeElement.content ? `"${activeElement.content.substring(0, 15)}"` : 'Văn bản nghệ thuật';
+      title = (activeElement.content && typeof activeElement.content === 'string') ? `"${activeElement.content.substring(0, 15)}"` : 'Văn bản nghệ thuật';
       subtitle = 'Lớp Văn Bản Nghệ Thuật';
       iconBgClass = 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
     } else if (selectedType === 'icon') {

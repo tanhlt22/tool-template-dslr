@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Type, QrCode, Trash } from 'lucide-react';
+import { Camera, Type, QrCode, Trash, Undo2, Redo2 } from 'lucide-react';
 
 interface EditorToolbarProps {
   selectedId: string | null;
@@ -8,10 +8,23 @@ interface EditorToolbarProps {
   onAddQr: () => void;
   onDeleteElement: (id: string) => void;
   onClearCanvas: () => void;
+  onUndo: () => void;
+  onRedo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({
-  selectedId, onAddSlot, onAddText, onAddQr, onDeleteElement, onClearCanvas
+  selectedId,
+  onAddSlot,
+  onAddText,
+  onAddQr,
+  onDeleteElement,
+  onClearCanvas,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo
 }) => (
   <div className="bg-white/95 backdrop-blur-md border-b border-[#dee8ff] py-2 px-6 flex items-center justify-between shrink-0 z-10 shadow-sm gap-4 flex-wrap">
     <div className="flex items-center gap-3">
@@ -40,6 +53,26 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
         <QrCode className="w-3.5 h-3.5" />
         <span>Thêm QR Link</span>
       </button>
+
+      {/* Undo / Redo */}
+      <div className="flex items-center gap-1 border-l border-[#dee8ff] pl-3 ml-1">
+        <button
+          onClick={onUndo}
+          disabled={!canUndo}
+          className="flex items-center justify-center p-2 rounded-xl text-slate-700 hover:bg-[#0058be] hover:text-white border border-[#dee8ff] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-450 transition-all duration-200 active:scale-90"
+          title="Quay lại (Undo)"
+        >
+          <Undo2 className="w-4 h-4" />
+        </button>
+        <button
+          onClick={onRedo}
+          disabled={!canRedo}
+          className="flex items-center justify-center p-2 rounded-xl text-slate-700 hover:bg-[#0058be] hover:text-white border border-[#dee8ff] disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-450 transition-all duration-200 active:scale-90"
+          title="Tiếp tục (Redo)"
+        >
+          <Redo2 className="w-4 h-4" />
+        </button>
+      </div>
     </div>
 
     <div className="flex items-center gap-3 ml-auto">

@@ -215,6 +215,36 @@ export const STICKER_TEMPLATES = [
     name: 'Retro Bracket',
     category: 'frames',
     url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%230058be" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H4v18h4M16 3h4v18h-4"/></svg>'
+  },
+  {
+    name: 'Love Swans',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 19c2-2 4-3 6-3s4 1 5 3M22 19c-2-2-4-3-6-3s-4 1-5 3M8 16c0-4 2-6 4-6s4 2 4 6M12 10c-1-2-1-4-2-5c1 0 2 2 2 5Z"/></svg>'
+  },
+  {
+    name: 'Sparkly Fireworks',
+    category: 'party',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4 12h4M16 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/><circle cx="12" cy="12" r="2" fill="%23eab308"/></svg>'
+  },
+  {
+    name: 'Party Balloon Trio',
+    category: 'party',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-6 2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm12 0a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM12 13v6M6 15v5M18 15v5"/></svg>'
+  },
+  {
+    name: 'Rose Bouquet',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c1.5-2 3-3 3-5s-1.5-3-3-3-3 1-3 3 1.5 3 3 5ZM8 12c-1.5-1.5-3-2.5-3-4.5s1.5-3 3-3 3 1 3 3-1.5 2.5-3 4.5ZM16 12c1.5-1.5 3-2.5 3-4.5s-1.5-3-3-3-3 1-3 3 1.5 2.5 3 4.5ZM12 12v9l-2-2h4l-2 2"/></svg>'
+  },
+  {
+    name: 'Wedding Car',
+    category: 'wedding',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%230284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-3.7-2-5c-.6-1-1.8-1-2 0c-.7 1.3-2 5-2 5S7.3 10.6 5.5 11.1c-.8.2-1.5 1-1.5 1.9v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/></svg>'
+  },
+  {
+    name: 'Champagne Cheers',
+    category: 'party',
+    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2050/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23dfb26b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22h4M8 22V11M14 22h4M16 22V11M5 11h6V4H5v7ZM13 11h6V4h-6v7ZM8 4h8M12 2v2"/></svg>'
   }
 ];
 

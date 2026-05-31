@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { FrameSlot, FrameElement } from '../types/canvas';
 
 interface UseCanvasLayersOptions {
@@ -8,8 +8,74 @@ interface UseCanvasLayersOptions {
 
 export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
   const [slots, setSlots] = useState<FrameSlot[]>([]);
-
   const [elements, setElements] = useState<FrameElement[]>([]);
+
+  // --- HISTORY STATE FOR UNDO / REDO ---
+  const isHistoryAction = useRef(false);
+  const [history, setHistory] = useState<{ slots: FrameSlot[]; elements: FrameElement[] }[]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
+
+  // Initialize history on mount or when states are first loaded
+  useEffect(() => {
+    if (history.length === 0) {
+      setHistory([{ slots, elements }]);
+      setHistoryIndex(0);
+    }
+  }, []);
+
+  // Automatic history logger
+  useEffect(() => {
+    if (isHistoryAction.current) {
+      isHistoryAction.current = false;
+      return;
+    }
+
+    const newState = { slots, elements };
+    const timer = setTimeout(() => {
+      setHistory(prev => {
+        // Compare with current state
+        if (historyIndex >= 0 && historyIndex < prev.length) {
+          const current = prev[historyIndex];
+          if (JSON.stringify(current.slots) === JSON.stringify(newState.slots) &&
+              JSON.stringify(current.elements) === JSON.stringify(newState.elements)) {
+            return prev;
+          }
+        }
+
+        const nextHistory = prev.slice(0, historyIndex + 1);
+        nextHistory.push(newState);
+        if (nextHistory.length > 50) {
+          nextHistory.shift();
+        }
+        setHistoryIndex(nextHistory.length - 1);
+        return nextHistory;
+      });
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [slots, elements]);
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      isHistoryAction.current = true;
+      const prevIndex = historyIndex - 1;
+      const prevState = history[prevIndex];
+      setSlots(prevState.slots);
+      setElements(prevState.elements);
+      setHistoryIndex(prevIndex);
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      isHistoryAction.current = true;
+      const nextIndex = historyIndex + 1;
+      const nextState = history[nextIndex];
+      setSlots(nextState.slots);
+      setElements(nextState.elements);
+      setHistoryIndex(nextIndex);
+    }
+  };
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<'slot' | 'text' | 'icon' | 'image' | 'qr' | null>(null);
@@ -322,5 +388,9 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     handleAlignElement,
     handleUpdateSelectedProp,
     handleClearCanvas,
+    handleUndo,
+    handleRedo,
+    canUndo: historyIndex > 0,
+    canRedo: historyIndex < history.length - 1
   };
 }

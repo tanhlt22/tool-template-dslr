@@ -45,3 +45,6 @@ yarn-error.log*
 # Project specific scratch files
 scratch/
 scratch_workspace.html
+
+# TS build cache
+*.tsbuildinfo

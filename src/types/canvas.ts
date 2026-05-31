@@ -16,6 +16,7 @@ export interface ElementStyle {
   fontFamily?: string;
   order?: number;
   fontWeight?: string;
+  fontStyle?: string;
 }
 
 export interface FrameElement {

@@ -115,6 +115,10 @@ export function App() {
               onAddSlot={layers.handleAddSlot} onAddText={layers.handleAddText} onAddQr={layers.handleAddQr}
               onDeleteElement={layers.handleDeleteElement}
               onClearCanvas={() => { if (layers.handleClearCanvas()) cs.setBgImageUrl(null); }}
+              onUndo={layers.handleUndo}
+              onRedo={layers.handleRedo}
+              canUndo={layers.canUndo}
+              canRedo={layers.canRedo}
             />
             <CanvasEditor
               width={cs.width} height={cs.height} backgroundImageUrl={cs.bgImageUrl}

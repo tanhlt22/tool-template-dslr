@@ -115,7 +115,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     })),
     ...elements.map(e => ({
       id: e.id,
-      name: e.type === 'text' ? `Chữ: "${e.content.substring(0, 10)}..."` : e.type === 'qr' ? 'Mã QR chia sẻ' : e.type === 'image' ? `Ảnh: ${e.fileName || 'Layer'}` : 'Sticker',
+      name: e.type === 'text' ? `Chữ: "${typeof e.content === 'string' ? e.content.substring(0, 10) : ''}..."` : e.type === 'qr' ? 'Mã QR chia sẻ' : e.type === 'image' ? `Ảnh: ${e.fileName || 'Layer'}` : 'Sticker',
       type: e.type,
       visible: e.visible !== false,
       locked: e.locked === true
@@ -505,6 +505,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <span className="text-[8px] text-slate-500 font-semibold text-center truncate w-full group-hover:text-[#0058be]">{st.name}</span>
                     </button>
                   ));
+                })()}
               </div>
             </div>
 
