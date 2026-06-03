@@ -1,22 +1,25 @@
 import React, { useState } from 'react';
 import {
-  Sparkles, Image as ImageIcon, Settings, Layers,
+  Sparkles, Image as ImageIcon, Layers,
   Eye, EyeOff, Lock, Unlock, GripVertical, Printer, Trash,
-  X, Camera, Type
+  X, Camera, Type, FolderOpen, Download, RotateCw, CheckCircle2, Save, User
 } from 'lucide-react';
-import { STICKER_TEMPLATES, PROMPT_PRESETS, PAPER_SIZES, BACKGROUND_PRESETS } from '../constants/templates';
-import { FrameSlot, FrameElement } from '../types/canvas';
+import { STICKER_TEMPLATES, PAPER_SIZES, BACKGROUND_PRESETS } from '../constants/templates';
+import { FrameConfig, FrameSlot, FrameElement } from '../types/canvas';
+import { PersonalizationData } from '../utils/personalization';
+
+interface TemplateRecord extends FrameConfig {
+  id: string;
+  created_at?: string;
+  background_prompt?: string;
+  background_image_url?: string | null;
+}
 
 interface SidebarProps {
-  prompt: string;
-  onPromptChange: (val: string) => void;
-  isGeneratingBg: boolean;
-  onGenerateBg: () => void;
-  onOpenAISettings: () => void;
-
   // Add operations
   onAddSticker: (url: string) => void;
   onAddImage: (file: File) => void;
+  onOpenAISettings: () => void;
 
   // State elements
   slots: FrameSlot[];
@@ -50,25 +53,35 @@ interface SidebarProps {
   // Background Image Upload & Slot Detection props
   bgImageUrl: string | null;
   onBgImageUrlChange: (url: string | null) => void;
-  isDetectingSlots?: boolean;
-  onAutoDetectSlots?: (type: 'transparency' | 'solid-green' | 'solid-white') => void;
 
   // Active Tab state elevation
-  activeTab: 'canvas' | 'stickers' | 'layers';
-  onActiveTabChange: (tab: 'canvas' | 'stickers' | 'layers') => void;
+  activeTab: 'workflow' | 'canvas' | 'stickers' | 'layers';
+  onActiveTabChange: (tab: 'workflow' | 'canvas' | 'stickers' | 'layers') => void;
+
+  // Unified workflow
+  personalization: PersonalizationData;
+  onPersonalizationChange: (data: PersonalizationData) => void;
+  onApplyPersonalization: () => void;
+  savedFrames: TemplateRecord[];
+  onLoadSavedFrame: (frame: TemplateRecord) => void;
+  isExporting: boolean;
+  onExportPNG: () => void;
+  isExportingZip: boolean;
+  zipExportSuccess: boolean;
+  onExportDslrboothZip: () => void;
+  userRole: string;
+  editingTemplateId: string | null;
+  isSavingTemplate: boolean;
+  onUpdateTemplateInDb: () => void;
+  onSaveNewTemplateToDb: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onActiveTabChange,
-  prompt,
-  onPromptChange,
-  isGeneratingBg,
-  onGenerateBg,
-  onOpenAISettings,
-
   onAddSticker,
   onAddImage,
+  onOpenAISettings,
 
   slots,
   elements,
@@ -97,11 +110,53 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onBgGradientChange,
   bgImageUrl,
   onBgImageUrlChange,
-  isDetectingSlots = false,
-  onAutoDetectSlots
+  personalization,
+  onPersonalizationChange,
+  onApplyPersonalization,
+  savedFrames,
+  onLoadSavedFrame,
+  isExporting,
+  onExportPNG,
+  isExportingZip,
+  zipExportSuccess,
+  onExportDslrboothZip,
+  userRole,
+  editingTemplateId,
+  isSavingTemplate,
+  onUpdateTemplateInDb,
+  onSaveNewTemplateToDb
 }) => {
-  const [detectType, setDetectType] = useState<'transparency' | 'solid-green' | 'solid-white'>('transparency');
   const [selectedStickerCat, setSelectedStickerCat] = useState<string>('all');
+
+  // Identify which personalization fields are needed based on elements present
+  const neededFields = {
+    brideGroom: elements.some(e => {
+      if (e.type !== 'text') return false;
+      const c = (e.content || '').toUpperCase();
+      return c.includes('{BRIDE}') || c.includes('{GROOM}') || c.includes('{COUPLE}') ||
+             c.includes('MINH & LAN') || c.includes('TEN CO DAU') || c.includes('CO DAU & CHU RE') || c.includes('TEN CO DAU & CHU RE');
+    }),
+    weddingDate: elements.some(e => {
+      if (e.type !== 'text') return false;
+      const c = (e.content || '').toUpperCase();
+      return c.includes('{DATE}') || c.includes('30.05.2026') || c.includes('30.12.2026') || c.includes('00.00.0000') || c.includes('NGAY TO CHUC');
+    }),
+    eventName: elements.some(e => {
+      if (e.type !== 'text') return false;
+      const c = (e.content || '').toUpperCase();
+      return c.includes('{EVENT}') || c.includes('HAPPY WEDDING') || c.includes('HAPPY WEDDING DAY');
+    }),
+    galleryUrl: elements.some(e => {
+      if (e.type === 'qr') return true;
+      if (e.type === 'text') {
+        const c = (e.content || '').toUpperCase();
+        return c.includes('{GALLERYURL}');
+      }
+      return false;
+    })
+  };
+
+  const hasAnyNeededField = neededFields.brideGroom || neededFields.weddingDate || neededFields.eventName || neededFields.galleryUrl;
 
   // Unified list of all layers (ordered by rendering stack)
   // Slots are drawn first, then elements
@@ -139,25 +194,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <aside className="w-80 shrink-0 border-r border-[#dee8ff] glass-panel flex flex-col overflow-hidden">
+    <aside className="w-80 shrink-0 border-r border-[#dee8ff] bg-white/95 backdrop-blur-md flex flex-col overflow-hidden shadow-lg">
 
-      {/* 🔮 Tab Selector */}
+      {/* Tab Selector */}
       <div className="flex border-b border-[#dee8ff] shrink-0 bg-[#f0f3ff]">
+        <button
+          onClick={() => onActiveTabChange('workflow')}
+          className={`flex-1 py-3 text-[9px] font-black uppercase tracking-wider flex items-center justify-center gap-1 border-b-2 transition-all ${activeTab === 'workflow' ? 'border-[#0058be] text-[#0058be] bg-white font-extrabold' : 'border-transparent text-slate-500 hover:text-[#0058be] hover:bg-white/40'
+            }`}
+        >
+          <User className="w-3 h-3 text-[#0058be]" />
+          THAO TÁC
+        </button>
         <button
           onClick={() => onActiveTabChange('canvas')}
           className={`flex-1 py-3 text-[9px] font-black uppercase tracking-wider flex items-center justify-center gap-1 border-b-2 transition-all ${activeTab === 'canvas' ? 'border-[#0058be] text-[#0058be] bg-white font-extrabold' : 'border-transparent text-slate-500 hover:text-[#0058be] hover:bg-white/40'
             }`}
         >
           <Sparkles className="w-3 h-3 text-[#0058be]" />
-          Khổ Giấy & AI
-        </button>
-        <button
-          onClick={() => onActiveTabChange('stickers')}
-          className={`flex-1 py-3 text-[9px] font-black uppercase tracking-wider flex items-center justify-center gap-1 border-b-2 transition-all ${activeTab === 'stickers' ? 'border-[#0058be] text-[#0058be] bg-white font-extrabold' : 'border-transparent text-slate-500 hover:text-[#0058be] hover:bg-white/40'
-            }`}
-        >
-          <ImageIcon className="w-3 h-3 text-[#0058be]" />
-          Stickers
+          KHỔ GIẤY
         </button>
         <button
           onClick={() => onActiveTabChange('layers')}
@@ -165,15 +220,153 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }`}
         >
           <Layers className="w-3 h-3 text-[#0058be]" />
-          Lớp Bản Vẽ
+          LỚP BẢN VẼ
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-5 custom-scrollbar">
+        {/* ================= UNIFIED WORKFLOW TAB ================= */}
+        {activeTab === 'workflow' && (
+          <div className="flex flex-col gap-4 animate-fade-in">
+            <div className="flex flex-col gap-3">
+              <h3 className="text-xs font-black text-[#0058be] uppercase tracking-wider flex items-center gap-1.5">
+                <FolderOpen className="w-4 h-4 text-[#0058be]" />
+                THƯ VIỆN MẪU THIẾT KẾ
+              </h3>
+
+              {savedFrames.length > 0 ? (
+                <div className="flex flex-col gap-2 max-h-[230px] overflow-y-auto pr-1 custom-scrollbar">
+                  {savedFrames.map((frame, idx) => (
+                    <button
+                      key={frame.id || idx}
+                      onClick={() => onLoadSavedFrame(frame)}
+                      className="w-full text-left bg-white hover:bg-[#f0f3ff] hover:border-[#0058be]/30 p-2.5 rounded-xl border border-[#dee8ff] transition-all flex items-center justify-between group active:scale-98 shadow-xs"
+                    >
+                      <div className="truncate">
+                        <p className="text-xs font-extrabold text-[#111c2d] group-hover:text-[#0058be] transition-colors truncate">{frame.name}</p>
+                        <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">{frame.width}x{frame.height} | Số ảnh: {frame.slots?.length || 0}</p>
+                      </div>
+                      <span className="text-[9px] font-black uppercase tracking-wider text-[#0058be] bg-[#0058be]/5 group-hover:bg-[#0058be] group-hover:text-white border border-[#0058be]/10 px-2.5 py-1.5 rounded-lg transition-all shrink-0 font-sans">Dùng</span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-[10px] font-bold text-slate-400 py-6 border border-dashed border-[#dee8ff] rounded-xl font-sans">
+                  Không có mẫu thiết kế nào được lưu.
+                </div>
+              )}
+            </div>
+
+            <hr className="border-[#dee8ff]" />
+
+            <div className="flex flex-col gap-3">
+              <h3 className="text-xs font-black text-[#0058be] uppercase tracking-wider flex items-center gap-1.5">
+                <User className="w-4 h-4 text-[#0058be]" />
+                CÁ NHÂN HÓA SỰ KIỆN
+              </h3>
+
+              {hasAnyNeededField ? (
+                <>
+                  {neededFields.brideGroom && (
+                    <>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Tên cô dâu</label>
+                        <input
+                          type="text"
+                          value={personalization.brideName}
+                          onChange={(e) => onPersonalizationChange({ ...personalization, brideName: e.target.value })}
+                          className="w-full px-3 py-2 bg-white border border-[#dee8ff] rounded-xl text-xs font-bold text-[#111c2d] focus:outline-none focus:border-[#0058be]/50 transition-colors shadow-xs"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Tên chú rể</label>
+                        <input
+                          type="text"
+                          value={personalization.groomName}
+                          onChange={(e) => onPersonalizationChange({ ...personalization, groomName: e.target.value })}
+                          className="w-full px-3 py-2 bg-white border border-[#dee8ff] rounded-xl text-xs font-bold text-[#111c2d] focus:outline-none focus:border-[#0058be]/50 transition-colors shadow-xs"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {neededFields.weddingDate && (
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Ngày sự kiện</label>
+                      <input
+                        type="text"
+                        value={personalization.weddingDate}
+                        onChange={(e) => onPersonalizationChange({ ...personalization, weddingDate: e.target.value })}
+                        className="w-full px-3 py-2 bg-white border border-[#dee8ff] rounded-xl text-xs font-bold text-[#111c2d] focus:outline-none focus:border-[#0058be]/50 transition-colors shadow-xs"
+                      />
+                    </div>
+                  )}
+
+                  {neededFields.eventName && (
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Tên sự kiện</label>
+                      <input
+                        type="text"
+                        value={personalization.eventName}
+                        onChange={(e) => onPersonalizationChange({ ...personalization, eventName: e.target.value })}
+                        className="w-full px-3 py-2 bg-white border border-[#dee8ff] rounded-xl text-xs font-bold text-[#111c2d] focus:outline-none focus:border-[#0058be]/50 transition-colors shadow-xs"
+                      />
+                    </div>
+                  )}
+
+                  {neededFields.galleryUrl && (
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Đường dẫn thư viện / QR</label>
+                      <input
+                        type="text"
+                        value={personalization.galleryUrl}
+                        onChange={(e) => onPersonalizationChange({ ...personalization, galleryUrl: e.target.value })}
+                        className="w-full px-3 py-2 bg-white border border-[#dee8ff] rounded-xl text-xs font-bold text-[#111c2d] focus:outline-none focus:border-[#0058be]/50 transition-colors shadow-xs"
+                      />
+                    </div>
+                  )}
+
+                  <button
+                    onClick={onApplyPersonalization}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white hover:bg-[#f0f3ff] text-[#0058be] border border-[#dee8ff] hover:border-[#0058be]/30 font-extrabold text-xs shadow-xs active:scale-[0.98] transition-all font-sans"
+                  >
+                    <Sparkles className="w-4 h-4 text-[#0058be]" />
+                    Áp Dụng Cho Chữ Trên Canvas
+                  </button>
+                </>
+              ) : (
+                <div className="bg-[#f0f3ff]/40 border border-[#dee8ff] rounded-xl p-3">
+                  <p className="text-[10px] text-slate-500 font-semibold leading-normal text-center">
+                    Mẫu thiết kế này đã được hoàn thiện hoặc không chứa thông tin cần thay đổi nhanh.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {userRole === 'admin' && (
+              <>
+                <hr className="border-[#dee8ff]" />
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-xs font-black text-[#0058be] uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-[#0058be]" />
+                    CÀI ĐẶT ADMIN
+                  </h3>
+                  <button
+                    onClick={onOpenAISettings}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white hover:bg-[#f0f3ff] text-[#0058be] border border-[#dee8ff] hover:border-[#0058be]/30 font-extrabold text-xs shadow-xs active:scale-[0.98] transition-all font-sans"
+                  >
+                    <Sparkles className="w-4 h-4 text-[#0058be]" />
+                    Cấu Hình AI Background
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         {/* ================= SETTINGS TAB ================= */}
         {activeTab === 'canvas' && (
-          <div className="flex flex-col gap-4.5 animate-fade-in">
+          <div className="flex flex-col gap-4 animate-fade-in">
 
             {/* 1. Paper and print settings */}
             <div className="flex flex-col gap-3">
@@ -199,7 +392,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Hướng Xoay</label>
                   <select
                     value={orientation}
-                    onChange={(e) => onOrientationChange(e.target.value as any)}
+                    onChange={(e) => onOrientationChange(e.target.value as 'vertical' | 'horizontal')}
                     disabled={paperSize === 'custom'}
                     className="w-full px-2.5 py-2 bg-white border border-[#dee8ff] rounded-xl text-xs font-bold text-[#111c2d] focus:outline-none focus:border-[#0058be]/50 disabled:opacity-40 transition-colors shadow-xs"
                   >
@@ -265,8 +458,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       key={type}
                       onClick={() => onBackgroundTypeChange(type)}
                       className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition-all ${backgroundType === type
-                          ? 'bg-white text-[#0058be] border border-[#dee8ff] shadow-xs font-bold'
-                          : 'text-slate-500 hover:text-[#0058be]'
+                        ? 'bg-white text-[#0058be] border border-[#dee8ff] shadow-xs font-bold'
+                        : 'text-slate-500 hover:text-[#0058be]'
                         }`}
                     >
                       {type}
@@ -275,7 +468,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               </div>
 
-              {/* AI generator form inside tab */}
+              {/* AI generator placeholder */}
               {backgroundType === 'ai' && (
                 <div className="flex flex-col items-center justify-center gap-3 bg-amber-50/50 border border-amber-200/50 p-6 rounded-2xl animate-fade-in text-center">
                   <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 shadow-sm shadow-amber-500/10">
@@ -336,247 +529,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               )}
             </div>
 
-            {/* 🖼️ Upload background layout & Auto detect slots */}
-            <div className="flex flex-col gap-3.5 bg-[#f0f3ff]/55 border border-[#dee8ff]/80 p-4.5 rounded-2xl">
-              <div className="flex items-center gap-1.5 text-[#0058be]">
-                <Camera className="w-4 h-4 text-[#0058be] animate-pulse" />
-                <h3 className="text-xs font-black uppercase tracking-wider">
-                  Tải Ảnh Nền & Nhận Diện Ô
-                </h3>
-              </div>
-              
-              <div className="flex flex-col gap-2">
-                <label className="py-2.5 px-3.5 rounded-xl bg-white hover:bg-[#f0f3ff] hover:text-[#0058be] text-slate-700 border border-[#dee8ff] hover:border-[#0058be]/20 transition-all font-extrabold text-[11px] flex items-center justify-center gap-2 active:scale-95 shadow-xs cursor-pointer text-center">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        // Add as a layer element (keeps real size, shows in layers list)
-                        onAddImage(file);
-                        // Also store as bgImageUrl for detection algorithm
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                          if (event.target?.result) {
-                            onBgImageUrlChange(event.target.result as string);
-                          }
-                        };
-                        reader.readAsDataURL(file);
-                        e.target.value = '';
-                      }
-                    }}
-                    className="hidden"
-                  />
-                  <ImageIcon className="w-4 h-4 text-[#0058be]" />
-                  <span>Tải Lên Ảnh Khung Thiết Kế</span>
-                </label>
-                
-                {bgImageUrl && (
-                  <div className="relative rounded-xl overflow-hidden border border-[#dee8ff] bg-white p-1">
-                    <img 
-                      src={bgImageUrl} 
-                      alt="Uploaded frame layout preview" 
-                      className="max-h-24 object-contain w-full rounded-lg"
-                    />
-                    <button
-                      onClick={() => onBgImageUrlChange(null)}
-                      className="absolute top-2 right-2 p-1 bg-red-600 hover:bg-red-700 text-white rounded-full transition-all shadow-md active:scale-90"
-                      title="Xóa ảnh nhận diện"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {bgImageUrl && (
-                <div className="flex flex-col gap-2 bg-white/70 p-2.5 rounded-xl border border-[#dee8ff]/50 animate-fade-in">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Kiểu Nhận Diện Ô Ảnh</label>
-                    <select
-                      value={detectType}
-                      onChange={(e) => setDetectType(e.target.value as any)}
-                      className="w-full px-2 py-1.5 bg-white border border-[#dee8ff] rounded-lg text-xs font-bold text-[#111c2d]"
-                    >
-                      <option value="transparency">Ô Trong Suốt (PNG Transparency)</option>
-                      <option value="solid-green">Ô Phông Xanh (Green Screen)</option>
-                      <option value="solid-white">Ô Màu Trắng (Solid White Card)</option>
-                    </select>
-                  </div>
-
-                  <button
-                    onClick={() => onAutoDetectSlots && onAutoDetectSlots(detectType)}
-                    disabled={isDetectingSlots}
-                    className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-gradient-to-r from-[#0058be] to-[#2170e4] hover:from-[#004b9e] hover:to-[#175cc0] disabled:opacity-50 text-white font-extrabold text-xs shadow-md shadow-blue-500/10 active:scale-[0.98] transition-all"
-                  >
-                    {isDetectingSlots ? (
-                      <>
-                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Đang Nhận Diện...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4 text-white" />
-                        Tự Động Phát Hiện Ô Ảnh!
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-
           </div>
         )}
 
-        {/* ================= STICKERS/ASSETS TAB ================= */}
-        {activeTab === 'stickers' && (
-          <div className="flex flex-col gap-4.5 animate-fade-in">
-            {/* Tải Lên Tệp Tin */}
-            <div className="flex flex-col gap-2 bg-[#f0f3ff]/40 border border-[#dee8ff] p-3 rounded-2xl">
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Tải lên hình ảnh / Logo</span>
-              <label className="py-3 px-4 rounded-xl bg-white hover:bg-[#f0f3ff] hover:text-[#0058be] text-slate-700 border border-[#dee8ff] hover:border-[#0058be]/20 transition-all font-extrabold text-xs flex items-center justify-center gap-2 active:scale-95 shadow-xs cursor-pointer text-center">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      onAddImage(file);
-                      e.target.value = '';
-                    }
-                  }}
-                  className="hidden"
-                />
-                <ImageIcon className="w-4 h-4 text-[#0058be]" />
-                Tải Logo hoặc Ảnh Trang Trí
-              </label>
-              <p className="text-[9px] text-slate-400 font-semibold text-center mt-1 leading-normal">
-                Hỗ trợ định dạng PNG, JPG. Ảnh tải lên sẽ được đưa trực tiếp vào canvas.
-              </p>
-            </div>
 
-            <hr className="border-[#dee8ff]" />
 
-            {/* Thư viện sticker */}
-            <div className="flex flex-col gap-3">
-              <span className="text-[10px] text-[#0058be] font-black uppercase tracking-wider flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5" />
-                Thư Viện Nhãn Trang Trí
-              </span>
-
-              {/* Nhãn loại sticker (Category tabs) */}
-              <div className="flex flex-wrap gap-1 bg-[#f0f3ff]/65 p-1 rounded-xl border border-[#dee8ff]">
-                {[
-                  { id: 'all', label: 'Tất cả' },
-                  { id: 'y2k', label: 'Y2K/Dễ thương' },
-                  { id: 'wedding', label: 'Wedding/Love' },
-                  { id: 'party', label: 'Party/Event' },
-                  { id: 'frames', label: 'Khung/Sparks' }
-                ].map(cat => (
-                  <button
-                    key={cat.id}
-                    onClick={() => setSelectedStickerCat(cat.id)}
-                    className={`px-2 py-1 text-[9px] font-black uppercase rounded-lg transition-all ${selectedStickerCat === cat.id
-                      ? 'bg-white text-[#0058be] border border-[#dee8ff] shadow-xs font-bold'
-                      : 'text-slate-500 hover:text-[#0058be] hover:bg-white/20'
-                    }`}
-                  >
-                    {cat.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Grid hiển thị nhãn trang trí */}
-              <div className="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
-                {(() => {
-                  const filtered = selectedStickerCat === 'all'
-                    ? STICKER_TEMPLATES
-                    : STICKER_TEMPLATES.filter(st => (st as any).category === selectedStickerCat);
-
-                  return filtered.map((st, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => onAddSticker(st.url)}
-                      className="bg-white hover:bg-[#f0f3ff] aspect-square rounded-xl p-2 flex flex-col items-center justify-center gap-1 transition-all hover:scale-[1.04] active:scale-95 group border border-[#dee8ff] hover:border-[#0058be]/30 shadow-xs"
-                      title={st.name}
-                    >
-                      <img src={st.url} alt={st.name} className="w-8 h-8 group-hover:scale-110 transition-transform object-contain" />
-                      <span className="text-[8px] text-slate-500 font-semibold text-center truncate w-full group-hover:text-[#0058be]">{st.name}</span>
-                    </button>
-                  ));
-                })()}
-              </div>
-            </div>
-
-            <hr className="border-[#dee8ff]" />
-
-            {/* Mẫu chữ nghệ thuật */}
-            <div className="flex flex-col gap-3">
-              <span className="text-[10px] text-[#0058be] font-black uppercase tracking-wider flex items-center gap-1">
-                <Type className="w-3.5 h-3.5" />
-                Mẫu Chữ Nghệ Thuật
-              </span>
-              <div className="grid grid-cols-2 gap-2 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar">
-                {[
-                  { label: 'Happy Wedding', text: 'Happy Wedding', font: 'Great Vibes', color: '#e11d48' },
-                  { label: 'Save The Date', text: 'SAVE THE DATE', font: 'Outfit', color: '#1e293b' },
-                  { label: 'Best Day Ever', text: 'BEST DAY EVER', font: 'Bungee', color: '#eab308' },
-                  { label: 'Our Love Story', text: 'Our Love Story', font: 'Playfair Display', color: '#ba1a1a', italic: true },
-                  { label: 'Just Married', text: 'Just Married', font: 'Pacifico', color: '#db2777' },
-                  { label: 'Sweet Memories', text: 'Sweet Memories', font: 'Great Vibes', color: '#0f766e' },
-                  { label: 'Happy Birthday', text: 'HAPPY BIRTHDAY', font: 'Bungee', color: '#8b5cf6' },
-                  { label: 'Together Forever', text: 'Together Forever', font: 'Pacifico', color: '#0284c7' }
-                ].map((item, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      const newText: FrameElement = {
-                        id: `text_${Date.now()}_${idx}`,
-                        type: 'text',
-                        content: item.text,
-                        x: width / 2 - 150,
-                        y: height / 2 - 30,
-                        width: 300,
-                        height: 60,
-                        rotation: 0,
-                        visible: true,
-                        locked: false,
-                        style: {
-                          color: item.color,
-                          fontSize: 36,
-                          fontFamily: item.font,
-                          fontWeight: 'bold',
-                          fontStyle: item.italic ? 'italic' : 'normal',
-                          order: elements.length
-                        }
-                      };
-                      onElementsChange([...elements, newText]);
-                      onSelectElement(newText.id, 'text');
-                      onActiveTabChange('layers');
-                    }}
-                    className="bg-white hover:bg-[#f0f3ff] rounded-xl p-2.5 flex flex-col items-center justify-center gap-1 transition-all hover:scale-[1.03] active:scale-95 border border-[#dee8ff] hover:border-[#0058be]/30 shadow-xs h-15 group text-center"
-                  >
-                    <span 
-                      className="text-xs truncate w-full text-center leading-none"
-                      style={{ 
-                        fontFamily: item.font,
-                        color: item.color,
-                        fontStyle: item.italic ? 'italic' : 'normal',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {item.text}
-                    </span>
-                    <span className="text-[7px] text-slate-400 font-bold uppercase tracking-wider group-hover:text-[#0058be]/70 transition-colors">
-                      {item.font}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
         {/* ================= LAYERS TAB ================= */}
         {activeTab === 'layers' && (
           <div className="flex flex-col gap-3.5 bg-[#f0f3ff]/30 border border-[#dee8ff] rounded-2xl p-4 shadow-xs animate-fade-in">
@@ -642,7 +599,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                         <button
                           onClick={() => onDeleteElement(layer.id)}
-                          className={`p-1 rounded-lg hover:bg-rose-50 text-rose-500 hover:text-rose-655 transition-colors ${isSelected ? 'hover:bg-rose-600 hover:text-white' : ''}`}
+                          className={`p-1 rounded-lg hover:bg-rose-50 text-rose-500 hover:text-rose-600 transition-colors ${isSelected ? 'hover:bg-rose-600 hover:text-white' : ''}`}
                           title="Xóa layer"
                         >
                           <Trash className="w-3.5 h-3.5" />
@@ -660,4 +617,5 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </aside>
   );
 };
+
 export default Sidebar;

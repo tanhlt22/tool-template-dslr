@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react';
-import { Download, Upload, Sliders, RefreshCw, CheckCircle2, ShieldCheck, Image as ImageIcon } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Download, Upload, Sliders, RefreshCw, CheckCircle2, ShieldCheck, Image as ImageIcon, Cloud } from 'lucide-react';
 import JSZip from 'jszip';
 import { formatDate, generateDslrboothId } from './utils';
+import { apiService } from '../../services/api';
 
 export const OperatorTab: React.FC = () => {
   const [operatorFile, setOperatorFile] = useState<File | null>(null);
@@ -15,7 +16,17 @@ export const OperatorTab: React.FC = () => {
   const [packageSuccess, setPackageSuccess] = useState<boolean>(false);
   const [showGuide, setShowGuide] = useState<boolean>(true);
 
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
+
   const operatorCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const [userRole, setUserRole] = useState<string>('user');
+
+  useEffect(() => {
+    const role = localStorage.getItem('lumibooth_role') || 'user';
+    setUserRole(role);
+  }, []);
 
   // Load uploaded frame image
   const handleOperatorFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,6 +129,93 @@ export const OperatorTab: React.FC = () => {
     }, 1200);
   };
 
+  // Upload original frame to Cloudinary and Save Config to Supabase frames database
+  const handleSaveToSystem = async () => {
+    if (userRole !== 'admin') {
+      alert('Chỉ quản trị viên mới có quyền lưu mẫu thiết kế lên hệ thống!');
+      return;
+    }
+    if (!operatorFile || detectedSlots.length === 0) {
+      alert('Vui lòng tải ảnh lên và quét phát hiện ô ảnh trước khi lưu!');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const canvas = operatorCanvasRef.current;
+      if (!canvas) throw new Error('Canvas not loaded');
+
+      // 1. Load Cloudinary credentials from localStorage or process.env defaults
+      const cloudName = localStorage.getItem('lumibooth_cloudinary_cloud_name') || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'drd21vvuv';
+      const uploadPreset = localStorage.getItem('lumibooth_cloudinary_upload_preset') || process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'photoboth-template';
+
+      if (!cloudName || !uploadPreset) {
+        throw new Error('Vui lòng cấu hình Cloud Name và Upload Preset trong tab Quản Trị Mẫu trước!');
+      }
+
+      // 2. Direct upload original file to Cloudinary API
+      const formData = new FormData();
+      formData.append('file', operatorFile);
+      formData.append('upload_preset', uploadPreset);
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Cloudinary upload failed: ${errText}`);
+      }
+
+      const data = await res.json();
+      if (!data.secure_url) {
+        throw new Error(data.error?.message || 'Không có secure_url được trả về từ Cloudinary');
+      }
+
+      const imageUrl = data.secure_url;
+
+      // 3. Save frame layout metadata directly to Supabase
+      const payload = {
+        name: operatorFile.name.replace(/\.[^/.]+$/, "") || 'Mẫu DSLRbooth Mới',
+        width: canvas.width,
+        height: canvas.height,
+        backgroundPrompt: 'image',
+        backgroundImageUrl: imageUrl,
+        slots: detectedSlots.map(s => ({
+          id: `slot_${s.id}`,
+          x: s.x,
+          y: s.y,
+          width: s.w,
+          height: s.h,
+          rotation: 0,
+          order: s.id
+        })),
+        elements: autoAddQr ? [
+          {
+            id: 'qr_code',
+            type: 'qr',
+            content: 'https://lumibooth.com/gallery',
+            x: qrPos === 'bl' || qrPos === 'tl' ? 40 : canvas.width - Math.round(Math.min(canvas.width, canvas.height) * 0.12) - 40,
+            y: qrPos === 'tl' || qrPos === 'tr' ? 40 : canvas.height - Math.round(Math.min(canvas.width, canvas.height) * 0.12) - 40,
+            width: Math.round(Math.min(canvas.width, canvas.height) * 0.12),
+            height: Math.round(Math.min(canvas.width, canvas.height) * 0.12)
+          }
+        ] : []
+      };
+
+      await apiService.createFrame(payload);
+
+      setSaveSuccess(true);
+      alert(`Đã lưu mẫu "${payload.name}" thành công! Ảnh thô đã được upload lên Cloudinary tại địa chỉ: ${imageUrl}`);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    } catch (e: any) {
+      alert('Lỗi khi lưu mẫu lên hệ thống: ' + (e.message || e));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // Generate & Download Operator DSLRbooth template ZIP
   const handleDownloadOperatorZip = async () => {
     if (!operatorFileUrl || detectedSlots.length === 0) return;
@@ -207,19 +305,19 @@ export const OperatorTab: React.FC = () => {
       let xmlStr = `<?xml version="1.0" encoding="utf-8"?>\n`;
       xmlStr += `<Template Name="dslrbooth_auto_frame" Width="${canvas.width}" Height="${canvas.height}" Dimensions="0" Resolution="300" BackgroundColor="#FFFFFFFF" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-LUMIBOOTH">\n`;
       xmlStr += `  <Elements>\n`;
-      
+
       // Background Image (lowest ZIndex: 0)
       xmlStr += `    <Image Name="Background" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${canvas.width}" Height="${canvas.height}" Top="0" Left="0" ImagePath="background.jpg" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="0" Rotation="0" />\n`;
-      
+
       // Photos (ZIndex 1 to N)
       detectedSlots.forEach((s, idx) => {
         xmlStr += `    <Photo Name="Photo ${s.id}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${s.w}" Height="${s.h}" Top="${s.y}" Left="${s.x}" ImagePath="" KeepAspect="False" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${s.id}" ZIndex="${idx + 1}" />\n`;
       });
-      
+
       // Overlay Image (ZIndex N + 1)
       const overlayZIndex = detectedSlots.length + 1;
       xmlStr += `    <Image Name="Overlay" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${canvas.width}" Height="${canvas.height}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" Rotation="0" />\n`;
-      
+
       xmlStr += `  </Elements>\n`;
       xmlStr += `</Template>`;
       zip.file('template.xml', xmlStr);
@@ -259,7 +357,7 @@ export const OperatorTab: React.FC = () => {
         {/* Upload area */}
         <div className="flex flex-col gap-2">
           <label className="text-[10px] text-slate-450 font-black uppercase tracking-wider ml-1">Tải Lên Frame Nguyên Bản</label>
-          
+
           <div className="border-2 border-dashed border-slate-200/50 hover:border-[#0058be] rounded-2xl p-5 flex flex-col items-center justify-center gap-2 bg-slate-100 hover:bg-[#0058be]/5 transition-all cursor-pointer relative group shadow-inner">
             <input
               type="file"
@@ -283,7 +381,7 @@ export const OperatorTab: React.FC = () => {
         {/* Configurations */}
         <div className="flex flex-col gap-4">
           <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-1.5 ml-1">Cấu Hình Quét Pixel</span>
-          
+
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] text-slate-450 font-black uppercase tracking-wider ml-1">Kiểu Nhận Diện Ô Ảnh</label>
             <select
@@ -309,7 +407,7 @@ export const OperatorTab: React.FC = () => {
                 className="w-4 h-4 cursor-pointer accent-[#0058be]"
               />
             </div>
-            
+
             {autoAddQr && (
               <div className="flex flex-col gap-1.5 mt-2 pt-2 border-t border-slate-200/40">
                 <span className="text-[9px] text-slate-450 font-black uppercase ml-1">Vị Trí Đặt QR Code</span>
@@ -363,6 +461,23 @@ export const OperatorTab: React.FC = () => {
             <span>{isDetecting ? 'ĐANG QUÉT MÀU KHUNG...' : 'PHÁT HIỆN Ô TỰ ĐỘNG'}</span>
           </button>
 
+          {userRole === 'admin' && (
+            <button
+              onClick={handleSaveToSystem}
+              disabled={detectedSlots.length === 0 || isSaving}
+              className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 disabled:opacity-40 text-white rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/10 active:scale-[0.98] transition-all cursor-pointer"
+            >
+              {isSaving ? (
+                <RefreshCw className="w-4 h-4 animate-spin text-white" />
+              ) : saveSuccess ? (
+                <CheckCircle2 className="w-4 h-4 text-white" />
+              ) : (
+                <Cloud className="w-4 h-4 text-white" />
+              )}
+              <span>{isSaving ? 'ĐANG UPLOAD CLOUDINARY...' : saveSuccess ? 'ĐÃ LƯU HỆ THỐNG!' : 'LƯU LÊN CLOUDINARY & HỆ THỐNG'}</span>
+            </button>
+          )}
+
           <button
             onClick={handleDownloadOperatorZip}
             disabled={detectedSlots.length === 0 || isPackaging}
@@ -407,4 +522,5 @@ export const OperatorTab: React.FC = () => {
     </>
   );
 };
+
 export default OperatorTab;

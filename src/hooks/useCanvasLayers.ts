@@ -79,7 +79,7 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<'slot' | 'text' | 'icon' | 'image' | 'qr' | null>(null);
-  const [activeSidebarTab, setActiveSidebarTab] = useState<'canvas' | 'stickers' | 'layers'>('canvas');
+  const [activeSidebarTab, setActiveSidebarTab] = useState<'workflow' | 'canvas' | 'stickers' | 'layers'>('workflow');
 
   // Add items
   const handleAddSlot = () => {
@@ -100,11 +100,11 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     setActiveSidebarTab('layers');
   };
 
-  const handleAddText = () => {
+  const handleAddText = (customText?: string, customStyle?: Partial<FrameElement['style']>) => {
     const newText: FrameElement = {
       id: `text_${Date.now()}`,
       type: 'text',
-      content: 'Tap to Edit Text',
+      content: customText || 'Tap to Edit Text',
       x: width / 2 - 150,
       y: height / 2 - 20,
       width: 300,
@@ -117,7 +117,8 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
         fontSize: 28,
         fontFamily: 'Outfit',
         fontWeight: 'bold',
-        order: elements.length
+        order: elements.length,
+        ...customStyle
       }
     };
     setElements([...elements, newText]);
@@ -180,15 +181,8 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
         const natW = img.naturalWidth || img.width;
         const natH = img.naturalHeight || img.height;
 
-        let finalW = natW;
-        let finalH = natH;
-        if (natW > width || natH > height) {
-          const scaleX = width / natW;
-          const scaleY = height / natH;
-          const scale = Math.min(scaleX, scaleY);
-          finalW = Math.round(natW * scale);
-          finalH = Math.round(natH * scale);
-        }
+        const finalW = natW;
+        const finalH = natH;
 
         const newImage: FrameElement = {
           id: `image_${Date.now()}`,
@@ -212,6 +206,49 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
         setSelectedId(newImage.id);
         setSelectedType('image');
         setActiveSidebarTab('layers');
+      };
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddBackgroundFrame = (
+    file: File,
+    onBgImageUrlChange: (url: string | null) => void,
+    onBackgroundTypeChange: (type: 'color' | 'gradient' | 'ai') => void
+  ) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      const img = new Image();
+      img.src = dataUrl;
+      img.onload = () => {
+        const natW = img.naturalWidth || img.width;
+        const natH = img.naturalHeight || img.height;
+
+        const newBgElement: FrameElement = {
+          id: `background_frame_${Date.now()}`,
+          type: 'image',
+          content: dataUrl,
+          x: 0,
+          y: 0,
+          width: natW,
+          height: natH,
+          rotation: 0,
+          visible: true,
+          locked: false,
+          fileName: file.name,
+          style: {
+            order: -1
+          }
+        };
+
+        setElements([...elements, newBgElement]);
+        setSelectedId(newBgElement.id);
+        setSelectedType('image');
+        setActiveSidebarTab('layers');
+        
+        onBgImageUrlChange(dataUrl);
+        onBackgroundTypeChange('ai');
       };
     };
     reader.readAsDataURL(file);
@@ -382,6 +419,7 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     handleAddQr,
     handleAddSticker,
     handleAddImage,
+    handleAddBackgroundFrame,
     handleDeleteElement,
     handleDuplicateElement,
     handleMoveLayerOrder,

@@ -14,7 +14,8 @@ export async function renderBackground(
     backgroundColor: string;
     bgGradient: string;
     bgImageUrl: string | null;
-  }
+  },
+  elements?: FrameElement[]
 ): Promise<void> {
   const { backgroundType, backgroundColor, bgGradient, bgImageUrl } = options;
 
@@ -30,8 +31,9 @@ export async function renderBackground(
     ctx.fillRect(0, 0, width, height);
   }
 
-  // Draw background image if set
-  if (bgImageUrl) {
+  // Draw background image if set, ONLY if it is not present in the elements array as a layer
+  const hasBgFrameLayer = elements?.some(e => e.id.startsWith('background_frame'));
+  if (bgImageUrl && !hasBgFrameLayer) {
     const bgImg = new Image();
     bgImg.crossOrigin = 'anonymous';
     await new Promise((resolve) => {
@@ -202,7 +204,7 @@ export async function generateClientBase64(
   const ctx = canvas.getContext('2d');
   if (!ctx) return '';
 
-  await renderBackground(ctx, width, height, bgOptions);
+  await renderBackground(ctx, width, height, bgOptions, elements);
 
   // Punch slot holes
   punchSlotHoles(ctx, slots, true);
@@ -238,7 +240,7 @@ export async function generateDslrboothZip(
   bgCanvas.height = height;
   const bgCtx = bgCanvas.getContext('2d');
   if (bgCtx) {
-    await renderBackground(bgCtx, width, height, bgOptions);
+    await renderBackground(bgCtx, width, height, bgOptions, elements);
     await renderImageElements(bgCtx, elements);
   }
   const bgBlob = await new Promise<Blob | null>(res => bgCanvas.toBlob(res, 'image/jpeg', 0.95));

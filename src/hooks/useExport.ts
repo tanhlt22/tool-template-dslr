@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { FrameSlot, FrameElement } from '../types/canvas';
 import { generateClientBase64, generateDslrboothZip, simulateLocalBackground, punchSlotHoles, renderAllElements } from '../utils/canvasRenderer';
 import { createCompositeCanvas, detectSlots, DetectType } from '../utils/slotDetection';
+import { applyPersonalizationToElements, PersonalizationData } from '../utils/personalization';
 import { apiService } from '../services/api';
+
+type SidebarTab = 'workflow' | 'canvas' | 'stickers' | 'layers';
 
 interface UseExportOptions {
   width: number;
@@ -17,26 +20,36 @@ interface UseExportOptions {
   prompt: string;
   setBgImageUrl: (url: string | null) => void;
   setSlots: (slots: FrameSlot[]) => void;
-  setActiveSidebarTab: (tab: 'canvas' | 'stickers' | 'layers') => void;
+  setActiveSidebarTab: (tab: SidebarTab) => void;
+  personalization?: PersonalizationData;
+}
+
+interface ExportResult {
+  success: boolean;
+  frame_id: string;
+  image_url: string;
+  name: string;
 }
 
 export function useExport(options: UseExportOptions) {
   const {
     width, height, slots, elements, frameName,
     backgroundType, backgroundColor, bgGradient, bgImageUrl, prompt,
-    setBgImageUrl, setSlots, setActiveSidebarTab
+    setBgImageUrl, setSlots, setActiveSidebarTab, personalization
   } = options;
 
-  const [isGeneratingBg, setIsGeneratingBg] = useState<boolean>(false);
-  const [isExporting, setIsExporting] = useState<boolean>(false);
-  const [exportResult, setExportResult] = useState<any>(null);
-  const [isExportingZip, setIsExportingZip] = useState<boolean>(false);
-  const [zipExportSuccess, setZipExportSuccess] = useState<boolean>(false);
-  const [isDetectingSlots, setIsDetectingSlots] = useState<boolean>(false);
+  const [isGeneratingBg, setIsGeneratingBg] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportResult, setExportResult] = useState<ExportResult | null>(null);
+  const [isExportingZip, setIsExportingZip] = useState(false);
+  const [zipExportSuccess, setZipExportSuccess] = useState(false);
+  const [isDetectingSlots, setIsDetectingSlots] = useState(false);
 
   const bgOptions = { backgroundType, backgroundColor, bgGradient, bgImageUrl };
+  const getExportElements = () => (
+    personalization ? applyPersonalizationToElements(elements, personalization) : elements
+  );
 
-  // Generate AI background
   const handleGenerateBg = async () => {
     if (!prompt.trim()) return;
     setIsGeneratingBg(true);
@@ -45,21 +58,20 @@ export function useExport(options: UseExportOptions) {
     try {
       const data = await apiService.generateBackground(prompt, width, height);
       setBgImageUrl(data.image);
-    } catch (e) {
-      console.warn('Backend offline or failed. Starting offline browser simulation...');
+    } catch {
+      console.warn('Background API failed. Using local generated fallback.');
       setBgImageUrl(simulateLocalBackground(width, height));
     } finally {
       setIsGeneratingBg(false);
     }
   };
 
-  // Export PNG
   const handleExportPNG = async () => {
     setIsExporting(true);
     setExportResult(null);
 
     try {
-      const finalImageBase64 = await generateClientBase64(width, height, slots, elements, bgOptions);
+      const finalImageBase64 = await generateClientBase64(width, height, slots, getExportElements(), bgOptions);
       setExportResult({
         success: true,
         frame_id: `client_${Date.now().toString().slice(-6)}`,
@@ -67,13 +79,12 @@ export function useExport(options: UseExportOptions) {
         name: frameName || 'lumibooth_frame'
       });
     } catch (e) {
-      alert('Không thể xuất ảnh: ' + e);
+      alert('Cannot export PNG: ' + String(e));
     } finally {
       setIsExporting(false);
     }
   };
 
-  // Client-side mock export (preview)
   const simulateClientExport = () => {
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -82,7 +93,6 @@ export function useExport(options: UseExportOptions) {
     if (!ctx) return;
 
     const doRender = async () => {
-      // Background
       if (backgroundType === 'ai' && bgImageUrl) {
         const img = new Image();
         img.src = bgImageUrl;
@@ -103,7 +113,7 @@ export function useExport(options: UseExportOptions) {
 
       punchSlotHoles(ctx, slots, true);
       ctx.globalCompositeOperation = 'source-over';
-      await renderAllElements(ctx, elements);
+      await renderAllElements(ctx, getExportElements());
 
       setExportResult({
         success: true,
@@ -113,16 +123,15 @@ export function useExport(options: UseExportOptions) {
       });
     };
 
-    doRender();
+    void doRender();
   };
 
-  // Export DSLRbooth ZIP
   const handleExportDslrboothZip = async () => {
     setIsExportingZip(true);
     setZipExportSuccess(false);
 
     try {
-      const blob = await generateDslrboothZip(width, height, slots, elements, frameName, bgOptions);
+      const blob = await generateDslrboothZip(width, height, slots, getExportElements(), frameName, bgOptions);
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -130,21 +139,21 @@ export function useExport(options: UseExportOptions) {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
       setZipExportSuccess(true);
       setTimeout(() => setZipExportSuccess(false), 2500);
     } catch (e) {
-      alert('Không thể đóng gói ZIP: ' + e);
+      alert('Cannot package DSLRbooth ZIP: ' + String(e));
     } finally {
       setIsExportingZip(false);
     }
   };
 
-  // Auto detect slots
   const handleAutoDetectSlots = async (detectType: DetectType) => {
     const imageElements = elements.filter(el => el.type === 'image' && el.visible !== false && el.content);
     if (imageElements.length === 0 && !bgImageUrl) {
-      alert('Vui lòng tải ảnh nền/overlay có các ô ảnh lên trước!');
+      alert('Upload a background or overlay image before detecting photo slots.');
       return;
     }
 
@@ -154,30 +163,29 @@ export function useExport(options: UseExportOptions) {
       const newSlots = await detectSlots(compositeCanvas, imageElements, detectType, width, height);
 
       if (newSlots.length === 0) {
-        alert('Không nhận diện được ô ảnh nào! Vui lòng kiểm tra lại kiểu nhận diện hoặc chất lượng ảnh.');
+        alert('No photo slots detected. Try another detection mode or a cleaner overlay image.');
         return;
       }
 
       setSlots(newSlots);
       setActiveSidebarTab('layers');
-      alert(`Đã tự động nhận diện thành công ${newSlots.length} ô ảnh!`);
-    } catch (e: any) {
-      alert('Lỗi khi quét nhận diện ô ảnh: ' + (e?.message || e));
+      alert(`Detected ${newSlots.length} photo slots.`);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      alert('Slot detection failed: ' + message);
     } finally {
       setIsDetectingSlots(false);
     }
   };
 
   return {
-    // State
     isGeneratingBg,
     isExporting,
-    exportResult, setExportResult,
+    exportResult,
+    setExportResult,
     isExportingZip,
     zipExportSuccess,
     isDetectingSlots,
-
-    // Handlers
     handleGenerateBg,
     handleExportPNG,
     simulateClientExport,

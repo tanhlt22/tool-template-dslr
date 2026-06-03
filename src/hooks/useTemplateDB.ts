@@ -58,6 +58,10 @@ export function useTemplateDB(
   };
 
   const handleUpdateTemplateInDb = async () => {
+    if (userRole !== 'admin') {
+      alert('Chỉ quản trị viên mới có quyền cập nhật mẫu thiết kế!');
+      return false;
+    }
     if (!editingTemplateId) return;
     setIsSavingTemplate(true);
     try {
@@ -85,6 +89,10 @@ export function useTemplateDB(
   };
 
   const handleSaveNewTemplateToDb = async () => {
+    if (userRole !== 'admin') {
+      alert('Chỉ quản trị viên mới có quyền tạo mẫu thiết kế hệ thống!');
+      return false;
+    }
     const inputName = window.prompt('Nhập tên mẫu thiết kế DSLRbooth mới:', currentState.frameName);
     if (inputName === null) return false;
     const finalName = inputName.trim() || 'Mẫu thiết kế mới';
@@ -118,9 +126,30 @@ export function useTemplateDB(
     setHeight(frame.height);
     setPrompt(frame.background_prompt || '');
     setSlots(frame.slots || []);
-    setElements(frame.elements || []);
+    
+    const loadedElements = [...(frame.elements || [])];
+    const hasBgFrame = loadedElements.some((e: any) => e.id === 'background_frame' || (e.id && e.id.startsWith('background_frame_')));
+    if (frame.background_image_url && !hasBgFrame) {
+      loadedElements.unshift({
+        id: 'background_frame',
+        type: 'image',
+        content: frame.background_image_url,
+        x: 0,
+        y: 0,
+        width: frame.width,
+        height: frame.height,
+        rotation: 0,
+        visible: true,
+        locked: false,
+        fileName: 'background_frame.png',
+        style: {
+          order: -1
+        }
+      });
+    }
+    setElements(loadedElements);
     setBgImageUrl(frame.background_image_url || null);
-    setBackgroundType(frame.background_prompt ? 'ai' : 'color');
+    setBackgroundType((frame.background_image_url || frame.background_prompt) ? 'ai' : 'color');
 
     if (frame.slots && frame.slots.length > 0) {
       setSelectedId(frame.slots[0].id);

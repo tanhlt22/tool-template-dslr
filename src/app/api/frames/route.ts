@@ -239,6 +239,7 @@ export async function POST(req: Request) {
         }
       } catch (err: any) {
         console.error('[Frames API] Supabase save error:', err.message);
+        return NextResponse.json({ error: `Lỗi lưu Supabase: ${err.message}` }, { status: 500 });
       }
     }
 
@@ -286,6 +287,7 @@ export async function PUT(req: Request) {
         if (error) throw error;
       } catch (err: any) {
         console.error('[Frames API] Supabase update error:', err.message);
+        return NextResponse.json({ error: `Lỗi cập nhật Supabase: ${err.message}` }, { status: 500 });
       }
     }
 

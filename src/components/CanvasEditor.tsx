@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { fabric } from 'fabric';
+import { Sparkles, X } from 'lucide-react';
 import { FrameSlot, FrameElement } from '../types/canvas';
 
 interface CanvasEditorProps {
@@ -17,6 +18,8 @@ interface CanvasEditorProps {
   backgroundColor: string;
   backgroundType: 'color' | 'gradient' | 'ai';
   bgGradient: string;
+  onAutoDetectSlots?: (type: 'transparency' | 'solid-green' | 'solid-white') => void;
+  isDetectingSlots?: boolean;
 }
 
 export const CanvasEditor: React.FC<CanvasEditorProps> = ({
@@ -33,19 +36,66 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   snapToGrid,
   backgroundColor,
   backgroundType,
-  bgGradient
+  bgGradient,
+  onAutoDetectSlots,
+  isDetectingSlots = false
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvas = useRef<fabric.Canvas | null>(null);
   const isUpdatingFromProps = useRef<boolean>(false);
 
+  // Prevent any browser viewport auto-scrolling on double click/focus
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY !== 0 || window.scrollX !== 0) {
+        window.scrollTo(0, 0);
+      }
+      if (document.documentElement.scrollTop !== 0 || document.documentElement.scrollLeft !== 0) {
+        document.documentElement.scrollTop = 0;
+        document.documentElement.scrollLeft = 0;
+      }
+      if (document.body.scrollTop !== 0 || document.body.scrollLeft !== 0) {
+        document.body.scrollTop = 0;
+        document.body.scrollLeft = 0;
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
+    document.addEventListener('scroll', handleScroll, { capture: true, passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // States for automatic slot detection popup on canvas
+  const [dismissed, setDismissed] = useState(true);
+  const [detectType, setDetectType] = useState<'transparency' | 'solid-green' | 'solid-white'>('transparency');
+
+  const prevImageCountRef = useRef(0);
+  const prevBgImageUrlRef = useRef<string | null>(null);
+
+  const imageElementsCount = elements.filter(e => e.type === 'image').length;
+
+  useEffect(() => {
+    // Automatically trigger suggestion when a new image is added/uploaded
+    const bgChanged = !!(backgroundImageUrl && backgroundImageUrl !== prevBgImageUrlRef.current);
+    const countChanged = imageElementsCount > prevImageCountRef.current;
+
+    if (bgChanged || countChanged) {
+      setDismissed(false);
+    }
+
+    prevBgImageUrlRef.current = backgroundImageUrl;
+    prevImageCountRef.current = imageElementsCount;
+  }, [backgroundImageUrl, imageElementsCount]);
+
   // 1. Initialize Canvas
   useEffect(() => {
     if (!canvasRef.current) return;
 
     console.log('[CanvasEditor] Initializing Fabric.js canvas');
-    
+
     // Create fabric canvas
     const canvas = new fabric.Canvas(canvasRef.current, {
       width: width,
@@ -55,6 +105,23 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     });
 
     fabricCanvas.current = canvas;
+
+    // Prevent browser auto-scroll-to-focus on Fabric.js hidden accessibility textarea
+    const hiddenTextarea = (canvas as any).hiddenTextarea;
+    if (hiddenTextarea) {
+      hiddenTextarea.style.position = 'fixed';
+      hiddenTextarea.style.top = '0px';
+      hiddenTextarea.style.left = '0px';
+      hiddenTextarea.style.width = '0px';
+      hiddenTextarea.style.height = '0px';
+      hiddenTextarea.style.opacity = '0';
+      hiddenTextarea.style.pointerEvents = 'none';
+
+      const originalFocus = hiddenTextarea.focus;
+      hiddenTextarea.focus = function (options?: any) {
+        return originalFocus.call(this, { preventScroll: true, ...options });
+      };
+    }
 
     // Custom styling for active object borders & handles
     fabric.Object.prototype.transparentCorners = false;
@@ -115,7 +182,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     // Listen to changes
     const syncCanvasStateToReact = () => {
       if (isUpdatingFromProps.current) return;
-      
+
       const allObjects = canvas.getObjects();
       const updatedSlots: FrameSlot[] = [];
       const updatedElements: FrameElement[] = [];
@@ -123,7 +190,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       allObjects.forEach((obj) => {
         if (!obj.data) return;
         const id = obj.data.id;
-        
+
         const x = obj.left || 0;
         const y = obj.top || 0;
         const w = (obj.width || 0) * (obj.scaleX || 1);
@@ -146,7 +213,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           });
         } else if (obj.data.type === 'text') {
           const style = obj.data.style || {};
-          const textObj = obj as fabric.IText;
+          const textObj = obj as fabric.Text;
           updatedElements.push({
             id,
             type: 'text',
@@ -198,15 +265,15 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const el = containerRef.current;
       const canvasEl = el.querySelector('.canvas-container') as HTMLElement;
       if (!canvasEl) return;
-      
+
       const isMobile = el.clientWidth < 768;
       const padding = isMobile ? 24 : 40;
       const availableW = el.clientWidth - padding;
       const availableH = el.clientHeight - padding;
-      
+
       const scaleX = availableW / width;
       const scaleY = availableH / height;
-      
+
       let scale;
       if (isMobile) {
         // On mobile, scale to fit the width so it's readable, and allow vertical scrolling
@@ -215,10 +282,10 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         // On desktop, scale to fit both dimensions
         scale = Math.min(scaleX, scaleY, 1.0);
       }
-      
+
       canvasEl.style.transform = `scale(${scale})`;
       canvasEl.style.transformOrigin = 'top left';
-      
+
       // Update canvas scaler size to allow perfect scroll footprint
       const scalerEl = el.querySelector('.canvas-scaler') as HTMLElement;
       if (scalerEl) {
@@ -239,32 +306,19 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     };
   }, [width, height, snapToGrid]);
 
-  // 2. Sync background color / gradient / image
+  // 2. Sync background color / gradient
   useEffect(() => {
     const canvas = fabricCanvas.current;
     if (!canvas) return;
 
-    if (backgroundType === 'ai' && backgroundImageUrl) {
-      fabric.Image.fromURL(backgroundImageUrl, (img) => {
-        img.set({
-          originX: 'left',
-          originY: 'top',
-          scaleX: width / (img.width || width),
-          scaleY: height / (img.height || height),
-        });
-        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-      }, { crossOrigin: 'anonymous' });
-    } else if (backgroundType === 'gradient' && bgGradient) {
-      // Clear background image first
-      canvas.setBackgroundImage('', () => {});
-      
+    canvas.backgroundImage = undefined;
+    if (backgroundType === 'gradient' && bgGradient) {
       // Clean soft light blue-gray fallback for gradient inside editor
       canvas.setBackgroundColor('#dee8ff', canvas.renderAll.bind(canvas));
     } else {
-      canvas.setBackgroundImage('', () => {});
       canvas.setBackgroundColor(backgroundColor || '#ffffff', canvas.renderAll.bind(canvas));
     }
-  }, [backgroundImageUrl, backgroundType, backgroundColor, bgGradient, width, height]);
+  }, [backgroundType, backgroundColor, bgGradient, width, height]);
 
   // 3. Render Grid Overlay
   useEffect(() => {
@@ -282,7 +336,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     if (showGrid) {
       const grid = 40;
       const strokeColor = 'rgba(99, 102, 241, 0.1)';
-      
+
       // Vertical lines
       for (let i = 0; i < width; i += grid) {
         const line = new fabric.Line([i, 0, i, height], {
@@ -397,7 +451,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         applyLockStatus(existing, isLocked);
 
         if (elem.type === 'text') {
-          const textObj = existing as fabric.IText;
+          const textObj = existing as fabric.Text;
           textObj.set({
             text: elem.content,
             fill: elem.style?.color || '#ffffff',
@@ -407,7 +461,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         }
       } else {
         if (elem.type === 'text') {
-          const text = new fabric.IText(elem.content, {
+          const text = new fabric.Text(elem.content, {
             left: elem.x,
             top: elem.y,
             fontSize: elem.style?.fontSize || 24,
@@ -489,19 +543,88 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     isUpdatingFromProps.current = false;
   }, [slots, elements, selectedId]);
 
+  const hasImages = !!backgroundImageUrl || elements.some(el => el.type === 'image' && el.visible !== false && el.content);
+
   return (
-    <div 
-      ref={containerRef} 
+    <div
+      ref={containerRef}
       className="flex-1 w-full h-full flex items-center justify-center overflow-y-auto bg-[#f0f3ff] relative p-4 py-8 custom-scrollbar"
     >
       {/* Visual background grid pattern for Precision Engineering look */}
       <div className="absolute inset-0 bg-[radial-gradient(#cfdaf2_1.5px,transparent_1.5px)] [background-size:24px_24px] opacity-70 pointer-events-none" />
-      
+
       <div className="canvas-scaler relative shrink-0">
         <div className="canvas-container shadow-xl shadow-slate-200/50 absolute top-0 left-0">
           <canvas ref={canvasRef} />
         </div>
       </div>
+
+      {/* Floating suggestion panel or button for slot detection */}
+      {hasImages && (
+        dismissed ? (
+          <button
+            onClick={() => setDismissed(false)}
+            className="absolute top-4 right-4 z-10 bg-white/95 hover:bg-white backdrop-blur-md border border-[#dee8ff] hover:border-[#0058be]/30 text-[#0058be] font-extrabold text-[11px] px-3.5 py-2.5 rounded-xl shadow-md flex items-center gap-1.5 active:scale-95 transition-all font-sans"
+            title="Tự động nhận diện các ô chứa ảnh từ thiết kế"
+          >
+            <Sparkles className="w-4 h-4 text-[#0058be]" />
+            Tự động phát hiện ô ảnh
+          </button>
+        ) : (
+          <div className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-md border border-[#dee8ff] rounded-2xl p-4 shadow-xl max-w-sm flex flex-col gap-3 animate-fade-in font-sans">
+            <div className="flex items-center justify-between gap-6">
+              <h4 className="text-xs font-black text-[#0058be] uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-[#0058be]" />
+                Tự động phát hiện ô ảnh
+              </h4>
+              <button
+                onClick={() => setDismissed(true)}
+                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+                title="Bỏ qua"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <p className="text-[11px] text-slate-500 font-bold leading-normal">
+              Phát hiện và tạo tự động các ô chứa ảnh (slots) từ khung thiết kế hoặc hình ảnh bạn vừa thêm?
+            </p>
+            <div className="flex items-center gap-2">
+              <select
+                value={detectType}
+                onChange={(e) => setDetectType(e.target.value as any)}
+                className="flex-1 px-2.5 py-2 bg-white border border-[#dee8ff] rounded-xl text-[11px] font-bold text-[#111c2d] focus:outline-none"
+              >
+                <option value="transparency">Ô Trong Suốt (PNG)</option>
+                <option value="solid-green">Ô Phông Xanh (Green Screen)</option>
+                <option value="solid-white">Ô Màu Trắng (White Card)</option>
+              </select>
+              <button
+                onClick={async () => {
+                  if (onAutoDetectSlots) {
+                    await onAutoDetectSlots(detectType);
+                    setDismissed(true);
+                    setDetectType('transparency');
+                  }
+                }}
+                disabled={isDetectingSlots}
+                className="px-3.5 py-2 rounded-xl bg-[#0058be] hover:bg-[#004b9e] disabled:opacity-50 text-white font-extrabold text-[11px] active:scale-95 transition-all shadow-xs flex items-center gap-1.5 shrink-0"
+              >
+                {isDetectingSlots ? (
+                  <>
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Đang xử lý...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                    Nhận diện
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )
+      )}
     </div>
   );
 };
