@@ -134,7 +134,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       if (e.type !== 'text') return false;
       const c = (e.content || '').toUpperCase();
       return c.includes('{BRIDE}') || c.includes('{GROOM}') || c.includes('{COUPLE}') ||
-             c.includes('MINH & LAN') || c.includes('TEN CO DAU') || c.includes('CO DAU & CHU RE') || c.includes('TEN CO DAU & CHU RE');
+        c.includes('MINH & LAN') || c.includes('TEN CO DAU') || c.includes('CO DAU & CHU RE') || c.includes('TEN CO DAU & CHU RE');
     }),
     weddingDate: elements.some(e => {
       if (e.type !== 'text') return false;
@@ -204,7 +204,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }`}
         >
           <User className="w-3 h-3 text-[#0058be]" />
-          THAO TÁC
+          Mẫu Frame
         </button>
         <button
           onClick={() => onActiveTabChange('canvas')}
@@ -231,7 +231,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="flex flex-col gap-3">
               <h3 className="text-xs font-black text-[#0058be] uppercase tracking-wider flex items-center gap-1.5">
                 <FolderOpen className="w-4 h-4 text-[#0058be]" />
-                THƯ VIỆN MẪU THIẾT KẾ
+                MẪU THIẾT KẾ
               </h3>
 
               {savedFrames.length > 0 ? (
@@ -262,7 +262,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="flex flex-col gap-3">
               <h3 className="text-xs font-black text-[#0058be] uppercase tracking-wider flex items-center gap-1.5">
                 <User className="w-4 h-4 text-[#0058be]" />
-                CÁ NHÂN HÓA SỰ KIỆN
+                Thông tin sự kiện
               </h3>
 
               {hasAnyNeededField ? (

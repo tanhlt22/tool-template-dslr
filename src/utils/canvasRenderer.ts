@@ -1,6 +1,7 @@
 import { FrameSlot, FrameElement } from '../types/canvas';
 import JSZip from 'jszip';
 import { formatDate, generateDslrboothId } from '../components/dslrbooth/utils';
+import QRCode from 'qrcode';
 
 /**
  * Renders a background (color, gradient, or image) onto a canvas context.
@@ -217,7 +218,8 @@ export async function generateClientBase64(
 }
 
 /**
- * Generates a DSLRbooth ZIP file (background.jpg + overlay.png + template.xml + template.json).
+ * Generates a DSLRbooth ZIP file (background.jpg + overlay.png + preview.png + template.xml).
+ * Tuân thủ format chuẩn DSLRbooth: không có template.json, có preview.png, QrCode element trong XML.
  */
 export async function generateDslrboothZip(
   width: number,
@@ -246,51 +248,83 @@ export async function generateDslrboothZip(
   const bgBlob = await new Promise<Blob | null>(res => bgCanvas.toBlob(res, 'image/jpeg', 0.95));
   if (bgBlob) zip.file('background.jpg', bgBlob);
 
-  // B. overlay.png — render frame elements then punch out slots
+  // B. overlay.png — decoration elements (text, sticker) + đục lỗ slot. QR không vào overlay.
   const overlayCanvas = document.createElement('canvas');
   overlayCanvas.width = width;
   overlayCanvas.height = height;
   const overCtx = overlayCanvas.getContext('2d');
   if (overCtx) {
-    await renderAllElements(overCtx, elements);
+    const nonQrElements = elements.filter(e => e.type !== 'qr');
+    await renderAllElements(overCtx, nonQrElements);
     punchSlotHoles(overCtx, slots);
   }
   const overBlob = await new Promise<Blob | null>(res => overlayCanvas.toBlob(res, 'image/png'));
   if (overBlob) zip.file('overlay.png', overBlob);
 
-  // C. template.json
-  const templateJson = {
-    width,
-    height,
-    background: 'background.jpg',
-    overlay: 'overlay.png',
-    photos: slots.filter(s => s.visible !== false).map((s, idx) => ({
-      id: s.order || (idx + 1),
-      x: s.x,
-      y: s.y,
-      width: s.width,
-      height: s.height,
-      rotation: s.rotation || 0
-    })),
-    qrcode: null
-  };
-  zip.file('template.json', JSON.stringify(templateJson, null, 2));
+  // C. preview.png — ảnh xem trước tổng hợp (như bản gốc DSLRbooth)
+  const previewCanvas = document.createElement('canvas');
+  previewCanvas.width = width;
+  previewCanvas.height = height;
+  const prevCtx = previewCanvas.getContext('2d');
+  if (prevCtx) {
+    await renderBackground(prevCtx, width, height, bgOptions, elements);
+    await renderImageElements(prevCtx, elements);
+    // Vẽ slot placeholder (ô tối mờ để dễ nhận biết vị trí ảnh)
+    prevCtx.globalCompositeOperation = 'source-over';
+    for (const s of slots.filter(sl => sl.visible !== false)) {
+      prevCtx.save();
+      prevCtx.globalAlpha = 0.20;
+      prevCtx.fillStyle = '#1e293b';
+      prevCtx.fillRect(s.x, s.y, s.width, s.height);
+      prevCtx.globalAlpha = 1.0;
+      prevCtx.strokeStyle = 'rgba(255,255,255,0.12)';
+      prevCtx.lineWidth = 2;
+      prevCtx.strokeRect(s.x, s.y, s.width, s.height);
+      prevCtx.restore();
+    }
+    await renderAllElements(prevCtx, elements);
+  }
+  const prevBlob = await new Promise<Blob | null>(res => previewCanvas.toBlob(res, 'image/png'));
+  if (prevBlob) zip.file('preview.png', prevBlob);
 
-  // D. template.xml (DSLRbooth compliance format)
+  // D. template.xml — chuẩn DSLRbooth (UTF-8, CRLF, đúng thứ tự ZIndex)
   const xmlDate = formatDate();
   const xmlId = generateDslrboothId();
-  let xmlStr = `<?xml version="1.0" encoding="utf-8"?>\n`;
-  xmlStr += `<Template Name="dslrbooth_${frameName.replace(/\s+/g, '_')}" Width="${width}" Height="${height}" Dimensions="0" Resolution="300" BackgroundColor="#FFFFFFFF" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-LUMIBOOTH">\n`;
-  xmlStr += `  <Elements>\n`;
-  xmlStr += `    <Image Name="Background" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${width}" Height="${height}" Top="0" Left="0" ImagePath="background.jpg" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="0" Rotation="0" />\n`;
+  const visibleSlots = slots.filter(s => s.visible !== false);
+  const qrElements = elements.filter(e => e.type === 'qr' && e.visible !== false);
+  // ZIndex chuẩn DSLRbooth:
+  // Photos: ZIndex 1..N (PhotoNumber = ZIndex)
+  // Overlay: ZIndex = N (cùng số với photo cuối — DSLRbooth xử lý overlay riêng theo tên "overlay")
+  // QR: ZIndex = N + 1 (trên tất cả)
+  const photoCount = visibleSlots.length;
+  const overlayZIndex = photoCount; // bằng số photo cuối cùng (chuẩn DSLRbooth)
+  const qrBaseZIndex = photoCount + 1;
 
-  slots.filter(s => s.visible !== false).forEach((s, idx) => {
-    xmlStr += `    <Photo Name="Photo ${s.order || (idx + 1)}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${s.width}" Height="${s.height}" Top="${s.y}" Left="${s.x}" ImagePath="" KeepAspect="False" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${s.order || (idx + 1)}" ZIndex="${idx + 1}" />\n`;
-  });
+  let xmlStr = `<?xml version="1.0" encoding="UTF-8"?>\r\n`;
+  xmlStr += `<Template Name="dslrbooth_${frameName.replace(/\s+/g, '_')}" Width="${width}" Height="${height}" Dimensions="0" Resolution="300" BackgroundColor="#FFFFFFFF" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-HAIVUSTUDIO">\r\n`;
+  xmlStr += `  <Elements>\r\n`;
 
-  const overlayZIndex = slots.length + 1;
-  xmlStr += `    <Image Name="Overlay" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${width}" Height="${height}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" Rotation="0" />\n`;
-  xmlStr += `  </Elements>\n`;
+  // QrCode element — DSLRbooth đọc Left/Top trực tiếp từ XML
+  // Vị trí = tọa độ x/y của QR element trong canvas editor
+  for (const qr of qrElements) {
+    xmlStr += `    <QrCode Name="QR Code" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" UseUploadUrl="False" Width="${qr.width}" Height="${qr.height}" BackgroundColor="#00FFFFFF" ZIndex="${qrBaseZIndex}" Left="${qr.x}" Top="${qr.y}" />\r\n`;
+  }
+
+  // Overlay (ZIndex = số photo, list trước Photos trong XML)
+  xmlStr += `    <Image Name="overlay" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${width}" Height="${height}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" Rotation="0" />\r\n`;
+
+  // Photos: list theo thứ tự ZIndex giảm dần (Photo N → Photo 1), ZIndex = PhotoNumber
+  [...visibleSlots]
+    .sort((a, b) => (b.order ?? 0) - (a.order ?? 0))
+    .forEach((s) => {
+      const photoNum = (s.order ?? 0) + 1; // order bắt đầu từ 0 → PhotoNumber từ 1
+      xmlStr += `    <Photo Name="Photo ${photoNum}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${s.width}" Height="${s.height}" Top="${s.y}" Left="${s.x}" ImagePath="" KeepAspect="False" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${photoNum}" ZIndex="${photoNum}" />\r\n`;
+    });
+
+  // Background (ZIndex 0 — dưới cùng, list cuối trong XML)
+  xmlStr += `    <Image Name="background" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${width}" Height="${height}" Top="0" Left="0" ImagePath="background.jpg" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="0" Rotation="0" />\r\n`;
+
+  xmlStr += `  </Elements>\r\n`;
   xmlStr += `</Template>`;
   zip.file('template.xml', xmlStr);
 

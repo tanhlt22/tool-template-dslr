@@ -48,17 +48,6 @@ const DEFAULT_TEMPLATES = [
         height: 60,
         rotation: -15,
         style: { order: 1 }
-      },
-      {
-        id: "qr_kcode",
-        type: "qr",
-        content: "https://lumibooth.com/share/korean",
-        x: 230,
-        y: 1580,
-        width: 140,
-        height: 140,
-        rotation: 0,
-        style: { order: 2 }
       }
     ],
     created_at: "2026-05-30T10:00:00Z"
@@ -109,17 +98,6 @@ const DEFAULT_TEMPLATES = [
           fontWeight: "bold",
           order: 1
         }
-      },
-      {
-        id: "qr_wcode",
-        type: "qr",
-        content: "https://lumibooth.com/share/wedding",
-        x: 920,
-        y: 1530,
-        width: 180,
-        height: 180,
-        rotation: 0,
-        style: { order: 2 }
       }
     ],
     created_at: "2026-05-30T10:01:00Z"
