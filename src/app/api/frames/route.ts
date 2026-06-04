@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
-export const dynamic = 'force-dynamic';
+// CDN cache 10 phút, stale-while-revalidate 2 phút
+export const revalidate = 600;
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
@@ -176,7 +177,14 @@ export async function GET() {
   }
 
   // Prepend default templates
-  return NextResponse.json([...DEFAULT_TEMPLATES, ...dbFrames]);
+  return NextResponse.json([...DEFAULT_TEMPLATES, ...dbFrames], {
+    headers: {
+      // s-maxage: Vercel CDN cache 10 phút
+      // stale-while-revalidate: CDN serve cache cũ trong 2 phút khi đang fetch mới
+      // max-age: browser cache 5 phút
+      'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=120, max-age=300',
+    },
+  });
 }
 
 export async function POST(req: Request) {

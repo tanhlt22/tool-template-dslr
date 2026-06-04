@@ -1,5 +1,15 @@
 import { FrameConfig } from '../types/canvas';
 
+// ─── Client-side in-memory cache ────────────────────────────────────────────
+// TTL 5 phút — hợp lí vì template ít thay đổi, CDN đã cache 10 phút ở trên
+const CLIENT_CACHE_TTL = 5 * 60 * 1000; // 5 phút (ms)
+let framesCache: { data: any[]; timestamp: number } | null = null;
+
+function invalidateFramesCache() {
+  framesCache = null;
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 export const apiService = {
   /**
    * Generate an AI background using Google Gemini Imagen 3
@@ -37,13 +47,20 @@ export const apiService = {
 
   /**
    * Fetch all saved frame layouts from database
+   * Client cache: 5 phút | CDN cache: 10 phút
    */
   async getFrames(): Promise<any[]> {
+    const now = Date.now();
+    if (framesCache && now - framesCache.timestamp < CLIENT_CACHE_TTL) {
+      return framesCache.data;
+    }
     const res = await fetch('/api/frames');
     if (!res.ok) {
       throw new Error('Failed to fetch list of frames');
     }
-    return res.json();
+    const data = await res.json();
+    framesCache = { data, timestamp: now };
+    return data;
   },
 
   /**
@@ -95,6 +112,7 @@ export const apiService = {
     if (!res.ok) {
       throw new Error('Lỗi tạo mẫu thiết kế mới');
     }
+    invalidateFramesCache(); // Xóa cache để fetch lại data mới
     return res.json();
   },
 
@@ -110,6 +128,7 @@ export const apiService = {
     if (!res.ok) {
       throw new Error('Lỗi cập nhật cấu hình mẫu');
     }
+    invalidateFramesCache(); // Xóa cache để fetch lại data mới
     return res.json();
   },
 
@@ -123,6 +142,7 @@ export const apiService = {
     if (!res.ok) {
       throw new Error('Lỗi xóa mẫu thiết kế');
     }
+    invalidateFramesCache(); // Xóa cache để fetch lại data mới
     return res.json();
   }
 };
