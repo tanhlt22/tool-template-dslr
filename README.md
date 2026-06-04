@@ -1,6 +1,6 @@
-# Lumibooth AI Frame Designer
+# HaiVuStudio Frame Designer
 
-Lumibooth AI Frame Designer is a premium, high-performance interactive web application built with **React**, **Next.js**, **TypeScript**, and **Fabric.js** to design highly customizable layouts and templates for DSLR and photo booth installations.
+HaiVuStudio Frame Designer is a premium, high-performance interactive web application built with **React**, **Next.js**, **TypeScript**, and **Fabric.js** to design highly customizable layouts and templates for DSLR and photo booth installations.
 
 It leverages artificial intelligence to assist creators in building professional layouts, utilizing a responsive studio canvas, a dynamic design inspector, custom layers, asset search, and various advanced export configurations.
 

@@ -12,7 +12,7 @@ export const DEFAULT_PERSONALIZATION: PersonalizationData = {
   brideName: 'Thuy Trang',
   groomName: 'Quoc Huy',
   weddingDate: '30.12.2026',
-  galleryUrl: 'https://lumibooth.com/gallery',
+  galleryUrl: 'https://haivustudio.com/gallery',
   eventName: 'Happy Wedding Day'
 };
 
@@ -60,7 +60,7 @@ export function applyPersonalizationToElements(
       };
     }
 
-    if (element.type === 'qr' && (!element.content || element.content === 'https://lumibooth.com')) {
+    if (element.type === 'qr' && (!element.content || element.content === 'https://lumibooth.com' || element.content === 'https://haivustudio.com')) {
       return {
         ...element,
         content: data.galleryUrl

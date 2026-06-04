@@ -131,7 +131,7 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     const newQr: FrameElement = {
       id: `qr_${Date.now()}`,
       type: 'qr',
-      content: 'https://lumibooth.com',
+      content: 'https://haivustudio.com',
       x: width / 2 - 60,
       y: height / 2 - 60,
       width: 120,

@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'LumiBooth AI Frame Designer',
-        short_name: 'AI Frame Studio',
+        name: 'HaiVuStudio Frame Designer',
+        short_name: 'HaiVuStudio',
         description: 'Design dynamic layouts, texts, and stickers with Google Gemini Imagen 3',
         theme_color: '#0f172a', // Slate 900 premium dark
         background_color: '#0f172a',

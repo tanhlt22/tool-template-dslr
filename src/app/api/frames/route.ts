@@ -182,11 +182,13 @@ export async function GET() {
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (!error && data) {
+      if (error) {
+        console.error('[Frames API] Supabase query error details:', error);
+      } else if (data) {
         dbFrames = data;
       }
-    } catch (err) {
-      console.warn('[Frames API] Failed to fetch frames from Supabase, returning local db cache.');
+    } catch (err: any) {
+      console.error('[Frames API] Failed to fetch frames from Supabase, error details:', err.message || err);
     }
   }
 

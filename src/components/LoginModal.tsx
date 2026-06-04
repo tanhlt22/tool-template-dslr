@@ -128,7 +128,7 @@ export function LoginModal({ onSuccess }: LoginModalProps) {
             <Camera className="w-7 h-7 text-white" />
           </div>
           <h2 className="text-xl font-extrabold text-slate-800 tracking-tight font-sans">
-            LumiBooth AI Workspace
+            HaiVuStudio Workspace
           </h2>
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5 font-sans">
             Hệ thống quản lý tài khoản thiết kế

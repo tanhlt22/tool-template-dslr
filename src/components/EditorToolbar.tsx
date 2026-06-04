@@ -35,9 +35,55 @@ interface EditorToolbarProps {
 }
 
 const TEXT_PRESETS = [
+  // === ĐÁM CƯỚI (wedding) ===
+  {
+    name: 'Cô Dâu & Chú Rể (Nghệ thuật)',
+    text: 'Cô Dâu & Chú Rể',
+    category: 'wedding',
+    style: {
+      fontFamily: 'Great Vibes',
+      fontSize: 38,
+      fontWeight: 'bold',
+      color: '#e11d48'
+    }
+  },
+  {
+    name: 'Lễ Thành Hôn (Trang trọng)',
+    text: 'LỄ THÀNH HÔN',
+    category: 'wedding',
+    style: {
+      fontFamily: 'Cinzel',
+      fontSize: 34,
+      fontWeight: 'bold',
+      color: '#b91c1c'
+    }
+  },
+  {
+    name: 'Lễ Vu Quy (Truyền thống)',
+    text: 'LỄ VU QUY',
+    category: 'wedding',
+    style: {
+      fontFamily: 'Playfair Display',
+      fontSize: 34,
+      fontWeight: 'bold',
+      color: '#dc2626'
+    }
+  },
+  {
+    name: 'Lễ Đính Hôn (Elegant)',
+    text: 'LỄ ĐÍNH HÔN',
+    category: 'wedding',
+    style: {
+      fontFamily: 'Alex Brush',
+      fontSize: 38,
+      fontWeight: 'bold',
+      color: '#be185d'
+    }
+  },
   {
     name: 'Happy Wedding',
     text: 'Happy Wedding',
+    category: 'wedding',
     style: {
       fontFamily: 'Great Vibes',
       fontSize: 36,
@@ -48,26 +94,18 @@ const TEXT_PRESETS = [
   {
     name: 'Save The Date',
     text: 'SAVE THE DATE',
+    category: 'wedding',
     style: {
       fontFamily: 'Outfit',
-      fontSize: 36,
+      fontSize: 34,
       fontWeight: 'bold',
       color: '#1e293b'
     }
   },
   {
-    name: 'Best Day Ever',
-    text: 'BEST DAY EVER',
-    style: {
-      fontFamily: 'Bungee',
-      fontSize: 36,
-      fontWeight: 'bold',
-      color: '#eab308'
-    }
-  },
-  {
     name: 'Our Love Story',
     text: 'Our Love Story',
+    category: 'wedding',
     style: {
       fontFamily: 'Playfair Display',
       fontSize: 36,
@@ -79,6 +117,7 @@ const TEXT_PRESETS = [
   {
     name: 'Just Married',
     text: 'Just Married',
+    category: 'wedding',
     style: {
       fontFamily: 'Pacifico',
       fontSize: 36,
@@ -87,18 +126,33 @@ const TEXT_PRESETS = [
     }
   },
   {
-    name: 'Sweet Memories',
-    text: 'Sweet Memories',
+    name: 'Together Forever',
+    text: 'Together Forever',
+    category: 'wedding',
     style: {
-      fontFamily: 'Great Vibes',
+      fontFamily: 'Pacifico',
       fontSize: 36,
       fontWeight: 'bold',
-      color: '#0f766e'
+      color: '#0284c7'
+    }
+  },
+
+  // === TIỆC & SINH NHẬT (party) ===
+  {
+    name: 'Chúc Mừng Sinh Nhật (Cute)',
+    text: 'Chúc Mừng Sinh Nhật',
+    category: 'party',
+    style: {
+      fontFamily: 'Dancing Script',
+      fontSize: 34,
+      fontWeight: 'bold',
+      color: '#7c3aed'
     }
   },
   {
     name: 'Happy Birthday',
     text: 'HAPPY BIRTHDAY',
+    category: 'party',
     style: {
       fontFamily: 'Bungee',
       fontSize: 36,
@@ -107,13 +161,82 @@ const TEXT_PRESETS = [
     }
   },
   {
-    name: 'Together Forever',
-    text: 'Together Forever',
+    name: 'Best Day Ever',
+    text: 'BEST DAY EVER',
+    category: 'party',
     style: {
-      fontFamily: 'Pacifico',
+      fontFamily: 'Bungee',
       fontSize: 36,
       fontWeight: 'bold',
-      color: '#0284c7'
+      color: '#eab308'
+    }
+  },
+  {
+    name: "Let's Party (Cá tính)",
+    text: "LET'S PARTY",
+    category: 'party',
+    style: {
+      fontFamily: 'Lobster',
+      fontSize: 38,
+      fontWeight: 'bold',
+      color: '#ea580c'
+    }
+  },
+  {
+    name: 'Vui cùng bạn bè',
+    text: 'Vui Cùng Bạn Bè',
+    category: 'party',
+    style: {
+      fontFamily: 'Dancing Script',
+      fontSize: 36,
+      fontWeight: 'bold',
+      color: '#059669'
+    }
+  },
+
+  // === THƯỜNG DÙNG (general) ===
+  {
+    name: 'Kỷ Niệm Đáng Nhớ (Classic)',
+    text: 'Kỷ Niệm Đáng Nhớ',
+    category: 'general',
+    style: {
+      fontFamily: 'Playfair Display',
+      fontSize: 32,
+      fontWeight: 'bold',
+      color: '#334155'
+    }
+  },
+  {
+    name: 'Sweet Memories',
+    text: 'Sweet Memories',
+    category: 'general',
+    style: {
+      fontFamily: 'Great Vibes',
+      fontSize: 36,
+      fontWeight: 'bold',
+      color: '#0f766e'
+    }
+  },
+  {
+    name: 'Say Cheese! (Retro)',
+    text: 'SAY CHEESE!',
+    category: 'general',
+    style: {
+      fontFamily: 'Lobster',
+      fontSize: 36,
+      fontWeight: 'bold',
+      color: '#2563eb'
+    }
+  },
+  {
+    name: 'Welcome to our Party',
+    text: 'Welcome to our Party',
+    category: 'general',
+    style: {
+      fontFamily: 'Sacramento',
+      fontSize: 38,
+      fontWeight: 'bold',
+      color: '#0f172a'
     }
   }
 ];
@@ -147,6 +270,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   const [showTextMenu, setShowTextMenu] = useState(false);
   const [showStickerMenu, setShowStickerMenu] = useState(false);
   const [customText, setCustomText] = useState('');
+  const [textTab, setTextTab] = useState<'all' | 'wedding' | 'party' | 'general'>('all');
   const [stickerTab, setStickerTab] = useState<'all' | 'y2k' | 'wedding' | 'party' | 'frames'>('all');
 
   const textMenuRef = useRef<HTMLDivElement>(null);
@@ -270,11 +394,33 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                   </div>
                 </div>
 
+                {/* Categories tab for Text */}
+                <div className="flex flex-wrap gap-1 bg-[#f0f3ff]/65 p-1 rounded-xl border border-[#dee8ff]">
+                  {[
+                    { id: 'all', name: 'Tất cả' },
+                    { id: 'wedding', name: 'Đám cưới' },
+                    { id: 'party', name: 'Sinh nhật' },
+                    { id: 'general', name: 'Thông dụng' }
+                  ].map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => setTextTab(t.id as any)}
+                      className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border ${
+                        textTab === t.id
+                          ? 'bg-white text-indigo-800 border-indigo-250 shadow-xs'
+                          : 'bg-transparent text-slate-500 border-transparent hover:bg-white/40 hover:text-indigo-750'
+                      }`}
+                    >
+                      {t.name}
+                    </button>
+                  ))}
+                </div>
+
                 {/* Sample styles list */}
                 <div className="flex flex-col gap-2">
                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Chữ mẫu thiết kế</span>
                   <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-0.5 custom-scrollbar">
-                    {TEXT_PRESETS.map((preset, idx) => (
+                    {TEXT_PRESETS.filter((preset) => textTab === 'all' || preset.category === textTab).map((preset, idx) => (
                       <button
                         key={idx}
                         onClick={() => {

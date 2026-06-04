@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
         <div className="leading-tight">
           <h1 className="font-black text-xs sm:text-base text-[#111c2d]">
-            LumiBooth <span className="text-[#0058be]">AI</span>
+            HaiVu<span className="text-[#0058be]">Studio</span>
           </h1>
           <p className="text-[8px] text-slate-400 font-semibold hidden md:block">Unified photobooth template studio</p>
         </div>
@@ -66,9 +66,6 @@ export const Header: React.FC<HeaderProps> = ({
           className="bg-[#f0f3ff] hover:bg-[#dee8ff]/40 focus:bg-white border border-[#dee8ff]/50 focus:border-[#0058be]/50 rounded-xl px-3 py-1.5 text-xs font-bold text-[#111c2d] w-full focus:outline-none transition-all truncate"
           title="Design name"
         />
-        <span className="hidden lg:inline-flex px-3 py-1.5 rounded-full bg-[#0058be]/8 text-[#0058be] border border-[#0058be]/10 text-[10px] font-black uppercase tracking-wider whitespace-nowrap">
-          Unified Studio
-        </span>
       </div>
 
       <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">

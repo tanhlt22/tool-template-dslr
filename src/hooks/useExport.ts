@@ -76,7 +76,7 @@ export function useExport(options: UseExportOptions) {
         success: true,
         frame_id: `client_${Date.now().toString().slice(-6)}`,
         image_url: finalImageBase64,
-        name: frameName || 'lumibooth_frame'
+        name: frameName || 'haivustudio_frame'
       });
     } catch (e) {
       alert('Cannot export PNG: ' + String(e));

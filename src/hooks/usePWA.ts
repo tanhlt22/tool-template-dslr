@@ -26,7 +26,7 @@ export function usePWA() {
     const handleAppInstalled = () => {
       setIsInstalled(true);
       setInstallPromptEvent(null);
-      console.log('LumiBooth PWA was installed successfully!');
+      console.log('HaiVuStudio PWA was installed successfully!');
     };
 
     window.addEventListener('appinstalled', handleAppInstalled);

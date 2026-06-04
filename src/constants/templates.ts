@@ -276,7 +276,13 @@ export const GOOGLE_FONTS = [
   { name: 'Great Vibes (Mềm mại)', value: "'Great Vibes', cursive" },
   { name: 'Outfit (Sắc nét)', value: "'Outfit', sans-serif" },
   { name: 'Playfair Display (Cổ điển)', value: "'Playfair Display', serif" },
-  { name: 'Bungee (Cá tính)', value: "'Bungee', sans-serif" }
+  { name: 'Bungee (Cá tính)', value: "'Bungee', sans-serif" },
+  { name: 'Dancing Script (Bay bổng)', value: "'Dancing Script', cursive" },
+  { name: 'Cinzel (Hoàng gia)', value: "'Cinzel', serif" },
+  { name: 'Alex Brush (Mảnh mai)', value: "'Alex Brush', cursive" },
+  { name: 'Pinyon Script (Quý phái)', value: "'Pinyon Script', cursive" },
+  { name: 'Lobster (Cổ điển Retro)', value: "'Lobster', cursive" },
+  { name: 'Sacramento (Thanh lịch)', value: "'Sacramento', cursive" }
 ];
 
 export const BACKGROUND_PRESETS = [
