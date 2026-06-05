@@ -78,6 +78,23 @@ export function App() {
     setIsMobileInspectorOpen(false);
   };
 
+  const handleNewFrame = () => {
+    if (window.confirm('Tạo frame mới? Tất cả thiết kế chưa lưu trên canvas sẽ bị xóa.')) {
+      cs.setFrameName('My Premium AI Frame');
+      cs.handlePaperSizeChange('4x6'); // Resets width/height to 1200x1800 or orientation equivalents
+      cs.setBgImageUrl(null);
+      cs.setBackgroundType('color');
+      cs.setBackgroundColor('#ffffff');
+      cs.setPrompt('');
+      layers.setSlots([]);
+      layers.setElements([]);
+      layers.setSelectedId(null);
+      layers.setSelectedType(null);
+      tpl.setEditingTemplateId(null);
+      exp.setExportResult(null);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('lumibooth_auth_token');
     localStorage.removeItem('lumibooth_username');
@@ -207,6 +224,7 @@ export function App() {
             isExportingZip={exp.isExportingZip}
             zipExportSuccess={exp.zipExportSuccess}
             onExportDslrboothZip={exp.handleExportDslrboothZip}
+            onNewFrame={handleNewFrame}
           />
           <CanvasEditor
             width={cs.width}

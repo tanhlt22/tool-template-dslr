@@ -116,6 +116,23 @@ function StudioWorkspace({ onLogout }: { onLogout: () => void }) {
     setIsMobileInspectorOpen(false);
   };
 
+  const handleNewFrame = () => {
+    if (window.confirm('Tạo frame mới? Tất cả thiết kế chưa lưu trên canvas sẽ bị xóa.')) {
+      cs.setFrameName('My Premium AI Frame');
+      cs.handlePaperSizeChange('4x6'); // Resets width/height to 1200x1800 or orientation equivalents
+      cs.setBgImageUrl(null);
+      cs.setBackgroundType('color');
+      cs.setBackgroundColor('#ffffff');
+      cs.setPrompt('');
+      layers.setSlots([]);
+      layers.setElements([]);
+      layers.setSelectedId(null);
+      layers.setSelectedType(null);
+      tpl.setEditingTemplateId(null);
+      exp.setExportResult(null);
+    }
+  };
+
   return (
     <div className="w-screen h-screen flex flex-col overflow-hidden bg-[#f9f9ff] text-[#111c2d]">
       <Header
@@ -268,6 +285,7 @@ function StudioWorkspace({ onLogout }: { onLogout: () => void }) {
               isExportingZip={exp.isExportingZip}
               zipExportSuccess={exp.zipExportSuccess}
               onExportDslrboothZip={exp.handleExportDslrboothZip}
+              onNewFrame={handleNewFrame}
             />
             <CanvasEditor
               width={cs.width}

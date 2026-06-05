@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   Camera, Type, QrCode, Trash, Undo2, Redo2,
   Save, Download, CheckCircle2, RotateCw, Image as ImageIcon,
-  Smile, Upload, X
+  Smile, Upload, X, FilePlus2
 } from 'lucide-react';
 import { STICKER_TEMPLATES } from '../constants/templates';
 
@@ -32,6 +32,7 @@ interface EditorToolbarProps {
   isExportingZip: boolean;
   zipExportSuccess: boolean;
   onExportDslrboothZip: () => void;
+  onNewFrame?: () => void;
 }
 
 const TEXT_PRESETS = [
@@ -265,7 +266,8 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   onExportPNG,
   isExportingZip,
   zipExportSuccess,
-  onExportDslrboothZip
+  onExportDslrboothZip,
+  onNewFrame
 }) => {
   const [showTextMenu, setShowTextMenu] = useState(false);
   const [showStickerMenu, setShowStickerMenu] = useState(false);
@@ -564,6 +566,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             <Redo2 className="w-3.5 h-3.5" />
           </button>
         </div>
+
       </div>
 
       {/* RIGHT: Actions, Saves & Exports */}
@@ -582,11 +585,23 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
         {/* Reset button */}
         <button
           onClick={onClearCanvas}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-slate-600 bg-slate-50 hover:bg-slate-200 border border-slate-200 shadow-xs transition-all duration-150 active:scale-95"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-slate-600 bg-slate-50 hover:bg-slate-200 border border-slate-200 shadow-xs transition-all duration-150 active:scale-95 cursor-pointer"
           title="Đặt lại Canvas"
         >
           Đặt Lại
         </button>
+
+        {/* New Frame button */}
+        {onNewFrame && (
+          <button
+            onClick={onNewFrame}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-violet-750 bg-violet-50 hover:bg-violet-600 hover:text-white border border-violet-200/50 shadow-xs transition-all duration-150 active:scale-95 cursor-pointer"
+            title="Tạo Frame mới (xóa sạch và bắt đầu lại)"
+          >
+            <FilePlus2 className="w-3.5 h-3.5" />
+            <span>Frame Mới</span>
+          </button>
+        )}
 
         {/* Save Template (Admin only) */}
         {userRole === 'admin' && (
