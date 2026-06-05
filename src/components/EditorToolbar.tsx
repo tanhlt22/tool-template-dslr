@@ -304,250 +304,246 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
   return (
     <div className="bg-white/95 backdrop-blur-md border-b border-[#dee8ff] py-1.5 px-4 flex items-center justify-between shrink-0 z-20 shadow-sm gap-2 flex-wrap">
-        {/* LEFT: Creation & History Tools */}
-        <div className="flex items-center gap-2 flex-wrap">
+      {/* LEFT: Creation & History Tools */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <button
+          onClick={onAddSlot}
+          className="flex items-center justify-center p-2 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white border border-emerald-200/50 shadow-xs transition-all duration-150 active:scale-95"
+          title="Thêm Ô Ảnh (Slot)"
+        >
+          <Camera className="w-4 h-4" />
+        </button>
+
+        <label
+          className="flex items-center justify-center p-2 rounded-lg text-sky-700 bg-sky-50 hover:bg-sky-600 hover:text-white border border-sky-200/50 shadow-xs transition-all duration-150 active:scale-95 cursor-pointer"
+          title="Thêm Khung Nền"
+        >
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                onAddBackgroundFrame(file);
+                e.target.value = '';
+              }
+            }}
+            className="hidden"
+          />
+          <ImageIcon className="w-4 h-4" />
+        </label>
+
+        {/* TEXT TOOL WITH POPPING MENUS */}
+        <div className="relative">
           <button
-            onClick={onAddSlot}
-            className="flex items-center justify-center p-2 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white border border-emerald-200/50 shadow-xs transition-all duration-150 active:scale-95"
-            title="Thêm Ô Ảnh (Slot)"
+            onClick={() => {
+              setShowTextMenu(!showTextMenu);
+              setShowStickerMenu(false);
+            }}
+            className={`flex items-center justify-center p-2 rounded-lg transition-all duration-150 active:scale-95 border ${showTextMenu
+              ? 'text-white bg-indigo-650 border-indigo-650 shadow-md'
+              : 'text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white border-indigo-200/50 shadow-xs'
+              }`}
+            title="Thêm Chữ (Text)"
           >
-            <Camera className="w-4 h-4" />
+            <Type className="w-4 h-4" />
           </button>
 
-          <label 
-            className="flex items-center justify-center p-2 rounded-lg text-sky-700 bg-sky-50 hover:bg-sky-600 hover:text-white border border-sky-200/50 shadow-xs transition-all duration-150 active:scale-95 cursor-pointer"
-            title="Thêm Khung Nền"
-          >
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  onAddBackgroundFrame(file);
-                  e.target.value = '';
-                }
-              }}
-              className="hidden"
-            />
-            <ImageIcon className="w-4 h-4" />
-          </label>
-
-          {/* TEXT TOOL WITH POPPING MENUS */}
-          <div className="relative">
-            <button
-              onClick={() => {
-                setShowTextMenu(!showTextMenu);
-                setShowStickerMenu(false);
-              }}
-              className={`flex items-center justify-center p-2 rounded-lg transition-all duration-150 active:scale-95 border ${
-                showTextMenu
-                  ? 'text-white bg-indigo-650 border-indigo-650 shadow-md'
-                  : 'text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white border-indigo-200/50 shadow-xs'
-              }`}
-              title="Thêm Chữ (Text)"
-            >
-              <Type className="w-4 h-4" />
-            </button>
-            
-            {showTextMenu && (
-              <div ref={textMenuRef} className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 bg-white border border-[#dee8ff] rounded-2xl p-4 shadow-xl w-80 flex flex-col gap-3 font-sans">
-                <div className="flex items-center justify-between border-b border-[#f0f3ff] pb-2">
-                  <span className="text-[11px] font-black text-indigo-700 uppercase tracking-wider">
-                    Chữ Mẫu & Tùy Chọn
-                  </span>
-                  <button onClick={() => setShowTextMenu(false)} className="text-slate-400 hover:text-slate-650">
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-                {/* Custom text uploader */}
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Chữ tùy chọn</span>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Nhập nội dung chữ..."
-                      value={customText}
-                      onChange={(e) => setCustomText(e.target.value)}
-                      className="flex-1 min-w-0 px-2.5 py-1.5 text-xs border border-[#dee8ff] rounded-xl focus:outline-none focus:border-indigo-500 font-bold bg-slate-50/50"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && customText.trim()) {
-                          onAddText(customText.trim());
-                          setCustomText('');
-                          setShowTextMenu(false);
-                        }
-                      }}
-                    />
-                    <button
-                      onClick={() => {
-                        if (customText.trim()) {
-                          onAddText(customText.trim());
-                          setCustomText('');
-                          setShowTextMenu(false);
-                        }
-                      }}
-                      className="shrink-0 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-black transition-all active:scale-95 shadow-xs"
-                    >
-                      Thêm
-                    </button>
-                  </div>
-                </div>
-
-                {/* Categories tab for Text */}
-                <div className="flex flex-wrap gap-1 bg-[#f0f3ff]/65 p-1 rounded-xl border border-[#dee8ff]">
-                  {[
-                    { id: 'all', name: 'Tất cả' },
-                    { id: 'wedding', name: 'Đám cưới' },
-                    { id: 'party', name: 'Sinh nhật' },
-                    { id: 'general', name: 'Thông dụng' }
-                  ].map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => setTextTab(t.id as any)}
-                      className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border ${
-                        textTab === t.id
-                          ? 'bg-white text-indigo-800 border-indigo-250 shadow-xs'
-                          : 'bg-transparent text-slate-500 border-transparent hover:bg-white/40 hover:text-indigo-750'
-                      }`}
-                    >
-                      {t.name}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Sample styles list */}
-                <div className="flex flex-col gap-2">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Chữ mẫu thiết kế</span>
-                  <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-0.5 custom-scrollbar">
-                    {TEXT_PRESETS.filter((preset) => textTab === 'all' || preset.category === textTab).map((preset, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          onAddText(preset.text, preset.style);
-                          setShowTextMenu(false);
-                        }}
-                        className="w-full text-left p-2.5 rounded-xl border border-slate-100 hover:border-indigo-200/60 bg-slate-50/30 hover:bg-indigo-50/20 transition-all flex flex-col gap-1 active:scale-98"
-                      >
-                        <span className="text-[10px] font-extrabold text-slate-600 uppercase tracking-wider">{preset.name}</span>
-                        <span 
-                          className="text-xs truncate font-bold" 
-                          style={{ 
-                            fontFamily: preset.style.fontFamily, 
-                            color: preset.style.color === '#ffffff' ? '#1e293b' : preset.style.color 
-                          }}
-                        >
-                          {preset.text}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+          {showTextMenu && (
+            <div ref={textMenuRef} className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 bg-white border border-[#dee8ff] rounded-2xl p-4 shadow-xl w-80 flex flex-col gap-3 font-sans">
+              <div className="flex items-center justify-between border-b border-[#f0f3ff] pb-2">
+                <span className="text-[11px] font-black text-indigo-700 uppercase tracking-wider">
+                  Chữ Mẫu & Tùy Chọn
+                </span>
+                <button onClick={() => setShowTextMenu(false)} className="text-slate-400 hover:text-slate-650">
+                  <X className="w-3.5 h-3.5" />
+                </button>
               </div>
-            )}
-          </div>
 
-          {/* STICKER TOOL WITH POPPING MENUS */}
-          <div className="relative">
-            <button
-              onClick={() => {
-                setShowStickerMenu(!showStickerMenu);
-                setShowTextMenu(false);
-              }}
-              className={`flex items-center justify-center p-2 rounded-lg transition-all duration-150 active:scale-95 border ${
-                showStickerMenu
-                  ? 'text-white bg-amber-650 border-amber-650 shadow-md'
-                  : 'text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white border-amber-200/50 shadow-xs'
-              }`}
-              title="Thêm Sticker"
-            >
-              <Smile className="w-4 h-4" />
-            </button>
-            
-            {showStickerMenu && (
-              <div ref={stickerMenuRef} className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 bg-white border border-[#dee8ff] rounded-2xl p-4 shadow-xl w-80 flex flex-col gap-3 font-sans">
-                <div className="flex items-center justify-between border-b border-[#f0f3ff] pb-2">
-                  <span className="text-[11px] font-black text-amber-700 uppercase tracking-wider">
-                    Stickers & Hình Ảnh
-                  </span>
-                  <button onClick={() => setShowStickerMenu(false)} className="text-slate-400 hover:text-slate-650">
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-
-                {/* Custom image uploader */}
-                <label className="flex items-center justify-center gap-1.5 px-3 py-2.5 border border-dashed border-[#dee8ff] rounded-xl hover:border-amber-500 hover:bg-amber-50/10 transition-all cursor-pointer text-[10px] font-black text-slate-500 uppercase tracking-wider">
-                  <Upload className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Tự tải Sticker / Ảnh</span>
+              {/* Custom text uploader */}
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Chữ tùy chọn</span>
+                <div className="flex gap-2">
                   <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        onAddImage(file);
-                        setShowStickerMenu(false);
-                        e.target.value = '';
+                    type="text"
+                    placeholder="Nhập nội dung chữ..."
+                    value={customText}
+                    onChange={(e) => setCustomText(e.target.value)}
+                    className="flex-1 min-w-0 px-2.5 py-1.5 text-xs border border-[#dee8ff] rounded-xl focus:outline-none focus:border-indigo-500 font-bold bg-slate-50/50"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && customText.trim()) {
+                        onAddText(customText.trim());
+                        setCustomText('');
+                        setShowTextMenu(false);
                       }
                     }}
-                    className="hidden"
                   />
-                </label>
-
-                {/* Categories tab */}
-                <div className="flex flex-wrap gap-1 bg-[#f0f3ff]/65 p-1 rounded-xl border border-[#dee8ff]">
-                  {[
-                    { id: 'all', name: 'Tất cả' },
-                    { id: 'y2k', name: 'Y2K' },
-                    { id: 'wedding', name: 'Đám cưới' },
-                    { id: 'party', name: 'Tiệc tùng' },
-                    { id: 'frames', name: 'Khung/Sao' }
-                  ].map((t) => (
-                    <button
-                      key={t.id}
-                      onClick={() => setStickerTab(t.id as any)}
-                      className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border ${
-                        stickerTab === t.id
-                          ? 'bg-white text-amber-800 border-amber-250 shadow-xs'
-                          : 'bg-transparent text-slate-500 border-transparent hover:bg-white/40 hover:text-amber-700'
-                      }`}
-                    >
-                      {t.name}
-                    </button>
-                  ))}
+                  <button
+                    onClick={() => {
+                      if (customText.trim()) {
+                        onAddText(customText.trim());
+                        setCustomText('');
+                        setShowTextMenu(false);
+                      }
+                    }}
+                    className="shrink-0 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] font-black transition-all active:scale-95 shadow-xs"
+                  >
+                    Thêm
+                  </button>
                 </div>
+              </div>
 
-                {/* Grid of sample stickers */}
-                <div className="grid grid-cols-4 gap-2 max-h-56 overflow-y-auto pr-0.5 custom-scrollbar">
-                  {STICKER_TEMPLATES.filter((st) => stickerTab === 'all' || st.category === stickerTab).map((st, idx) => (
+              {/* Categories tab for Text */}
+              <div className="flex flex-wrap gap-1 bg-[#f0f3ff]/65 p-1 rounded-xl border border-[#dee8ff]">
+                {[
+                  { id: 'all', name: 'Tất cả' },
+                  { id: 'wedding', name: 'Đám cưới' },
+                  { id: 'party', name: 'Sinh nhật' },
+                  { id: 'general', name: 'Thông dụng' }
+                ].map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => setTextTab(t.id as any)}
+                    className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border ${textTab === t.id
+                      ? 'bg-white text-indigo-800 border-indigo-250 shadow-xs'
+                      : 'bg-transparent text-slate-500 border-transparent hover:bg-white/40 hover:text-indigo-750'
+                      }`}
+                  >
+                    {t.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* Sample styles list */}
+              <div className="flex flex-col gap-2">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Chữ mẫu thiết kế</span>
+                <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-0.5 custom-scrollbar">
+                  {TEXT_PRESETS.filter((preset) => textTab === 'all' || preset.category === textTab).map((preset, idx) => (
                     <button
                       key={idx}
                       onClick={() => {
-                        onAddSticker(st.url);
-                        setShowStickerMenu(false);
+                        onAddText(preset.text, preset.style);
+                        setShowTextMenu(false);
                       }}
-                      className="aspect-square p-2 border border-slate-100 hover:border-amber-250 bg-slate-50/50 hover:bg-amber-50/10 rounded-xl flex items-center justify-center transition-all duration-150 hover:scale-105 active:scale-95"
-                      title={st.name}
+                      className="w-full text-left p-2.5 rounded-xl border border-slate-100 hover:border-indigo-200/60 bg-slate-50/30 hover:bg-indigo-50/20 transition-all flex flex-col gap-1 active:scale-98"
                     >
-                      <img
-                        src={st.url}
-                        alt={st.name}
-                        className="max-w-full max-h-full object-contain pointer-events-none"
-                      />
+                      <span className="text-[10px] font-extrabold text-slate-600 uppercase tracking-wider">{preset.name}</span>
+                      <span
+                        className="text-xs truncate font-bold"
+                        style={{
+                          fontFamily: preset.style.fontFamily,
+                          color: preset.style.color === '#ffffff' ? '#1e293b' : preset.style.color
+                        }}
+                      >
+                        {preset.text}
+                      </span>
                     </button>
                   ))}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
+        {/* STICKER TOOL WITH POPPING MENUS */}
+        <div className="relative">
           <button
-            onClick={onAddQr}
-            className="flex items-center justify-center p-2 rounded-lg text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white border border-amber-200/50 shadow-xs transition-all duration-150 active:scale-95"
-            title="Thêm QR Link"
+            onClick={() => {
+              setShowStickerMenu(!showStickerMenu);
+              setShowTextMenu(false);
+            }}
+            className={`flex items-center justify-center p-2 rounded-lg transition-all duration-150 active:scale-95 border ${showStickerMenu
+              ? 'text-white bg-amber-650 border-amber-650 shadow-md'
+              : 'text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white border-amber-200/50 shadow-xs'
+              }`}
+            title="Thêm Sticker"
           >
-            <QrCode className="w-4 h-4" />
+            <Smile className="w-4 h-4" />
           </button>
+
+          {showStickerMenu && (
+            <div ref={stickerMenuRef} className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 bg-white border border-[#dee8ff] rounded-2xl p-4 shadow-xl w-80 flex flex-col gap-3 font-sans">
+              <div className="flex items-center justify-between border-b border-[#f0f3ff] pb-2">
+                <span className="text-[11px] font-black text-amber-700 uppercase tracking-wider">
+                  Stickers & Hình Ảnh
+                </span>
+                <button onClick={() => setShowStickerMenu(false)} className="text-slate-400 hover:text-slate-650">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Custom image uploader */}
+              <label className="flex items-center justify-center gap-1.5 px-3 py-2.5 border border-dashed border-[#dee8ff] rounded-xl hover:border-amber-500 hover:bg-amber-50/10 transition-all cursor-pointer text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                <Upload className="w-3.5 h-3.5 text-slate-400" />
+                <span>Tự tải Sticker / Ảnh</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      onAddImage(file);
+                      setShowStickerMenu(false);
+                      e.target.value = '';
+                    }
+                  }}
+                  className="hidden"
+                />
+              </label>
+
+              {/* Categories tab */}
+              <div className="flex flex-wrap gap-1 bg-[#f0f3ff]/65 p-1 rounded-xl border border-[#dee8ff]">
+                {[
+                  { id: 'all', name: 'Tất cả' },
+                  { id: 'y2k', name: 'Y2K' },
+                  { id: 'wedding', name: 'Đám cưới' },
+                  { id: 'party', name: 'Tiệc tùng' },
+                  { id: 'frames', name: 'Khung/Sao' }
+                ].map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => setStickerTab(t.id as any)}
+                    className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border ${stickerTab === t.id
+                      ? 'bg-white text-amber-800 border-amber-250 shadow-xs'
+                      : 'bg-transparent text-slate-500 border-transparent hover:bg-white/40 hover:text-amber-700'
+                      }`}
+                  >
+                    {t.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* Grid of sample stickers */}
+              <div className="grid grid-cols-4 gap-2 max-h-56 overflow-y-auto pr-0.5 custom-scrollbar">
+                {STICKER_TEMPLATES.filter((st) => stickerTab === 'all' || st.category === stickerTab).map((st, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      onAddSticker(st.url);
+                      setShowStickerMenu(false);
+                    }}
+                    className="aspect-square p-2 border border-slate-100 hover:border-amber-250 bg-slate-50/50 hover:bg-amber-50/10 rounded-xl flex items-center justify-center transition-all duration-150 hover:scale-105 active:scale-95"
+                    title={st.name}
+                  >
+                    <img
+                      src={st.url}
+                      alt={st.name}
+                      className="max-w-full max-h-full object-contain pointer-events-none"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={onAddQr}
+          className="flex items-center justify-center p-2 rounded-lg text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white border border-amber-200/50 shadow-xs transition-all duration-150 active:scale-95"
+          title="Thêm QR Link"
+        >
+          <QrCode className="w-4 h-4" />
+        </button>
 
         {/* History Group */}
         <div className="flex items-center gap-1 border-l border-[#dee8ff] pl-2 ml-1">

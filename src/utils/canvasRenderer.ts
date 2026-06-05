@@ -287,46 +287,43 @@ export async function generateDslrboothZip(
   const prevBlob = await new Promise<Blob | null>(res => previewCanvas.toBlob(res, 'image/png'));
   if (prevBlob) zip.file('preview.png', prevBlob);
 
-  // D. template.xml — chuẩn DSLRbooth (UTF-8, CRLF, đúng thứ tự ZIndex)
+  // D. template.xml — chuẩn DSLRbooth (UTF-8 BOM, CRLF, blank lines, đúng thứ tự ZIndex)
   const xmlDate = formatDate();
   const xmlId = generateDslrboothId();
   const visibleSlots = slots.filter(s => s.visible !== false);
   const qrElements = elements.filter(e => e.type === 'qr' && e.visible !== false);
   // ZIndex chuẩn DSLRbooth:
-  // Photos: ZIndex 1..N (PhotoNumber = ZIndex)
-  // Overlay: ZIndex = N (cùng số với photo cuối — DSLRbooth xử lý overlay riêng theo tên "overlay")
-  // QR: ZIndex = N + 1 (trên tất cả)
+  // Photos: ZIndex = PhotoNumber (1..N)
+  // Overlay: ZIndex = N (cùng số với photo cuối)
+  // QR: ZIndex = N + 1 (trên cùng)
   const photoCount = visibleSlots.length;
-  const overlayZIndex = photoCount; // bằng số photo cuối cùng (chuẩn DSLRbooth)
-  const qrBaseZIndex = photoCount + 1;
+  const overlayZIndex = photoCount;
+  const qrZIndex = photoCount + 1;
 
-  let xmlStr = `<?xml version="1.0" encoding="UTF-8"?>\r\n`;
+  // BOM (EF BB BF) bắt buộc cho .NET XML parser của DSLRbooth
+  let xmlStr = `\uFEFF<?xml version="1.0" encoding="UTF-8"?>\r\n`;
   xmlStr += `<Template Name="dslrbooth_${frameName.replace(/\s+/g, '_')}" Width="${width}" Height="${height}" Dimensions="0" Resolution="300" BackgroundColor="#FFFFFFFF" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-HAIVUSTUDIO">\r\n`;
   xmlStr += `  <Elements>\r\n`;
 
   // QrCode element — DSLRbooth đọc Left/Top trực tiếp từ XML
-  // Vị trí = tọa độ x/y của QR element trong canvas editor
   for (const qr of qrElements) {
-    xmlStr += `    <QrCode Name="QR Code" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" UseUploadUrl="False" Width="${qr.width}" Height="${qr.height}" BackgroundColor="#00FFFFFF" ZIndex="${qrBaseZIndex}" Left="${qr.x}" Top="${qr.y}" />\r\n`;
+    xmlStr += `    <QrCode Name="QR Code" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" UseUploadUrl="True" Width="${Math.round(qr.width)}" Height="${Math.round(qr.height)}" BackgroundColor="#00FFFFFF" ZIndex="${qrZIndex}" Left="${Math.round(qr.x)}" Top="${Math.round(qr.y)}" />\r\n`;
   }
 
-  // Overlay (ZIndex = số photo, list trước Photos trong XML)
+  // Overlay (ZIndex = photoCount, liệt kê trước Photos trong XML)
   xmlStr += `    <Image Name="overlay" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${width}" Height="${height}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" Rotation="0" />\r\n`;
 
   // Photos: list theo thứ tự ZIndex giảm dần (Photo N → Photo 1), ZIndex = PhotoNumber
-  [...visibleSlots]
-    .sort((a, b) => (b.order ?? 0) - (a.order ?? 0))
-    .forEach((s) => {
-      const photoNum = (s.order ?? 0) + 1; // order bắt đầu từ 0 → PhotoNumber từ 1
-      xmlStr += `    <Photo Name="Photo ${photoNum}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${s.width}" Height="${s.height}" Top="${s.y}" Left="${s.x}" ImagePath="" KeepAspect="False" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${photoNum}" ZIndex="${photoNum}" />\r\n`;
-    });
-
-  // Background (ZIndex 0 — dưới cùng, list cuối trong XML)
-  xmlStr += `    <Image Name="background" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${width}" Height="${height}" Top="0" Left="0" ImagePath="background.jpg" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="0" Rotation="0" />\r\n`;
+  const sortedSlots = [...visibleSlots].sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
+  sortedSlots.forEach((s, index) => {
+    const photoNum = photoCount - index; // luôn bắt đầu từ 1: N, N-1, ..., 1
+    xmlStr += `    <Photo Name="Photo ${photoNum}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${Math.round(s.width)}" Height="${Math.round(s.height)}" Top="${Math.round(s.y)}" Left="${Math.round(s.x)}" ImagePath="" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${photoNum}" ZIndex="${photoNum}" />\r\n`;
+  });
 
   xmlStr += `  </Elements>\r\n`;
-  xmlStr += `</Template>`;
+  xmlStr += `</Template>\r\n`;
   zip.file('template.xml', xmlStr);
 
-  return await zip.generateAsync({ type: 'blob' });
+  // DEFLATE compression (method=8) — bắt buộc theo format DSLRbooth
+  return await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
 }

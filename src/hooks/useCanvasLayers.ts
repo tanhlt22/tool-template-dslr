@@ -37,7 +37,7 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
         if (historyIndex >= 0 && historyIndex < prev.length) {
           const current = prev[historyIndex];
           if (JSON.stringify(current.slots) === JSON.stringify(newState.slots) &&
-              JSON.stringify(current.elements) === JSON.stringify(newState.elements)) {
+            JSON.stringify(current.elements) === JSON.stringify(newState.elements)) {
             return prev;
           }
         }
@@ -246,7 +246,7 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
         setSelectedId(newBgElement.id);
         setSelectedType('image');
         setActiveSidebarTab('layers');
-        
+
         onBgImageUrlChange(dataUrl);
         onBackgroundTypeChange('ai');
       };

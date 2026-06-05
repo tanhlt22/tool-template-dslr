@@ -113,9 +113,8 @@ export function App() {
         )}
 
         <div
-          className={`fixed inset-y-0 left-0 z-30 transition-transform duration-300 transform md:static md:translate-x-0 md:flex md:z-10 h-full flex shrink-0 ${
-            isMobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
-          }`}
+          className={`fixed inset-y-0 left-0 z-30 transition-transform duration-300 transform md:static md:translate-x-0 md:flex md:z-10 h-full flex shrink-0 ${isMobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
+            }`}
         >
           <Sidebar
             onOpenAISettings={() => setIsAISettingsOpen(true)}
@@ -209,7 +208,7 @@ export function App() {
             zipExportSuccess={exp.zipExportSuccess}
             onExportDslrboothZip={exp.handleExportDslrboothZip}
           />
-           <CanvasEditor
+          <CanvasEditor
             width={cs.width}
             height={cs.height}
             backgroundImageUrl={cs.bgImageUrl}
@@ -252,9 +251,8 @@ export function App() {
         )}
 
         <div
-          className={`fixed inset-y-0 right-0 z-30 transition-transform duration-300 transform md:static md:translate-x-0 md:flex md:z-10 h-full flex shrink-0 ${
-            isMobileInspectorOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full md:translate-x-0'
-          }`}
+          className={`fixed inset-y-0 right-0 z-30 transition-transform duration-300 transform md:static md:translate-x-0 md:flex md:z-10 h-full flex shrink-0 ${isMobileInspectorOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full md:translate-x-0'
+            }`}
         >
           <Inspector
             selectedId={layers.selectedId}

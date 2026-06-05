@@ -345,92 +345,60 @@ export const CoupleTab: React.FC = () => {
       const overBlob = await new Promise<Blob | null>(res => overlayCanvas.toBlob(res, 'image/png'));
       if (overBlob) zip.file('overlay.png', overBlob);
 
-      // 3. Generate template.json
-      let photos = [];
-      let qrcode = null;
+      // 3. Generate template.xml (DSLRbooth Native Format)
+      const xmlDate = formatDate();
+      const xmlId = generateDslrboothId();
+
+      // Gather slots and QR info
+      let allSlots: Array<{id: number; x: number; y: number; w: number; h: number}> = [];
+      let qrElement: {x: number; y: number; width: number; height: number} | null = null;
 
       if (isLegacy) {
-        photos = currentTemplate.slots.map((s: any) => ({
-          id: s.id,
-          x: s.x,
-          y: s.y,
-          width: s.w,
-          height: s.h,
-          rotation: 0
-        }));
-        qrcode = {
-          x: currentTemplate.qr.x,
-          y: currentTemplate.qr.y,
-          width: currentTemplate.qr.w,
-          height: currentTemplate.qr.h,
-          url: 'https://lumibooth.com/gallery'
-        };
+        allSlots = currentTemplate.slots.map((s: any) => ({ id: s.id, x: s.x, y: s.y, w: s.w, h: s.h }));
+        qrElement = { x: currentTemplate.qr.x, y: currentTemplate.qr.y, width: currentTemplate.qr.w, height: currentTemplate.qr.h };
       } else {
         const slots = currentTemplate.slots || [];
-        photos = slots.map((s: any) => ({
-          id: s.order || s.id,
-          x: s.x,
-          y: s.y,
-          width: s.width,
-          height: s.height,
-          rotation: s.rotation || 0
-        }));
-
+        allSlots = slots.map((s: any, idx: number) => ({ id: s.order || idx + 1, x: s.x, y: s.y, w: s.width, h: s.height }));
         const elements = currentTemplate.elements || [];
         const qrEl = elements.find((el: any) => el.type === 'qr');
         if (qrEl) {
-          qrcode = {
-            x: qrEl.x,
-            y: qrEl.y,
-            width: qrEl.width,
-            height: qrEl.height,
-            url: qrEl.content || 'https://lumibooth.com/gallery'
-          };
+          qrElement = { x: qrEl.x, y: qrEl.y, width: qrEl.width, height: qrEl.height };
         }
       }
 
-      const templateJson = {
-        width,
-        height,
-        background: 'background.jpg',
-        overlay: 'overlay.png',
-        photos,
-        qrcode
-      };
-      zip.file('template.json', JSON.stringify(templateJson, null, 2));
+      const photoCount = allSlots.length;
+      const overlayZIndex = photoCount;
+      const qrZIndex = photoCount + 1;
 
-      // 4. Generate template.xml (DSLRbooth Official Format)
-      const xmlDate = formatDate();
-      const xmlId = generateDslrboothId();
-      let xmlStr = `<?xml version="1.0" encoding="utf-8"?>\n`;
-      xmlStr += `<Template Name="dslrbooth_${groomName}_${brideName}" Width="${width}" Height="${height}" Dimensions="0" Resolution="300" BackgroundColor="#FFFFFFFF" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-LUMIBOOTH">\n`;
-      xmlStr += `  <Elements>\n`;
+      // BOM (EF BB BF) bắt buộc cho .NET XML parser của DSLRbooth
+      let xmlStr = `\uFEFF<?xml version="1.0" encoding="UTF-8"?>\r\n`;
+      xmlStr += `<Template Name="dslrbooth_${groomName}_${brideName}" Width="${width}" Height="${height}" Dimensions="0" Resolution="300" BackgroundColor="#FFFFFFFF" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-HAIVUSTUDIO">\r\n`;
+      xmlStr += `  <Elements>\r\n`;
 
-      // Background Image (lowest ZIndex: 0)
-      xmlStr += `    <Image Name="Background" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${width}" Height="${height}" Top="0" Left="0" ImagePath="background.jpg" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="0" Rotation="0" />\n`;
-
-      // Photos (ZIndex 1 to N)
-      if (isLegacy) {
-        currentTemplate.slots.forEach((s: any, idx: number) => {
-          xmlStr += `    <Photo Name="Photo ${s.id}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${s.w}" Height="${s.h}" Top="${s.y}" Left="${s.x}" ImagePath="" KeepAspect="False" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${s.id}" ZIndex="${idx + 1}" />\n`;
-        });
-      } else {
-        const slots = currentTemplate.slots || [];
-        slots.forEach((s: any, idx: number) => {
-          xmlStr += `    <Photo Name="Photo ${s.order || s.id}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${s.width}" Height="${s.height}" Top="${s.y}" Left="${s.x}" ImagePath="" KeepAspect="False" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${s.order || s.id}" ZIndex="${idx + 1}" />\n`;
-        });
+      // QrCode element (trên cùng)
+      if (qrElement) {
+        xmlStr += `    <QrCode Name="QR Code" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" UseUploadUrl="True" Width="${Math.round(qrElement.width)}" Height="${Math.round(qrElement.height)}" BackgroundColor="#00FFFFFF" ZIndex="${qrZIndex}" Left="${Math.round(qrElement.x)}" Top="${Math.round(qrElement.y)}" />\r\n`;
       }
 
-      // Overlay Image (ZIndex N + 1)
-      const overlayZIndex = isLegacy ? currentTemplate.slots.length + 1 : (currentTemplate.slots || []).length + 1;
-      xmlStr += `    <Image Name="Overlay" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${width}" Height="${height}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" Rotation="0" />\n`;
+      // Overlay (ZIndex = photoCount)
+      xmlStr += `    <Image Name="overlay" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${width}" Height="${height}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" Rotation="0" />\r\n`;
 
-      xmlStr += `  </Elements>\n`;
-      xmlStr += `</Template>`;
+      // Photos: list theo thứ tự ZIndex giảm dần, ZIndex = PhotoNumber (1-based)
+      [...allSlots]
+        .sort((a, b) => b.id - a.id)
+        .forEach((s) => {
+          xmlStr += `    <Photo Name="Photo ${s.id}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${Math.round(s.w)}" Height="${Math.round(s.h)}" Top="${Math.round(s.y)}" Left="${Math.round(s.x)}" ImagePath="" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${s.id}" ZIndex="${s.id}" />\r\n`;
+        });
+
+      // Background (ZIndex 0 — dưới cùng)
+      xmlStr += `    <Image Name="background" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${width}" Height="${height}" Top="0" Left="0" ImagePath="background.jpg" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="0" Rotation="0" />\r\n`;
+
+      xmlStr += `  </Elements>\r\n`;
+      xmlStr += `</Template>\r\n`;
       zip.file('template.xml', xmlStr);
 
-      // Compress and download
-      const content = await zip.generateAsync({ type: 'blob' });
+      // DEFLATE compression (method=8) — bắt buộc theo format DSLRbooth
+      const content = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
       const url = URL.createObjectURL(content);
       const link = document.createElement('a');
       link.href = url;
