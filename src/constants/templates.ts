@@ -1,251 +1,54 @@
 export const STICKER_TEMPLATES = [
-  // === Y2K & Cute (y2k) ===
-  {
-    name: 'Neon Heart',
-    category: 'y2k',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>'
-  },
-  {
-    name: 'Cute Smile',
-    category: 'y2k',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>'
-  },
-  {
-    name: 'Y2K Ribbon Bow',
-    category: 'y2k',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M12 10C8.5 6 4 6 4 10c0 3.5 4.5 4 8 2"/><path d="M12 10c3.5-4 8-4 8 0c0 3.5-4.5 4-8 2"/><path d="M10 13l-4 8"/><path d="M14 13l4 8"/></svg>'
-  },
-  {
-    name: 'Sweet Cherry',
-    category: 'y2k',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="4" fill="%23ef4444" stroke="none"/><circle cx="18" cy="16" r="4" fill="%23ef4444" stroke="none"/><path d="M6 14c2-5 6-7 12-6"/><path d="M18 10V4l-4 1.5"/></svg>'
-  },
-  {
-    name: 'Teddy Bear',
-    category: 'y2k',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="6"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="7" r="2.5"/><circle cx="9" cy="11.5" r="0.5" fill="%23b45309"/><circle cx="15" cy="11.5" r="0.5" fill="%23b45309"/><path d="M10 14.5s1 1 2 1 2-1 2-1"/></svg>'
-  },
-  {
-    name: 'Daisy Flower',
-    category: 'y2k',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" fill="%23f59e0b"/><path d="M12 2a4 4 0 0 0-4 4v2a4 4 0 0 0 8 0V6a4 4 0 0 0-4-4Z"/><path d="M12 14a4 4 0 0 0-4 4v2a4 4 0 0 0 8 0v-2a4 4 0 0 0-4-4Z"/><path d="M2 12a4 4 0 0 0 4 4h2a4 4 0 0 0 0-8H6a4 4 0 0 0-4 4Z"/><path d="M14 12a4 4 0 0 0 4 4h2a4 4 0 0 0 0-8h-2a4 4 0 0 0-4 4Z"/></svg>'
-  },
-  {
-    name: 'Growth Leaf',
-    category: 'y2k',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2310b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 3.5 1 9.8a7 7 0 0 1-13.9.2"/><path d="M9 22v-4h4"/></svg>'
-  },
-  {
-    name: 'Cute Cloud',
-    category: 'y2k',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2338bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19A3.5 3.5 0 0 0 21 15.5c0-2.79-2.54-4.5-5-4.5-.42 0-.83.04-1.24.12A6.5 6.5 0 0 0 2.5 14c0 2.76 2.24 5 5 5h10Z"/></svg>'
-  },
-  {
-    name: 'Bubble Tea',
-    category: 'y2k',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23854d0e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h2"/><path d="M7 8V3l2-1h2v6"/><circle cx="8" cy="13" r="1" fill="%23854d0e"/><circle cx="12" cy="14" r="1" fill="%23854d0e"/><circle cx="15" cy="13" r="1" fill="%23854d0e"/><circle cx="10" cy="17" r="1" fill="%23854d0e"/><circle cx="14" cy="17" r="1" fill="%23854d0e"/></svg>'
-  },
-  {
-    name: 'Magic Wand',
-    category: 'y2k',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 2 3 3L6 22l-3-3L19 2Z"/><path d="M11.5 6.5 13 5"/><path d="m16 11 1.5-1.5"/><path d="M19 8.5 21 7"/><circle cx="5" cy="5" r="1" fill="%23c084fc"/></svg>'
-  },
+  // === Watercolor Floral Corners & Frames (frames) ===
+  { name: 'Góc hoa pastel trên-trái 1', category: 'frames', url: 'https://raw.githubusercontent.com/NgodingSolusi/the-wedding-of-rehan-maulidan/main/images/background/flowers/top-left-1.svg' },
+  { name: 'Góc hoa pastel trên-phải 1', category: 'frames', url: 'https://raw.githubusercontent.com/NgodingSolusi/the-wedding-of-rehan-maulidan/main/images/background/flowers/top-right-1.svg' },
+  { name: 'Góc hoa pastel dưới-trái 1', category: 'frames', url: 'https://raw.githubusercontent.com/NgodingSolusi/the-wedding-of-rehan-maulidan/main/images/background/flowers/bottom-left-1.svg' },
+  { name: 'Góc hoa pastel dưới-phải 1', category: 'frames', url: 'https://raw.githubusercontent.com/NgodingSolusi/the-wedding-of-rehan-maulidan/main/images/background/flowers/bottom-right-1.svg' },
+  { name: 'Góc hoa pastel trên-trái 2', category: 'frames', url: 'https://raw.githubusercontent.com/NgodingSolusi/the-wedding-of-rehan-maulidan/main/images/background/flowers/top-left-2.svg' },
+  { name: 'Góc hoa pastel trên-phải 2', category: 'frames', url: 'https://raw.githubusercontent.com/NgodingSolusi/the-wedding-of-rehan-maulidan/main/images/background/flowers/top-right-3.svg' },
+  { name: 'Góc hoa pastel dưới-trái 2', category: 'frames', url: 'https://raw.githubusercontent.com/NgodingSolusi/the-wedding-of-rehan-maulidan/main/images/background/flowers/bottom-left-3.svg' },
+  { name: 'Góc hoa pastel dưới-phải 2', category: 'frames', url: 'https://raw.githubusercontent.com/NgodingSolusi/the-wedding-of-rehan-maulidan/main/images/background/flowers/bottom-right-2.svg' },
+  { name: 'Cụm hoa & lá leo bên trái', category: 'frames', url: 'https://raw.githubusercontent.com/NgodingSolusi/the-wedding-of-rehan-maulidan/main/images/background/flowers/left-1.svg' },
+  { name: 'Cụm hoa & lá leo bên phải', category: 'frames', url: 'https://raw.githubusercontent.com/NgodingSolusi/the-wedding-of-rehan-maulidan/main/images/background/flowers/right-1.svg' },
+  { name: 'Viền hoa & lá ngang trên', category: 'frames', url: 'https://raw.githubusercontent.com/NgodingSolusi/the-wedding-of-rehan-maulidan/main/images/background/flowers/top-1.svg' },
+  { name: 'Viền hoa & lá ngang dưới', category: 'frames', url: 'https://raw.githubusercontent.com/NgodingSolusi/the-wedding-of-rehan-maulidan/main/images/background/flowers/bottom-1.svg' },
+  { name: 'Hoa góc cổ điển 1', category: 'frames', url: 'https://raw.githubusercontent.com/salmanagustian/wedding-digital-invitation/master/public/assets/images/decor.png' },
+  { name: 'Hoa góc cổ điển 2', category: 'frames', url: 'https://raw.githubusercontent.com/salmanagustian/wedding-digital-invitation/master/public/assets/images/decor2.png' },
+  { name: 'Họa tiết vương miện trên', category: 'frames', url: 'https://raw.githubusercontent.com/salmanagustian/wedding-digital-invitation/master/public/assets/images/decor3.png' },
+  { name: 'Họa tiết viền đứng', category: 'frames', url: 'https://raw.githubusercontent.com/salmanagustian/wedding-digital-invitation/master/public/assets/images/decor4.png' },
+  { name: 'Dải hoa chia dòng', category: 'frames', url: 'https://raw.githubusercontent.com/daengdoang/simple-wedding-invitation/master/image/divider-flowers-leaves.png' },
+  { name: 'Cụm lá chia dòng', category: 'frames', url: 'https://raw.githubusercontent.com/daengdoang/simple-wedding-invitation/master/image/divider-leaves.png' },
 
-  // === Wedding & Love (wedding) ===
-  {
-    name: 'Double Hearts',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16c1-1.3 2-2.8 2-4.8A4.5 4.5 0 0 0 13.5 7c-1.4 0-2.4.4-3.5 1.5C8.9 7.4 7.9 7 6.5 7A4.5 4.5 0 0 0 2 11.5c0 2 1 3.5 2 4.8l6 5.7Z"/><path d="M22 9c0 1.5-1 2.8-2 3.8l-4 3.7c.3-.5.5-1.1.5-1.8A4.5 4.5 0 0 0 12 10.2c.4-.6.9-1.2 1.5-1.2A4.5 4.5 0 0 1 18 13.5"/></svg>'
-  },
-  {
-    name: 'Diamond Ring',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%233b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="7"/><path d="M12 7V3l-3 1.5L12 7zm0-4l3 1.5L12 3z"/></svg>'
-  },
-  {
-    name: 'Red Rose',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 1 9 3c0 4-4 7-9 11-5-4-9-7-9-11a5 5 0 0 1 9-3z"/><path d="M12 16v6"/><path d="M12 18c-3 0-4-2-4-2"/><path d="M12 20c3 0 4-2 4-2"/></svg>'
-  },
-  {
-    name: 'Love Letter',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><path d="M12 11v3"/></svg>'
-  },
-  {
-    name: 'Love Balloon',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12Zm0 0v5c0 1.5-1 2-2 3"/></svg>'
-  },
-  {
-    name: 'Wedding Cake',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20h14v2H5v-2Zm1-7h12v7H6v-7Zm2-6h8v6H8V7Zm1-4h6v4H9V3Z"/></svg>'
-  },
-  {
-    name: 'Key to Heart',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23db2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="3"/><path d="M9.5 14.5 17 7"/><path d="m14 10 2 2"/><path d="m16 8 2 2"/><path d="m20 4-3 3"/></svg>'
-  },
-  {
-    name: 'Wedding Bells',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ca8a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9Zm-3 9a3 3 0 0 1-6 0"/></svg>'
-  },
-  {
-    name: 'Wedding Arch',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V10a8 8 0 0 1 16 0v12"/><path d="M12 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/><path d="M6 8a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/><path d="M18 8a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/></svg>'
-  },
-  {
-    name: 'Champagne Bottle',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23dfb26b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2h2v4h-2V2Z"/><path d="M10 6h6v4l-2 3v7a2 2 0 0 1-2 2h-2v-9l-2-3V6Z"/><path d="M11 20h4"/><path d="M11 16h4"/></svg>'
-  },
-  {
-    name: 'Love Dove',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2338bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3c-1.5 2-4 3-7 3a9 9 0 0 0-8 6l2 1a4 4 0 0 1 3-1l-3 4 5-1a4 4 0 0 1 3 3l1-4a9 9 0 0 0 6-8c0-3-1-4.5-3-3Z"/><path d="M11 10.5c.5.5.5 1.5 0 2"/></svg>'
-  },
-  {
-    name: 'Wedding Dress',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l1 3-3 2-3-2 1-3Z"/><path d="M6 10c2-2 10-2 12 0l2 11H4L6 10Z"/><path d="M12 10v11"/></svg>'
-  },
-  {
-    name: 'Groom Suit',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18H4V3Z"/><path d="M12 3v18"/><path d="m4 3 8 7 8-7"/><path d="m9 10 3 3 3-3"/></svg>'
-  },
-  {
-    name: 'Save The Date',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M12 14c-1.5 0-3.5 1-3.5 3s2 3 3.5 3 3.5-1 3.5-3-2-3-3.5-3Z"/></svg>'
-  },
-  {
-    name: 'Flower Bouquet',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2310b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2.5-3 5-4.5 5-7.5s-2.5-4-5-4-5 1-5 4 2.5 4.5 5 7.5Z"/><path d="M8 12c-2.5-2.5-4.5-4.5-4.5-7.5s2.5-4 5-4 4.5 2 4.5 4.5S10.5 9.5 8 12Z"/><path d="M16 12c2.5-2.5 4.5-4.5 4.5-7.5s-2.5-4-5-4-4.5 2-4.5 4.5 2 5.5 5 7.5Z"/><path d="M12 12v9"/><path d="M10 15h4"/><path d="M9 18h6"/></svg>'
-  },
-  {
-    name: 'Heart Arrow',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M2 22 9 15M22 2 15 9M22 2l-3 1.5L22 2.5v3Z"/></svg>'
-  },
-  {
-    name: 'Bride Silhouette',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4c0 1 .5 2 1.5 2.5C6.5 9 5 11 5 13.5v1.5h14v-1.5c0-2.5-1.5-4.5-4.5-5 .5-.5 1.5-1.5 1.5-2.5a4 4 0 0 0-4-4Z"/><path d="M6 15c0 3 3 6 6 6s6-3 6-6"/></svg>'
-  },
-  {
-    name: 'Groom Silhouette',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%233b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4c0 2 2 3 4 3s4-1 4-3a4 4 0 0 0-4-4Z"/><path d="M6 14v2c0 2.5 2 4.5 4.5 4.5h3c2.5 0 4.5-2 4.5-4.5v-2"/><path d="m9 10 3 3 3-3"/><path d="M12 13v4"/></svg>'
-  },
-  {
-    name: 'Wedding Love',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path d="M8 7a2 2 0 1 0 4 0 2 2 0 1 0-4 0Z"/><path d="M12 7a2 2 0 1 0 4 0 2 2 0 1 0-4 0Z"/></svg>'
-  },
+  // === Watercolor Romantic Elements (wedding) ===
+  { name: 'Cặp chim bồ câu tình yêu', category: 'wedding', url: 'https://cdn.jsdelivr.net/gh/Input-the-output/karimyasmine-cdn/heart-doves.png' },
+  { name: 'Đôi chim ngậm ruy băng', category: 'wedding', url: 'https://cdn.jsdelivr.net/gh/Input-the-output/karimyasmine-cdn/birds.png' },
+  { name: 'Chim hồng ngậm cành hoa', category: 'wedding', url: 'https://cdn.jsdelivr.net/gh/Input-the-output/karimyasmine-cdn/pink-bird-with-flower.png' },
+  { name: 'Trái tim màu nước ngọt ngào', category: 'wedding', url: 'https://cdn.jsdelivr.net/gh/Input-the-output/karimyasmine-cdn/heart.png' },
+  { name: 'Xe hoa cưới watercolor', category: 'wedding', url: 'https://cdn.jsdelivr.net/gh/Input-the-output/karimyasmine-cdn/car.png' },
+  { name: 'Thư mời đám cưới vintage', category: 'wedding', url: 'https://cdn.jsdelivr.net/gh/Input-the-output/karimyasmine-cdn/letter.png' },
+  { name: 'Hộp quà cưới watercolor', category: 'wedding', url: 'https://cdn.jsdelivr.net/gh/Input-the-output/karimyasmine-cdn/gift.png' },
+  { name: 'Bông hồng pastel màu nước', category: 'wedding', url: 'https://cdn.jsdelivr.net/gh/Input-the-output/karimyasmine-cdn/pink-flower.png' },
+  { name: 'Bông hồng đỏ màu nước', category: 'wedding', url: 'https://cdn.jsdelivr.net/gh/Input-the-output/karimyasmine-cdn/red-flower.png' },
 
-  // === Party & Celebration (party) ===
-  {
-    name: 'Party Popper',
-    category: 'party',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"/><path d="M14 8.5C14 5.5 17 3 20 3c0 3-2.5 6-5.5 6"/><path d="m19 8.5 2.5 2.5"/><path d="m11.5 14-2.5-2.5"/><circle cx="17" cy="14" r="1" fill="%23f97316"/><circle cx="13" cy="10" r="1" fill="%23f97316"/></svg>'
-  },
-  {
-    name: 'Disco Ball',
-    category: 'party',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2306b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4 12h16"/><path d="M12 4a8 8 0 0 0 0 16"/><path d="M12 4a8 8 0 0 1 0 16"/></svg>'
-  },
-  {
-    name: 'Celebration Toast',
-    category: 'party',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23dfb26b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h5v5c0 1.5-1 3-2.5 3S6 9.5 6 8V3Z"/><path d="M18 3h-5v5c0 1.5 1 3 2.5 3s2.5-1.5 2.5-3V3Z"/><path d="M8.5 11v7"/><path d="M15.5 11v7"/><path d="M6 18h12"/></svg>'
-  },
-  {
-    name: 'Camera Badge',
-    category: 'party',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>'
-  },
-  {
-    name: 'Music Note',
-    category: 'party',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>'
-  },
-  {
-    name: 'Princess Crown',
-    category: 'party',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M5 20h14"/></svg>'
-  },
-  {
-    name: 'Gift Box',
-    category: 'party',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="8" rx="2"/><path d="M12 5V2m-3 3a3 3 0 1 1 6 0"/><path d="M12 8v14M3 13h18"/></svg>'
-  },
-  {
-    name: 'Party Hat',
-    category: 'party',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2310b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20h12L12 4z"/><path d="M12 4a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><circle cx="9" cy="15" r="1" fill="%2310b981"/><circle cx="15" cy="12" r="1" fill="%2310b981"/></svg>'
-  },
-  {
-    name: 'Popcorn Tub',
-    category: 'party',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-2 14H8L6 8Z"/><path d="M8 8a3 3 0 0 1 8 0"/><path d="M5 8c0-1.5 1.5-3 3-3s3 1.5 3 3"/><path d="M13 8c0-1.5 1.5-3 3-3s3 1.5 3 3"/></svg>'
-  },
+  // === Elegant Line Art Illustrations (wedding) ===
+  { name: 'Cặp đôi nắm tay (Line Art)', category: 'wedding', url: 'https://cdn.jsdelivr.net/gh/Input-the-output/karimyasmine-cdn/karim-and-yasmine2-no-text.png' },
+  { name: 'Cặp đôi ôm nhau (Line Art)', category: 'wedding', url: 'https://cdn.jsdelivr.net/gh/Input-the-output/karimyasmine-cdn/karim-and-yasmine3-no-text.png' },
+  { name: 'Cô dâu & Chú rể (Line Art)', category: 'wedding', url: 'https://raw.githubusercontent.com/danigonlinea/wedding.github.io/main/src/assets/svg/wedding-couple-svgrepo-com.svg' },
+  { name: 'Cặp nhẫn cưới (Line Art)', category: 'wedding', url: 'https://raw.githubusercontent.com/danigonlinea/wedding.github.io/main/src/assets/svg/golden-ring.svg' },
+  { name: 'Vòm hoa đám cưới (Line Art)', category: 'wedding', url: 'https://raw.githubusercontent.com/danigonlinea/wedding.github.io/main/src/assets/svg/wedding-arch.svg' },
+  
+  // === Elegant Party & Celebration (party) ===
+  { name: 'Ly Champagne chúc mừng (Line Art)', category: 'party', url: 'https://raw.githubusercontent.com/danigonlinea/wedding.github.io/main/src/assets/svg/champagne-svgrepo-com.svg' },
+  { name: 'Quả cầu Disco party (Line Art)', category: 'party', url: 'https://raw.githubusercontent.com/danigonlinea/wedding.github.io/main/src/assets/svg/wedding-disco.svg' },
+  { name: 'Pháo hoa rực rỡ (Line Art)', category: 'party', url: 'https://raw.githubusercontent.com/danigonlinea/wedding.github.io/main/src/assets/svg/wedding-fireworks.svg' },
+  { name: 'Hộp quà thắt nơ (Line Art)', category: 'party', url: 'https://raw.githubusercontent.com/danigonlinea/wedding.github.io/main/src/assets/svg/wedding-gift.svg' },
+  { name: 'Bàn tiệc sang trọng (Line Art)', category: 'party', url: 'https://raw.githubusercontent.com/danigonlinea/wedding.github.io/main/src/assets/svg/wedding-banquete.svg' },
+  { name: 'Cặp đôi khiêu vũ (Line Art)', category: 'party', url: 'https://raw.githubusercontent.com/danigonlinea/wedding.github.io/main/src/assets/svg/wedding-baile.svg' },
 
-  // === Sparks & Borders (frames) ===
-  {
-    name: 'Sparkle Star',
-    category: 'frames',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2322d3ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
-  },
-  {
-    name: 'Corner Starburst',
-    category: 'frames',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23facc15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v14"/><path d="M19 3 5 17"/></svg>'
-  },
-  {
-    name: 'Triple Sparks',
-    category: 'frames',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%2322d3ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1 3 3 1-3 1-1 3-1-3-3-1 3-1Zm6 11 1 2 2 1-2 1-1 2-1-2-2-1 2-1ZM6 15l.5 1.5 1.5.5-1.5.5L6 18l-.5-1.5-1.5-.5 1.5-.5Z"/></svg>'
-  },
-  {
-    name: 'Retro Bracket',
-    category: 'frames',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%230058be" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H4v18h4M16 3h4v18h-4"/></svg>'
-  },
-  {
-    name: 'Love Swans',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 19c2-2 4-3 6-3s4 1 5 3M22 19c-2-2-4-3-6-3s-4 1-5 3M8 16c0-4 2-6 4-6s4 2 4 6M12 10c-1-2-1-4-2-5c1 0 2 2 2 5Z"/></svg>'
-  },
-  {
-    name: 'Sparkly Fireworks',
-    category: 'party',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4 12h4M16 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/><circle cx="12" cy="12" r="2" fill="%23eab308"/></svg>'
-  },
-  {
-    name: 'Party Balloon Trio',
-    category: 'party',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-6 2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm12 0a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM12 13v6M6 15v5M18 15v5"/></svg>'
-  },
-  {
-    name: 'Rose Bouquet',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c1.5-2 3-3 3-5s-1.5-3-3-3-3 1-3 3 1.5 3 3 5ZM8 12c-1.5-1.5-3-2.5-3-4.5s1.5-3 3-3 3 1 3 3-1.5 2.5-3 4.5ZM16 12c1.5-1.5 3-2.5 3-4.5s-1.5-3-3-3-3 1-3 3 1.5 2.5 3 4.5ZM12 12v9l-2-2h4l-2 2"/></svg>'
-  },
-  {
-    name: 'Wedding Car',
-    category: 'wedding',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%230284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-3.7-2-5c-.6-1-1.8-1-2 0c-.7 1.3-2 5-2 5S7.3 10.6 5.5 11.1c-.8.2-1.5 1-1.5 1.9v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/></svg>'
-  },
-  {
-    name: 'Champagne Cheers',
-    category: 'party',
-    url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2050/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%23dfb26b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22h4M8 22V11M14 22h4M16 22V11M5 11h6V4H5v7ZM13 11h6V4h-6v7ZM8 4h8M12 2v2"/></svg>'
-  }
+  // === Vintage & Retro aesthetic details (y2k) ===
+  { name: 'Ngôi sao lấp lánh (Line Art)', category: 'y2k', url: 'https://img.icons8.com/?size=512&id=7EoumkdcLQEo&format=png' },
+  { name: 'Ruy băng vintage (Line Art)', category: 'y2k', url: 'https://img.icons8.com/?size=512&id=ybK9MzQigZk6&format=png' },
+  { name: 'Đám mây retro (Line Art)', category: 'y2k', url: 'https://img.icons8.com/?size=512&id=7cXrlWLO2A0K&format=png' }
 ];
 
 export const PROMPT_PRESETS = [

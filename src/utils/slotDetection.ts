@@ -379,13 +379,21 @@ export async function detectSlots(
 
   const sorted = sortDetected(detected);
 
-  return sorted.map((s, index) => ({
-    id: `slot_auto_${index + 1}_${Date.now()}`,
-    x: s.x,
-    y: s.y,
-    width: s.w,
-    height: s.h,
-    rotation: 0,
-    order: index + 1
-  }));
+  return sorted.map((s, index) => {
+    // Expand slot by 1px in all directions to overlap with the overlay border/margin
+    const newX = Math.max(0, s.x - 1);
+    const newY = Math.max(0, s.y - 1);
+    const newW = Math.min(origW - newX, s.w + 2);
+    const newH = Math.min(origH - newY, s.h + 2);
+
+    return {
+      id: `slot_auto_${index + 1}_${Date.now()}`,
+      x: newX,
+      y: newY,
+      width: newW,
+      height: newH,
+      rotation: 0,
+      order: index + 1
+    };
+  });
 }
