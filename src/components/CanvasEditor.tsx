@@ -214,6 +214,11 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         } else if (obj.data.type === 'text') {
           const style = obj.data.style || {};
           const textObj = obj as fabric.Text;
+          
+          // Bake scaling into fontSize so it exports correctly at high resolution
+          const scaleY = textObj.scaleY || 1;
+          const newFontSize = Math.round((textObj.fontSize || 24) * scaleY);
+
           updatedElements.push({
             id,
             type: 'text',
@@ -228,7 +233,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
             style: {
               ...style,
               color: textObj.fill as string || '#ffffff',
-              fontSize: textObj.fontSize || 24,
+              fontSize: newFontSize,
               fontFamily: textObj.fontFamily || 'Outfit'
             }
           });
@@ -456,7 +461,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
             text: elem.content,
             fill: elem.style?.color || '#ffffff',
             fontSize: elem.style?.fontSize || 24,
-            fontFamily: elem.style?.fontFamily || 'Outfit'
+            fontFamily: elem.style?.fontFamily || 'Outfit',
+            scaleX: 1, // Reset scale so the baked fontSize doesn't get double scaled
+            scaleY: 1
           });
         }
       } else {
