@@ -3,6 +3,23 @@ import { fabric } from 'fabric';
 import { Hand, Sparkles, X, ZoomIn, ZoomOut } from 'lucide-react';
 import { FrameSlot, FrameElement } from '../types/canvas';
 
+const globalFabricImageCache: Record<string, HTMLImageElement> = {};
+
+const loadCachedFabricImage = (url: string, callback: (img: fabric.Image) => void) => {
+  if (globalFabricImageCache[url]) {
+    const img = new fabric.Image(globalFabricImageCache[url]);
+    callback(img);
+  } else {
+    fabric.Image.fromURL(url, (img) => {
+      if (!img) return;
+      if (img.getElement()) {
+        globalFabricImageCache[url] = img.getElement() as HTMLImageElement;
+      }
+      callback(img);
+    }, { crossOrigin: 'anonymous' });
+  }
+};
+
 interface CanvasEditorProps {
   width: number;
   height: number;
@@ -761,7 +778,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           applyHitTestStatus(text);
           canvas.add(text);
         } else if (elem.type === 'icon') {
-          fabric.Image.fromURL(elem.content, (img) => {
+          loadCachedFabricImage(elem.content, (img) => {
             if (canvas !== fabricCanvas.current) return;
             img.set({
               left: elem.x,
@@ -778,9 +795,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
             canvas.add(img);
             enforceZIndex();
             canvas.renderAll();
-          }, { crossOrigin: 'anonymous' });
+          });
         } else if (elem.type === 'image') {
-          fabric.Image.fromURL(elem.content, (img) => {
+          loadCachedFabricImage(elem.content, (img) => {
             if (canvas !== fabricCanvas.current) return;
             img.set({
               left: elem.x,
@@ -797,11 +814,11 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
             canvas.add(img);
             enforceZIndex();
             canvas.renderAll();
-          }, { crossOrigin: 'anonymous' });
+          });
         } else if (elem.type === 'qr') {
           // Dynamic QR Code link visual generator
           const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(elem.content)}&size=150x150`;
-          fabric.Image.fromURL(qrUrl, (img) => {
+          loadCachedFabricImage(qrUrl, (img) => {
             if (canvas !== fabricCanvas.current) return;
             img.set({
               left: elem.x,
@@ -818,7 +835,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
             canvas.add(img);
             enforceZIndex();
             canvas.renderAll();
-          }, { crossOrigin: 'anonymous' });
+          });
         }
       }
     });
