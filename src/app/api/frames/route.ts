@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
-// CDN cache 10 phút, stale-while-revalidate 2 phút
-export const revalidate = 600;
+// Sử dụng cache của Next.js (Vercel Data Cache).
+// Cache sẽ tồn tại 1 năm nhưng sẽ được tự động xóa (purge) bằng revalidatePath khi có thay đổi.
+export const revalidate = 31536000;
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
@@ -182,7 +184,7 @@ export async function GET() {
       // s-maxage: Vercel CDN cache 10 phút
       // stale-while-revalidate: CDN serve cache cũ trong 2 phút khi đang fetch mới
       // max-age: browser cache 5 phút
-      'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=120, max-age=300',
+      'Cache-Control': 'no-store',
     },
   });
 }
@@ -218,6 +220,7 @@ export async function POST(req: Request) {
         if (error) throw error;
         
         if (data && data.length > 0) {
+          revalidatePath('/api/frames');
           return NextResponse.json({
             success: true,
             frame_id: frameId,
@@ -260,8 +263,7 @@ export async function PUT(req: Request) {
       background_prompt: backgroundPrompt || '',
       background_image_url: backgroundImageUrl || null,
       slots: slots || [],
-      elements: elements || [],
-      updated_at: new Date().toISOString()
+      elements: elements || []
     };
 
     if (SUPABASE_URL && SUPABASE_KEY) {
@@ -273,6 +275,8 @@ export async function PUT(req: Request) {
           .eq('id', id);
 
         if (error) throw error;
+        
+        revalidatePath('/api/frames');
       } catch (err: any) {
         console.error('[Frames API] Supabase update error:', err.message);
         return NextResponse.json({ error: `Lỗi cập nhật Supabase: ${err.message}` }, { status: 500 });
@@ -306,6 +310,8 @@ export async function DELETE(req: Request) {
           .eq('id', id);
 
         if (error) throw error;
+        
+        revalidatePath('/api/frames');
       } catch (err: any) {
         console.error('[Frames API] Supabase delete error:', err.message);
       }

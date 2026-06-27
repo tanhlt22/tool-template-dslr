@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { FrameSlot, FrameElement } from '../types/canvas';
+import { useUI } from '../contexts/UIContext';
 
 interface UseCanvasLayersOptions {
   width: number;
@@ -80,6 +81,12 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<'slot' | 'text' | 'icon' | 'image' | 'qr' | null>(null);
   const [activeSidebarTab, setActiveSidebarTab] = useState<'workflow' | 'canvas' | 'stickers' | 'layers'>('workflow');
+  const { showConfirm } = useUI();
+
+  const getNextPhotoOrder = () => {
+    if (slots.length === 0) return 1;
+    return Math.max(...slots.map((slot) => Number(slot.order) || 1)) + 1;
+  };
 
   // Add items
   const handleAddSlot = () => {
@@ -90,7 +97,7 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
       width: 300,
       height: 200,
       rotation: 0,
-      order: slots.length,
+      order: getNextPhotoOrder(),
       visible: true,
       locked: false
     };
@@ -104,7 +111,7 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     const newText: FrameElement = {
       id: `text_${Date.now()}`,
       type: 'text',
-      content: customText || 'Tap to Edit Text',
+      content: customText || 'Nhap chu',
       x: width / 2 - 150,
       y: height / 2 - 20,
       width: 300,
@@ -181,18 +188,25 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
         const natW = img.naturalWidth || img.width;
         const natH = img.naturalHeight || img.height;
 
-        const finalW = natW;
-        const finalH = natH;
+        const selectedSlot = selectedType === 'slot' ? slots.find(slot => slot.id === selectedId) : null;
+        const targetW = selectedSlot ? selectedSlot.width : width * 0.7;
+        const targetH = selectedSlot ? selectedSlot.height : height * 0.7;
+        const containScale = Math.min(targetW / natW, targetH / natH, selectedSlot ? Number.POSITIVE_INFINITY : 1);
+        const finalW = Math.round(natW * containScale);
+        const finalH = Math.round(natH * containScale);
+        const finalX = selectedSlot ? selectedSlot.x + (selectedSlot.width - finalW) / 2 : (width - finalW) / 2;
+        const finalY = selectedSlot ? selectedSlot.y + (selectedSlot.height - finalH) / 2 : (height - finalH) / 2;
+        const finalRotation = selectedSlot ? selectedSlot.rotation || 0 : 0;
 
         const newImage: FrameElement = {
           id: `image_${Date.now()}`,
           type: 'image',
           content: dataUrl,
-          x: 0,
-          y: 0,
+          x: finalX,
+          y: finalY,
           width: finalW,
           height: finalH,
-          rotation: 0,
+          rotation: finalRotation,
           visible: true,
           locked: false,
           lockRatio: true,
@@ -271,10 +285,12 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
         ...slot,
         id: `slot_${Date.now()}`,
         x: Math.min(slot.x + 30, width - 100),
-        y: Math.min(slot.y + 30, height - 100),
-        order: slots.length
+        y: Math.min(slot.y + 30, height - 100)
       };
       setSlots([...slots, duplicatedSlot]);
+      setSelectedId(duplicatedSlot.id);
+      setSelectedType('slot');
+      setActiveSidebarTab('layers');
       return;
     }
     const elem = elements.find(e => e.id === id);
@@ -290,6 +306,9 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
         }
       };
       setElements([...elements, duplicatedElem]);
+      setSelectedId(duplicatedElem.id);
+      setSelectedType(elem.type);
+      setActiveSidebarTab('layers');
     }
   };
 
@@ -300,14 +319,14 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
       if (dir === 'up' && idx < slots.length - 1) {
         const next = slots[idx + 1];
         const updated = [...slots];
-        updated[idx] = { ...next, order: idx };
-        updated[idx + 1] = { ...slots[idx], order: idx + 1 };
+        updated[idx] = next;
+        updated[idx + 1] = slots[idx];
         setSlots(updated);
       } else if (dir === 'down' && idx > 0) {
         const prev = slots[idx - 1];
         const updated = [...slots];
-        updated[idx] = { ...prev, order: idx };
-        updated[idx - 1] = { ...slots[idx], order: idx - 1 };
+        updated[idx] = prev;
+        updated[idx - 1] = slots[idx];
         setSlots(updated);
       }
     } else {
@@ -388,8 +407,14 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     }
   };
 
-  const handleClearCanvas = () => {
-    if (confirm('Xóa sạch mọi layers và slots của canvas hiện tại?')) {
+  const handleClearCanvas = async () => {
+    const ok = await showConfirm({
+      title: 'Đặt lại Canvas',
+      message: 'Xóa sạch mọi layer và ô ảnh của canvas hiện tại?',
+      confirmText: 'Xóa',
+      cancelText: 'Hủy',
+    });
+    if (ok) {
       setSlots([]);
       setElements([]);
       setSelectedId(null);

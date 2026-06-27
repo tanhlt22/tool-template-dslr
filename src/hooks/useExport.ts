@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FrameSlot, FrameElement } from '../types/canvas';
 import { generateClientBase64, generateDslrboothZip, simulateLocalBackground, punchSlotHoles, renderAllElements } from '../utils/canvasRenderer';
 import { createCompositeCanvas, detectSlots, DetectType } from '../utils/slotDetection';
+import { useUI } from '../contexts/UIContext';
 import { applyPersonalizationToElements, PersonalizationData } from '../utils/personalization';
 import { apiService } from '../services/api';
 
@@ -43,6 +44,7 @@ export function useExport(options: UseExportOptions) {
   const [exportResult, setExportResult] = useState<ExportResult | null>(null);
   const [isExportingZip, setIsExportingZip] = useState(false);
   const [zipExportSuccess, setZipExportSuccess] = useState(false);
+  const { showToast } = useUI();
   const [isDetectingSlots, setIsDetectingSlots] = useState(false);
 
   const bgOptions = { backgroundType, backgroundColor, bgGradient, bgImageUrl };
@@ -79,7 +81,7 @@ export function useExport(options: UseExportOptions) {
         name: frameName || 'haivustudio_frame'
       });
     } catch (e) {
-      alert('Cannot export PNG: ' + String(e));
+      showToast('Không thể xuất ảnh PNG: ' + String(e), 'error');
     } finally {
       setIsExporting(false);
     }
@@ -144,7 +146,7 @@ export function useExport(options: UseExportOptions) {
       setZipExportSuccess(true);
       setTimeout(() => setZipExportSuccess(false), 2500);
     } catch (e) {
-      alert('Cannot package DSLRbooth ZIP: ' + String(e));
+      showToast('Không thể đóng gói DSLRbooth ZIP: ' + String(e), 'error');
     } finally {
       setIsExportingZip(false);
     }
@@ -153,7 +155,7 @@ export function useExport(options: UseExportOptions) {
   const handleAutoDetectSlots = async (detectType: DetectType) => {
     const imageElements = elements.filter(el => el.type === 'image' && el.visible !== false && el.content);
     if (imageElements.length === 0 && !bgImageUrl) {
-      alert('Upload a background or overlay image before detecting photo slots.');
+      showToast('Vui lòng tải lên ảnh khung (Frame) trước khi quét.', 'error');
       return;
     }
 
@@ -163,16 +165,16 @@ export function useExport(options: UseExportOptions) {
       const newSlots = await detectSlots(compositeCanvas, imageElements, detectType, width, height);
 
       if (newSlots.length === 0) {
-        alert('No photo slots detected. Try another detection mode or a cleaner overlay image.');
+        showToast('Không tìm thấy ô ảnh nào. Thử chế độ quét khác hoặc tải ảnh khác lên.', 'info');
         return;
       }
 
       setSlots(newSlots);
       setActiveSidebarTab('layers');
-      alert(`Detected ${newSlots.length} photo slots.`);
+      showToast(`Đã quét thành công và tạo ${newSlots.length} ô ảnh.`, 'success');
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      alert('Slot detection failed: ' + message);
+      showToast('Lỗi khi quét khung: ' + message, 'error');
     } finally {
       setIsDetectingSlots(false);
     }

@@ -1,7 +1,7 @@
 {
-  "name": "HaiVuStudio",
-  "short_name": "HaiVuStudio",
-  "description": "Premium DSLRbooth & Photobooth Studio Frame Designer",
+  "name": "Tanh Photobooth",
+  "short_name": "Tanh Photobooth",
+  "description": "Phần mềm thiết kế khung hình thông minh Tanh Photobooth",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",

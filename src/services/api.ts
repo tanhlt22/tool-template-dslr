@@ -1,8 +1,7 @@
 import { FrameConfig } from '../types/canvas';
 
 // ─── Client-side in-memory cache ────────────────────────────────────────────
-// TTL 5 phút — hợp lí vì template ít thay đổi, CDN đã cache 10 phút ở trên
-const CLIENT_CACHE_TTL = 5 * 60 * 1000; // 5 phút (ms)
+const CLIENT_CACHE_TTL = 0;
 let framesCache: { data: any[]; timestamp: number } | null = null;
 
 function invalidateFramesCache() {
@@ -51,10 +50,10 @@ export const apiService = {
    */
   async getFrames(): Promise<any[]> {
     const now = Date.now();
-    if (framesCache && now - framesCache.timestamp < CLIENT_CACHE_TTL) {
+    if (CLIENT_CACHE_TTL > 0 && framesCache && now - framesCache.timestamp < CLIENT_CACHE_TTL) {
       return framesCache.data;
     }
-    const res = await fetch('/api/frames');
+    const res = await fetch(`/api/frames`);
     if (!res.ok) {
       throw new Error('Failed to fetch list of frames');
     }
@@ -126,7 +125,14 @@ export const apiService = {
       body: JSON.stringify(payload)
     });
     if (!res.ok) {
-      throw new Error('Lỗi cập nhật cấu hình mẫu');
+      let errorMsg = 'Lỗi cập nhật cấu hình mẫu';
+      try {
+        const data = await res.json();
+        if (data.error) errorMsg = data.error;
+      } catch (e) {
+        // ignore
+      }
+      throw new Error(errorMsg);
     }
     invalidateFramesCache(); // Xóa cache để fetch lại data mới
     return res.json();

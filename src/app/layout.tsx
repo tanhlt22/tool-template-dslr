@@ -8,7 +8,7 @@ const outfit = Outfit({
 });
 
 export const metadata = {
-  title: 'HaiVuStudio Frame Designer',
+  title: 'Tanh Photobooth',
   description: 'Design dynamic layouts, texts, and stickers with Google Gemini Imagen 3',
   manifest: '/manifest.webmanifest',
 };

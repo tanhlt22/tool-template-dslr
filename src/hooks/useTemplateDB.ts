@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
-import { FrameSlot, FrameElement } from '../types/canvas';
+import { useEffect, useState } from 'react';
+import { FrameElement, FrameSlot } from '../types/canvas';
 import { apiService } from '../services/api';
+import { useUI } from '../contexts/UIContext';
 
 interface UseTemplateDBOptions {
   setFrameName: (name: string) => void;
@@ -29,15 +30,24 @@ export function useTemplateDB(
   }
 ) {
   const {
-    setFrameName, setWidth, setHeight, setPrompt,
-    setSlots, setElements, setBgImageUrl, setBackgroundType,
-    setSelectedId, setSelectedType, setExportResult
+    setFrameName,
+    setWidth,
+    setHeight,
+    setPrompt,
+    setSlots,
+    setElements,
+    setBgImageUrl,
+    setBackgroundType,
+    setSelectedId,
+    setSelectedType,
+    setExportResult
   } = options;
 
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
-  const [isSavingTemplate, setIsSavingTemplate] = useState<boolean>(false);
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false);
+  const { showToast } = useUI();
   const [savedFrames, setSavedFrames] = useState<any[]>([]);
-  const [userRole, setUserRole] = useState<string>('user');
+  const [userRole, setUserRole] = useState('user');
 
   useEffect(() => {
     const role = localStorage.getItem('lumibooth_role') || 'user';
@@ -52,54 +62,45 @@ export function useTemplateDB(
     try {
       const data = await apiService.getFrames();
       setSavedFrames(data);
-    } catch (e) {
+    } catch {
       console.warn('API call offline or failed. Mock DB fallback mode active.');
     }
   };
 
-  const handleUpdateTemplateInDb = async () => {
-    if (userRole !== 'admin') {
-      alert('Chỉ quản trị viên mới có quyền cập nhật mẫu thiết kế!');
-      return false;
+  const handleUpdateTemplateInDb = async (templateName?: string) => {
+    if (!editingTemplateId) {
+      return handleSaveNewTemplateToDb(templateName);
     }
-    if (!editingTemplateId) return;
+
     setIsSavingTemplate(true);
     try {
-      const payload = {
+      await apiService.updateFrame({
         id: editingTemplateId,
-        name: currentState.frameName,
+        name: templateName || currentState.frameName,
         width: currentState.width,
         height: currentState.height,
         backgroundPrompt: currentState.prompt,
         backgroundImageUrl: currentState.bgImageUrl,
         slots: currentState.slots,
         elements: currentState.elements
-      };
-      await apiService.updateFrame(payload);
-      alert('Đã lưu cập nhật mẫu thiết kế lên hệ thống thành công!');
-      setEditingTemplateId(null);
+      });
+      showToast('Đã lưu cập nhật mẫu thành công.', 'success');
       fetchSavedFrames();
-      return true; // signal success to caller
+      return true;
     } catch (e: any) {
-      alert('Lỗi cập nhật mẫu: ' + e.message);
+      showToast('Lỗi cập nhật mẫu: ' + (e?.message || String(e)), 'error');
       return false;
     } finally {
       setIsSavingTemplate(false);
     }
   };
 
-  const handleSaveNewTemplateToDb = async () => {
-    if (userRole !== 'admin') {
-      alert('Chỉ quản trị viên mới có quyền tạo mẫu thiết kế hệ thống!');
-      return false;
-    }
-    const inputName = window.prompt('Nhập tên mẫu thiết kế DSLRbooth mới:', currentState.frameName);
-    if (inputName === null) return false;
-    const finalName = inputName.trim() || 'Mẫu thiết kế mới';
+  const handleSaveNewTemplateToDb = async (templateName?: string) => {
+    const finalName = (templateName || currentState.frameName || 'Mẫu mới').trim() || 'Mẫu mới';
 
     setIsSavingTemplate(true);
     try {
-      const payload = {
+      const result = await apiService.createFrame({
         name: finalName,
         width: currentState.width,
         height: currentState.height,
@@ -107,13 +108,15 @@ export function useTemplateDB(
         backgroundImageUrl: currentState.bgImageUrl,
         slots: currentState.slots,
         elements: currentState.elements
-      };
-      await apiService.createFrame(payload);
-      alert(`Đã lưu mẫu thiết kế mới "${finalName}" thành công!`);
+      });
+      if (result?.frame_id) {
+        setEditingTemplateId(result.frame_id);
+      }
+      showToast(`Đã lưu mẫu "${finalName}" thành công.`, 'success');
       fetchSavedFrames();
       return true;
     } catch (e: any) {
-      alert('Lỗi lưu mẫu mới: ' + e.message);
+      showToast('Lỗi lưu mẫu mới: ' + (e?.message || String(e)), 'error');
       return false;
     } finally {
       setIsSavingTemplate(false);
@@ -126,7 +129,7 @@ export function useTemplateDB(
     setHeight(frame.height);
     setPrompt(frame.background_prompt || '');
     setSlots(frame.slots || []);
-    
+
     const loadedElements = [...(frame.elements || [])];
     const hasBgFrame = loadedElements.some((e: any) => e.id === 'background_frame' || (e.id && e.id.startsWith('background_frame_')));
     if (frame.background_image_url && !hasBgFrame) {
@@ -147,9 +150,10 @@ export function useTemplateDB(
         }
       });
     }
+
     setElements(loadedElements);
     setBgImageUrl(frame.background_image_url || null);
-    setBackgroundType((frame.background_image_url || frame.background_prompt) ? 'ai' : 'color');
+    setBackgroundType(frame.background_image_url || frame.background_prompt ? 'ai' : 'color');
 
     if (frame.slots && frame.slots.length > 0) {
       setSelectedId(frame.slots[0].id);
@@ -166,14 +170,14 @@ export function useTemplateDB(
   };
 
   return {
-    editingTemplateId, setEditingTemplateId,
+    editingTemplateId,
+    setEditingTemplateId,
     isSavingTemplate,
     savedFrames,
     userRole,
-
     handleUpdateTemplateInDb,
     handleSaveNewTemplateToDb,
     handleLoadSavedFrame,
-    fetchSavedFrames,
+    fetchSavedFrames
   };
 }

@@ -62,10 +62,11 @@ export async function renderImageElements(
     await new Promise((resolve) => {
       img.onload = () => {
         ctx.save();
-        const cx = elem.x + elem.width / 2;
-        const cy = elem.y + elem.height / 2;
+        const theta = (elem.rotation || 0) * Math.PI / 180;
+        const cx = elem.x + (elem.width / 2) * Math.cos(theta) - (elem.height / 2) * Math.sin(theta);
+        const cy = elem.y + (elem.width / 2) * Math.sin(theta) + (elem.height / 2) * Math.cos(theta);
         ctx.translate(cx, cy);
-        ctx.rotate((elem.rotation * Math.PI) / 180);
+        ctx.rotate(theta);
         ctx.drawImage(img, -elem.width / 2, -elem.height / 2, elem.width, elem.height);
         ctx.restore();
         resolve(null);
@@ -85,10 +86,11 @@ export async function renderAllElements(
 ): Promise<void> {
   for (const elem of elements.filter(e => e.visible !== false)) {
     ctx.save();
-    const cx = elem.x + elem.width / 2;
-    const cy = elem.y + elem.height / 2;
+    const theta = (elem.rotation || 0) * Math.PI / 180;
+    const cx = elem.x + (elem.width / 2) * Math.cos(theta) - (elem.height / 2) * Math.sin(theta);
+    const cy = elem.y + (elem.width / 2) * Math.sin(theta) + (elem.height / 2) * Math.cos(theta);
     ctx.translate(cx, cy);
-    ctx.rotate((elem.rotation * Math.PI) / 180);
+    ctx.rotate(theta);
 
     if (elem.type === 'text') {
       ctx.font = `bold ${elem.style?.fontSize || 24}px ${elem.style?.fontFamily || 'Outfit'}, Outfit, sans-serif`;
@@ -138,10 +140,11 @@ export function punchSlotHoles(
   ctx.globalCompositeOperation = 'destination-out';
   for (const slot of slots.filter(s => s.visible !== false)) {
     ctx.save();
-    const cx = slot.x + slot.width / 2;
-    const cy = slot.y + slot.height / 2;
+    const theta = (slot.rotation || 0) * Math.PI / 180;
+    const cx = slot.x + (slot.width / 2) * Math.cos(theta) - (slot.height / 2) * Math.sin(theta);
+    const cy = slot.y + (slot.width / 2) * Math.sin(theta) + (slot.height / 2) * Math.cos(theta);
     ctx.translate(cx, cy);
-    ctx.rotate(((slot.rotation || 0) * Math.PI) / 180);
+    ctx.rotate(theta);
     ctx.fillStyle = 'black';
     if (useRoundRect) {
       ctx.beginPath();
@@ -248,7 +251,7 @@ export async function generateDslrboothZip(
   const bgBlob = await new Promise<Blob | null>(res => bgCanvas.toBlob(res, 'image/jpeg', 0.95));
   if (bgBlob) zip.file('background.jpg', bgBlob);
 
-  // B. overlay.png — decoration elements (text, sticker) + đục lỗ slot. QR không vào overlay.
+  // B. overlay.png — decoration elements (text, sticker). QR không vào overlay.
   const overlayCanvas = document.createElement('canvas');
   overlayCanvas.width = width;
   overlayCanvas.height = height;
@@ -256,7 +259,6 @@ export async function generateDslrboothZip(
   if (overCtx) {
     const nonQrElements = elements.filter(e => e.type !== 'qr');
     await renderAllElements(overCtx, nonQrElements);
-    punchSlotHoles(overCtx, slots);
   }
   const overBlob = await new Promise<Blob | null>(res => overlayCanvas.toBlob(res, 'image/png'));
   if (overBlob) zip.file('overlay.png', overBlob);
@@ -273,13 +275,20 @@ export async function generateDslrboothZip(
     prevCtx.globalCompositeOperation = 'source-over';
     for (const s of slots.filter(sl => sl.visible !== false)) {
       prevCtx.save();
+      const theta = (s.rotation || 0) * Math.PI / 180;
+      const cx = s.x + (s.width / 2) * Math.cos(theta) - (s.height / 2) * Math.sin(theta);
+      const cy = s.y + (s.width / 2) * Math.sin(theta) + (s.height / 2) * Math.cos(theta);
+      
+      prevCtx.translate(cx, cy);
+      prevCtx.rotate(theta);
+
       prevCtx.globalAlpha = 0.20;
       prevCtx.fillStyle = '#1e293b';
-      prevCtx.fillRect(s.x, s.y, s.width, s.height);
+      prevCtx.fillRect(-s.width / 2, -s.height / 2, s.width, s.height);
       prevCtx.globalAlpha = 1.0;
       prevCtx.strokeStyle = 'rgba(255,255,255,0.12)';
       prevCtx.lineWidth = 2;
-      prevCtx.strokeRect(s.x, s.y, s.width, s.height);
+      prevCtx.strokeRect(-s.width / 2, -s.height / 2, s.width, s.height);
       prevCtx.restore();
     }
     await renderAllElements(prevCtx, elements);
@@ -296,9 +305,16 @@ export async function generateDslrboothZip(
   // Photos: ZIndex = PhotoNumber (1..N)
   // Overlay: ZIndex = N (cùng số với photo cuối)
   // QR: ZIndex = N + 1 (trên cùng)
-  const photoCount = visibleSlots.length;
-  const overlayZIndex = photoCount;
-  const qrZIndex = photoCount + 1;
+  const getPhotoNumber = (slot: FrameSlot, index: number) => {
+    const value = Number(slot.order);
+    return Number.isFinite(value) && value > 0 ? Math.round(value) : index + 1;
+  };
+  const maxPhotoNumber = visibleSlots.reduce(
+    (max, slot, index) => Math.max(max, getPhotoNumber(slot, index)),
+    0
+  );
+  const overlayZIndex = Math.max(maxPhotoNumber, 1);
+  const qrZIndex = overlayZIndex + 1;
 
   // BOM (EF BB BF) bắt buộc cho .NET XML parser của DSLRbooth
   let xmlStr = `\uFEFF<?xml version="1.0" encoding="UTF-8"?>\r\n`;
@@ -307,17 +323,53 @@ export async function generateDslrboothZip(
 
   // QrCode element — DSLRbooth đọc Left/Top trực tiếp từ XML
   for (const qr of qrElements) {
-    xmlStr += `    <QrCode Name="QR Code" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" UseUploadUrl="True" Width="${Math.round(qr.width)}" Height="${Math.round(qr.height)}" BackgroundColor="#00FFFFFF" ZIndex="${qrZIndex}" Left="${Math.round(qr.x)}" Top="${Math.round(qr.y)}" />\r\n`;
+    const qrTheta = (qr.rotation || 0) * Math.PI / 180;
+    const qcx = qr.x + (qr.width / 2) * Math.cos(qrTheta) - (qr.height / 2) * Math.sin(qrTheta);
+    const qcy = qr.y + (qr.width / 2) * Math.sin(qrTheta) + (qr.height / 2) * Math.cos(qrTheta);
+    const qrLeft = qcx - qr.width / 2;
+    const qrTop = qcy - qr.height / 2;
+    const qrRotation = Math.round(((qr.rotation || 0) % 360 + 360) % 360);
+    xmlStr += `    <QrCode Name="QR Code" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" UseUploadUrl="True" Width="${Math.round(qr.width)}" Height="${Math.round(qr.height)}" BackgroundColor="#00FFFFFF" ZIndex="${qrZIndex}" Left="${Math.round(qrLeft)}" Top="${Math.round(qrTop)}" Rotation="${qrRotation}" />\r\n`;
   }
 
   // Overlay (ZIndex = photoCount, liệt kê trước Photos trong XML)
   xmlStr += `    <Image Name="overlay" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${width}" Height="${height}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" Rotation="0" />\r\n`;
 
   // Photos: list theo thứ tự ZIndex giảm dần (Photo N → Photo 1), ZIndex = PhotoNumber
-  const sortedSlots = [...visibleSlots].sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
+  const sortedSlots = [...visibleSlots].sort((a, b) => getPhotoNumber(b, 0) - getPhotoNumber(a, 0));
   sortedSlots.forEach((s, index) => {
-    const photoNum = photoCount - index; // luôn bắt đầu từ 1: N, N-1, ..., 1
-    xmlStr += `    <Photo Name="Photo ${photoNum}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${Math.round(s.width)}" Height="${Math.round(s.height)}" Top="${Math.round(s.y)}" Left="${Math.round(s.x)}" ImagePath="" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${photoNum}" ZIndex="${photoNum}" />\r\n`;
+    const photoNum = getPhotoNumber(s, index);
+    const theta = (s.rotation || 0) * Math.PI / 180;
+    const cx = s.x + (s.width / 2) * Math.cos(theta) - (s.height / 2) * Math.sin(theta);
+    const cy = s.y + (s.width / 2) * Math.sin(theta) + (s.height / 2) * Math.cos(theta);
+
+    let dslrLeft, dslrTop, dslrWidth, dslrHeight, dslrRotation;
+    const normalizedRot = Math.round(((s.rotation || 0) % 360 + 360) % 360);
+
+    if (normalizedRot === 90 || normalizedRot === 270) {
+      // Bake 90/270 rotation into a portrait/landscape swap to prevent camera photo sideways rotation
+      dslrWidth = s.height;
+      dslrHeight = s.width;
+      dslrLeft = cx - dslrWidth / 2;
+      dslrTop = cy - dslrHeight / 2;
+      dslrRotation = 0;
+    } else if (normalizedRot === 180) {
+      // Bake 180 rotation
+      dslrWidth = s.width;
+      dslrHeight = s.height;
+      dslrLeft = cx - dslrWidth / 2;
+      dslrTop = cy - dslrHeight / 2;
+      dslrRotation = 0;
+    } else {
+      // Arbitrary rotation: use unrotated top-left and pass Rotation attribute
+      dslrWidth = s.width;
+      dslrHeight = s.height;
+      dslrLeft = cx - dslrWidth / 2;
+      dslrTop = cy - dslrHeight / 2;
+      dslrRotation = normalizedRot;
+    }
+
+    xmlStr += `    <Photo Name="Photo ${photoNum}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${Math.round(dslrWidth)}" Height="${Math.round(dslrHeight)}" Top="${Math.round(dslrTop)}" Left="${Math.round(dslrLeft)}" ImagePath="" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${photoNum}" ZIndex="${photoNum}" Rotation="${dslrRotation}" />\r\n`;
   });
 
   xmlStr += `  </Elements>\r\n`;

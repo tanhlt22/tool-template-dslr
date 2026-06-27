@@ -3,8 +3,10 @@ import { Download, Upload, Sliders, RefreshCw, CheckCircle2, ShieldCheck, Image 
 import JSZip from 'jszip';
 import { formatDate, generateDslrboothId } from './utils';
 import { apiService } from '../../services/api';
+import { useUI } from '../../contexts/UIContext';
 
 export const OperatorTab: React.FC = () => {
+  const { showToast } = useUI();
   const [operatorFile, setOperatorFile] = useState<File | null>(null);
   const [operatorFileUrl, setOperatorFileUrl] = useState<string | null>(null);
   const [isDetecting, setIsDetecting] = useState<boolean>(false);
@@ -132,11 +134,11 @@ export const OperatorTab: React.FC = () => {
   // Upload original frame to Cloudinary and Save Config to Supabase frames database
   const handleSaveToSystem = async () => {
     if (userRole !== 'admin') {
-      alert('Chỉ quản trị viên mới có quyền lưu mẫu thiết kế lên hệ thống!');
+      showToast('Chỉ quản trị viên mới có quyền lưu mẫu thiết kế lên hệ thống!', 'error');
       return;
     }
     if (!operatorFile || detectedSlots.length === 0) {
-      alert('Vui lòng tải ảnh lên và quét phát hiện ô ảnh trước khi lưu!');
+      showToast('Vui lòng tải ảnh lên và quét phát hiện ô ảnh trước khi lưu!', 'error');
       return;
     }
 
@@ -207,10 +209,10 @@ export const OperatorTab: React.FC = () => {
       await apiService.createFrame(payload);
 
       setSaveSuccess(true);
-      alert(`Đã lưu mẫu "${payload.name}" thành công! Ảnh thô đã được upload lên Cloudinary tại địa chỉ: ${imageUrl}`);
+      showToast(`Đã lưu mẫu "${payload.name}" thành công!`, 'success');
       setTimeout(() => setSaveSuccess(false), 2500);
     } catch (e: any) {
-      alert('Lỗi khi lưu mẫu lên hệ thống: ' + (e.message || e));
+      showToast('Lỗi khi lưu mẫu lên hệ thống: ' + (e.message || e), 'error');
     } finally {
       setIsSaving(false);
     }
@@ -328,9 +330,11 @@ export const OperatorTab: React.FC = () => {
       document.body.removeChild(link);
 
       setPackageSuccess(true);
+      showToast('Đã xuất gói ZIP DSLRbooth thành công!', 'success');
       setTimeout(() => setPackageSuccess(false), 2500);
     } catch (e) {
-      alert('Lỗi xuất gói: ' + e);
+      console.error(e);
+      showToast('Lỗi xuất gói: ' + e, 'error');
     } finally {
       setIsPackaging(false);
     }
@@ -343,10 +347,10 @@ export const OperatorTab: React.FC = () => {
         <div className="bg-amber-50/50 border border-amber-250/20 p-4 rounded-2xl flex flex-col gap-1.5 shadow-xs">
           <span className="text-[10px] font-black text-amber-800 uppercase tracking-widest flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-amber-600 animate-pulse" />
-            Chế độ Kỹ Thuật (Mobile OK)
+            Tạo Nhanh Bố Cục (Template)
           </span>
           <p className="text-[11px] text-amber-700 font-semibold leading-relaxed">
-            Thiết kế frame thô tĩnh, chụp hình quét màu tự động để máy phân tích và đục lỗ file ZIP cực chuẩn ngay trên điện thoại!
+            Chỉ cần tải lên ảnh khung PNG (có phần trong suốt), hệ thống sẽ tự quét và đục lỗ để tạo ra bố cục có tọa độ chính xác, không cần căn chỉnh bằng tay!
           </p>
         </div>
 
@@ -376,18 +380,18 @@ export const OperatorTab: React.FC = () => {
 
         {/* Configurations */}
         <div className="flex flex-col gap-4">
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-1.5 ml-1">Cấu Hình Quét Pixel</span>
+          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-1.5 ml-1">Cài Đặt Quét Ảnh</span>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] text-slate-450 font-black uppercase tracking-wider ml-1">Kiểu Nhận Diện Ô Ảnh</label>
+            <label className="text-[10px] text-slate-450 font-black uppercase tracking-wider ml-1">Vùng ảnh chứa người là:</label>
             <select
               value={detectType}
               onChange={(e) => setDetectType(e.target.value as any)}
               className="bg-slate-100 border-none rounded-xl px-3 py-2.5 text-xs focus:ring-2 focus:ring-[#0058be]/40 text-[#111c2d] font-bold"
             >
-              <option value="transparency">Vùng trong suốt (Alpha = 0)</option>
-              <option value="solid-green">Hộp màu xanh lá (Chroma-Key)</option>
-              <option value="solid-white">Hộp màu trắng (Solid White)</option>
+              <option value="transparency">Vùng rỗng trong suốt (PNG)</option>
+              <option value="solid-green">Khối màu xanh lá cây đậm</option>
+              <option value="solid-white">Khối màu trắng tinh</option>
             </select>
           </div>
 
@@ -424,20 +428,19 @@ export const OperatorTab: React.FC = () => {
 
         {/* Accordion Guide */}
         <div className="border border-slate-200/40 rounded-2xl overflow-hidden mt-1 bg-slate-50 shadow-xs">
-          <button
-            type="button"
-            onClick={() => setShowGuide(!showGuide)}
-            className="w-full px-4 py-2.5 bg-slate-100 hover:bg-[#0058be]/5 hover:text-[#0058be] text-left flex justify-between items-center text-[10.5px] font-black text-slate-700 transition-all focus:outline-none"
-          >
-            <span>📖 Cách import ZIP vào DSLRbooth</span>
-            <span className="text-slate-400 font-bold">{showGuide ? 'Ẩn' : 'Xem'}</span>
-          </button>
+          <div className="p-3 px-3.5 bg-slate-100/50 flex items-center justify-between cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => setShowGuide(!showGuide)}>
+            <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0058be]"></span>
+              Hướng Dẫn Sử Dụng
+            </span>
+            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${showGuide ? 'rotate-180' : ''}`} />
+          </div>
           {showGuide && (
             <div className="p-3.5 flex flex-col gap-2.5 text-[10.5px] leading-relaxed text-slate-600 border-t border-slate-200/40 bg-white">
-              <p>1. Giải nén file <code>.zip</code> tải từ app ra máy tính chạy photo booth.</p>
-              <p>2. Trong phần mềm <strong>DSLRbooth</strong>, click <strong>Templates</strong> (Mẫu thiết kế) ở cột trái.</p>
-              <p>3. Chọn <strong>Import Layout</strong> (Nhập bố cục) -&gt; Click mở file <code>template.xml</code> (hoặc <code>template.json</code> đối với LumaBooth).</p>
-              <p>4. Mọi thứ tự động nạp chính xác hoàn toàn!</p>
+              <p>1. Tải lên một chiếc khung (ảnh .PNG có đục sẵn lỗ rỗng để ghép ảnh).</p>
+              <p>2. Chọn kiểu "Vùng rỗng trong suốt".</p>
+              <p>3. Bấm nút <strong>QUÉT ĐỂ TẠO BỐ CỤC</strong>.</p>
+              <p>4. Hệ thống sẽ tự xác định tọa độ các ô trống, bạn chỉ cần lưu lại là xong!</p>
             </div>
           )}
         </div>
@@ -454,7 +457,7 @@ export const OperatorTab: React.FC = () => {
             ) : (
               <Sliders className="w-4 h-4 text-white" />
             )}
-            <span>{isDetecting ? 'ĐANG QUÉT MÀU KHUNG...' : 'PHÁT HIỆN Ô TỰ ĐỘNG'}</span>
+            <span>{isDetecting ? 'ĐANG QUÉT MÀU KHUNG...' : 'QUÉT ĐỂ TẠO BỐ CỤC'}</span>
           </button>
 
           {userRole === 'admin' && (

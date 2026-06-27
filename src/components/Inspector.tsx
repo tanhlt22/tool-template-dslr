@@ -1,9 +1,20 @@
+import React from 'react';
 import {
-  Layers, MousePointer, Download, RotateCw, FolderOpen, AlignLeft,
-  AlignCenter, AlignRight, ChevronUp, ChevronDown, Copy, Trash,
-  Camera, Type, Sparkles, QrCode, Image as ImageIcon, X, CheckCircle2, Save
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  Camera,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  Image as ImageIcon,
+  Layers,
+  MousePointer,
+  QrCode,
+  Trash2,
+  Type,
+  X
 } from 'lucide-react';
-import { FrameSlot } from '../types/canvas';
 import { GOOGLE_FONTS } from '../constants/templates';
 
 interface InspectorProps {
@@ -15,7 +26,6 @@ interface InspectorProps {
   onDuplicateElement: (id: string) => void;
   onMoveLayerOrder: (id: string, dir: 'up' | 'down') => void;
   onAlignElement: (id: string, alignType: 'left' | 'center-h' | 'right' | 'top' | 'center-v' | 'bottom') => void;
-
   isExporting: boolean;
   onExportPNG: () => void;
   isExportingZip?: boolean;
@@ -28,14 +38,31 @@ interface InspectorProps {
   canvasWidth?: number;
   canvasHeight?: number;
   onClose?: () => void;
-
-  // DSLRbooth visual design persistence props
   userRole?: string;
   editingTemplateId?: string | null;
   isSavingTemplate?: boolean;
   onUpdateTemplateInDb?: () => void;
   onSaveNewTemplateToDb?: () => void;
 }
+
+const NumberField: React.FC<{
+  label: string;
+  name: string;
+  value: number;
+  onChange: (value: number) => void;
+}> = ({ label, name, value, onChange }) => (
+  <label className="block text-xs font-bold text-slate-700">
+    {label}
+    <input
+      name={name}
+      type="number"
+      inputMode="numeric"
+      value={Number.isFinite(value) ? Math.round(value) : 0}
+      onChange={(event) => onChange(Number(event.target.value))}
+      className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-xs font-semibold text-slate-900 focus:border-rose-700 focus:outline-none"
+    />
+  </label>
+);
 
 export const Inspector: React.FC<InspectorProps> = ({
   selectedId,
@@ -46,421 +73,254 @@ export const Inspector: React.FC<InspectorProps> = ({
   onDuplicateElement,
   onMoveLayerOrder,
   onAlignElement,
-  isExporting,
-  onExportPNG,
-  isExportingZip = false,
-  zipExportSuccess = false,
-  onExportDslrboothZip,
-  savedFrames,
-  onLoadSavedFrame,
   slotsCount = 0,
   elementsCount = 0,
-  canvasWidth = 800,
-  canvasHeight = 1200,
-  onClose,
-  userRole = 'user',
-  editingTemplateId = null,
-  isSavingTemplate = false,
-  onUpdateTemplateInDb,
-  onSaveNewTemplateToDb
+  canvasWidth = 1200,
+  canvasHeight = 1800,
+  onClose
 }) => {
+  const header = (() => {
+    if (!activeElement) return { icon: MousePointer, title: 'Chon doi tuong', subtitle: 'Click vao layer hoac canvas' };
+    if (selectedType === 'slot') return { icon: Camera, title: `Anh chup ${activeElement.order || 1}`, subtitle: 'O anh photobooth' };
+    if (selectedType === 'text') return { icon: Type, title: 'Van ban', subtitle: String(activeElement.content || '').slice(0, 28) };
+    if (selectedType === 'qr') return { icon: QrCode, title: 'Ma QR', subtitle: 'Link chia se hoac upload' };
+    if (selectedType === 'image') return { icon: ImageIcon, title: 'Anh / nen', subtitle: activeElement.fileName || 'Layer anh' };
+    return { icon: Layers, title: 'Sticker', subtitle: 'Layer trang tri' };
+  })();
 
-  const renderHeaderCard = () => {
-    if (!activeElement) return null;
-
-    let IconComp = MousePointer;
-    let title = 'Chọn đối tượng';
-    let subtitle = 'Lớp Đối Tượng';
-    let iconBgClass = 'bg-slate-900 text-indigo-400';
-
-    if (selectedType === 'slot') {
-      IconComp = Camera;
-      title = `Ô ảnh số ${(activeElement as FrameSlot).order || 1}`;
-      subtitle = 'Lớp Khung Ảnh';
-      iconBgClass = 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-    } else if (selectedType === 'qr') {
-      IconComp = QrCode;
-      title = 'Mã QR chia sẻ';
-      subtitle = 'Lớp Mã QR Code';
-      iconBgClass = 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
-    } else if (selectedType === 'text') {
-      IconComp = Type;
-      title = (activeElement.content && typeof activeElement.content === 'string') ? `"${activeElement.content.substring(0, 15)}"` : 'Văn bản nghệ thuật';
-      subtitle = 'Lớp Văn Bản Nghệ Thuật';
-      iconBgClass = 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
-    } else if (selectedType === 'icon') {
-      IconComp = Sparkles;
-      title = 'Sticker Decor';
-      subtitle = 'Hình Dán Nhãn Trang Trí';
-      iconBgClass = 'bg-pink-500/10 text-pink-400 border border-pink-500/20';
-    } else if (selectedType === 'image') {
-      IconComp = ImageIcon;
-      title = activeElement.fileName ? activeElement.fileName : 'Hình ảnh tải lên';
-      subtitle = 'Lớp Ảnh Tải Lên';
-      iconBgClass = 'bg-purple-500/10 text-purple-400 border border-purple-500/20';
-    }
-
-    return (
-      <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${iconBgClass}`}>
-          <IconComp className="w-5 h-5" />
-        </div>
-        <div className="truncate flex-1">
-          <p className="text-xs font-bold text-slate-200 truncate leading-tight">{title}</p>
-          <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-0.5">{subtitle}</p>
-        </div>
-      </div>
-    );
-  };
+  const HeaderIcon = header.icon;
 
   return (
-    <aside className="w-80 shrink-0 border-l border-[#dee8ff] glass-panel flex flex-col p-4 overflow-y-auto gap-5 custom-scrollbar">
+    <aside className="w-80 shrink-0 border-l border-slate-200 bg-white flex flex-col overflow-hidden">
+      <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+        <div>
+          <h2 className="text-sm font-black text-slate-950">Thuoc tinh</h2>
+          <p className="text-[11px] font-semibold text-slate-500">Chinh layer dang chon</p>
+        </div>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Dong bang thuoc tinh"
+            className="rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+          >
+            <X className="h-4 w-4" aria-hidden="true" />
+          </button>
+        )}
+      </div>
 
-      {/* 🛠️ PROPERTIES EDITOR */}
-      <div className="flex flex-col gap-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xs font-black flex items-center gap-2 text-[#0058be] uppercase tracking-wider">
-            <Layers className="w-4 h-4 text-[#0058be]" />
-            Thuộc Tính Đối Tượng
-          </h2>
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="text-slate-400 hover:text-[#0058be] p-1 rounded-lg hover:bg-[#f0f3ff] transition-all active:scale-95"
-              title="Đóng bảng thuộc tính"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="mb-4 flex items-center gap-3 rounded-md border border-slate-200 bg-slate-50 p-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white text-rose-800 shadow-sm">
+            <HeaderIcon className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-black text-slate-950">{header.title}</p>
+            <p className="truncate text-xs font-semibold text-slate-500">{header.subtitle}</p>
+          </div>
         </div>
 
-        {activeElement ? (
-          <div className="flex flex-col gap-4 animate-fade-in">
-            {renderHeaderCard()}
-
-            {/* Căn lề nhanh (Quick Alignment) */}
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Căn lề nhanh (Canvas)</span>
-              <div className="grid grid-cols-6 gap-1 bg-[#f0f3ff]/45 p-1 rounded-xl border border-[#dee8ff] shadow-xs">
-                <button
-                  type="button"
-                  onClick={() => onAlignElement(selectedId!, 'left')}
-                  className="flex items-center justify-center p-1.5 hover:bg-[#0058be] hover:text-white rounded-lg text-slate-500 transition-all"
-                  title="Căn lề trái"
-                >
-                  <AlignLeft className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onAlignElement(selectedId!, 'center-h')}
-                  className="flex items-center justify-center p-1.5 hover:bg-[#0058be] hover:text-white rounded-lg text-slate-500 transition-all"
-                  title="Căn giữa ngang"
-                >
-                  <AlignCenter className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onAlignElement(selectedId!, 'right')}
-                  className="flex items-center justify-center p-1.5 hover:bg-[#0058be] hover:text-white rounded-lg text-slate-500 transition-all"
-                  title="Căn lề phải"
-                >
-                  <AlignRight className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onAlignElement(selectedId!, 'top')}
-                  className="flex items-center justify-center p-1.5 hover:bg-[#0058be] hover:text-white rounded-lg text-slate-500 transition-all rotate-90"
-                  title="Căn lề trên"
-                >
-                  <AlignLeft className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onAlignElement(selectedId!, 'center-v')}
-                  className="flex items-center justify-center p-1.5 hover:bg-[#0058be] hover:text-white rounded-lg text-slate-500 transition-all rotate-90"
-                  title="Căn giữa dọc"
-                >
-                  <AlignCenter className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onAlignElement(selectedId!, 'bottom')}
-                  className="flex items-center justify-center p-1.5 hover:bg-[#0058be] hover:text-white rounded-lg text-slate-500 transition-all rotate-90"
-                  title="Căn lề dưới"
-                >
-                  <AlignRight className="w-3.5 h-3.5" />
-                </button>
+        {!activeElement ? (
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="rounded-md border border-slate-200 p-2">
+                <p className="text-[10px] font-bold uppercase text-slate-500">Frame</p>
+                <p className="mt-1 truncate text-xs font-black text-slate-950">{canvasWidth}x{canvasHeight}</p>
+              </div>
+              <div className="rounded-md border border-slate-200 p-2">
+                <p className="text-[10px] font-bold uppercase text-slate-500">Anh</p>
+                <p className="mt-1 text-xs font-black text-slate-950">{slotsCount}</p>
+              </div>
+              <div className="rounded-md border border-slate-200 p-2">
+                <p className="text-[10px] font-bold uppercase text-slate-500">Layer</p>
+                <p className="mt-1 text-xs font-black text-slate-950">{elementsCount}</p>
               </div>
             </div>
+            <p className="rounded-md border border-slate-200 bg-slate-50 p-3 text-xs font-semibold leading-relaxed text-slate-600">
+              Chon mot o anh, chu, QR hoac anh tren canvas de chinh thuoc tinh chi tiet.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <section>
+              <h3 className="mb-2 text-xs font-black uppercase text-slate-500">Can le nhanh</h3>
+              <div className="grid grid-cols-6 gap-1">
+                {[
+                  ['left', AlignLeft, 'Trai'],
+                  ['center-h', AlignCenter, 'Giua ngang'],
+                  ['right', AlignRight, 'Phai'],
+                  ['top', AlignLeft, 'Tren'],
+                  ['center-v', AlignCenter, 'Giua doc'],
+                  ['bottom', AlignRight, 'Duoi']
+                ].map(([type, Icon, label]) => (
+                  <button
+                    key={String(type)}
+                    type="button"
+                    title={String(label)}
+                    onClick={() => onAlignElement(selectedId!, type as any)}
+                    className="flex h-8 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+                  >
+                    {React.createElement(Icon as any, { className: `h-4 w-4 ${['top', 'center-v', 'bottom'].includes(String(type)) ? 'rotate-90' : ''}`, 'aria-hidden': true })}
+                  </button>
+                ))}
+              </div>
+            </section>
 
-            {/* Quick Actions (Z-Index / Layer order & Duplicate) */}
-            <div className="grid grid-cols-3 gap-1.5">
+            <section className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => onMoveLayerOrder(selectedId!, 'up')}
-                className="flex flex-col items-center justify-center py-1.5 px-1 bg-white hover:bg-[#0058be] text-slate-700 hover:text-white rounded-xl border border-[#dee8ff] hover:border-[#0058be] text-[9px] font-black uppercase tracking-tight transition-all active:scale-95 shadow-xs"
-                title="Đưa lên trên một lớp"
+                className="rounded-md border border-slate-300 bg-white px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
               >
-                <ChevronUp className="w-4 h-4 mb-0.5" />
-                <span>Lên trên</span>
+                <ChevronUp className="mx-auto h-4 w-4" aria-hidden="true" />
+                Len
               </button>
               <button
                 type="button"
                 onClick={() => onMoveLayerOrder(selectedId!, 'down')}
-                className="flex flex-col items-center justify-center py-1.5 px-1 bg-white hover:bg-[#0058be] text-slate-700 hover:text-white rounded-xl border border-[#dee8ff] hover:border-[#0058be] text-[9px] font-black uppercase tracking-tight transition-all active:scale-95 shadow-xs"
-                title="Đưa xuống dưới một lớp"
+                className="rounded-md border border-slate-300 bg-white px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
               >
-                <ChevronDown className="w-4 h-4 mb-0.5" />
-                <span>Xuống dưới</span>
+                <ChevronDown className="mx-auto h-4 w-4" aria-hidden="true" />
+                Xuong
               </button>
               <button
                 type="button"
                 onClick={() => onDuplicateElement(selectedId!)}
-                className="flex flex-col items-center justify-center py-1.5 px-1 bg-white hover:bg-[#0058be] text-slate-700 hover:text-white rounded-xl border border-[#dee8ff] hover:border-[#0058be] text-[9px] font-black uppercase tracking-tight transition-all active:scale-95 shadow-xs"
-                title="Nhân bản đối tượng"
+                className="rounded-md border border-slate-300 bg-white px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
               >
-                <Copy className="w-4 h-4 mb-0.5" />
-                <span>Nhân bản</span>
+                <Copy className="mx-auto h-4 w-4" aria-hidden="true" />
+                Copy
               </button>
-            </div>
+            </section>
 
-            {/* exact dimensions */}
-            <div className="flex flex-col gap-2 bg-[#f0f3ff]/40 border border-[#dee8ff] p-2.5 rounded-xl">
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Tọa độ & Kích thước (px)</span>
+            <section className="rounded-md border border-slate-200 p-3">
+              <h3 className="mb-2 text-xs font-black uppercase text-slate-500">Vi tri va kich thuoc</h3>
               <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[8px] font-bold text-slate-400 uppercase">Trục X</span>
-                  <input
-                    type="number"
-                    value={Math.round(activeElement.x)}
-                    onChange={(e) => onUpdateProp('x', Number(e.target.value))}
-                    className="px-2 py-1 bg-white border border-[#dee8ff] rounded-lg text-xs font-bold text-[#111c2d] focus:outline-none focus:border-[#0058be]"
-                  />
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[8px] font-bold text-slate-400 uppercase">Trục Y</span>
-                  <input
-                    type="number"
-                    value={Math.round(activeElement.y)}
-                    onChange={(e) => onUpdateProp('y', Number(e.target.value))}
-                    className="px-2 py-1 bg-white border border-[#dee8ff] rounded-lg text-xs font-bold text-[#111c2d] focus:outline-none focus:border-[#0058be]"
-                  />
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[8px] font-bold text-slate-400 uppercase">Chiều rộng</span>
-                  <input
-                    type="number"
-                    value={Math.round(activeElement.width)}
-                    onChange={(e) => onUpdateProp('width', Number(e.target.value))}
-                    className="px-2 py-1 bg-white border border-[#dee8ff] rounded-lg text-xs font-bold text-[#111c2d] focus:outline-none focus:border-[#0058be]"
-                  />
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[8px] font-bold text-slate-400 uppercase">Chiều cao</span>
-                  <input
-                    type="number"
-                    value={Math.round(activeElement.height)}
-                    onChange={(e) => onUpdateProp('height', Number(e.target.value))}
-                    className="px-2 py-1 bg-white border border-[#dee8ff] rounded-lg text-xs font-bold text-[#111c2d] focus:outline-none focus:border-[#0058be]"
-                  />
-                </div>
+                <NumberField label="X" name="x" value={activeElement.x} onChange={(value) => onUpdateProp('x', value)} />
+                <NumberField label="Y" name="y" value={activeElement.y} onChange={(value) => onUpdateProp('y', value)} />
+                <NumberField label="Rong" name="width" value={activeElement.width} onChange={(value) => onUpdateProp('width', value)} />
+                <NumberField label="Cao" name="height" value={activeElement.height} onChange={(value) => onUpdateProp('height', value)} />
               </div>
-            </div>
+              <label className="mt-2 block text-xs font-bold text-slate-700">
+                Xoay
+                <input
+                  name="rotation"
+                  type="range"
+                  min="-180"
+                  max="180"
+                  value={activeElement.rotation || 0}
+                  onChange={(event) => onUpdateProp('rotation', Number(event.target.value))}
+                  className="mt-1 w-full accent-rose-800"
+                />
+                <span className="text-[11px] font-semibold text-slate-500">{activeElement.rotation || 0} do</span>
+              </label>
+            </section>
 
-            {/* Custom attributes by type */}
             {selectedType === 'slot' && (
-              <div className="flex flex-col gap-2.5">
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Góc Xoay Độ (°)</label>
-                  <input
-                    type="range"
-                    min="-180"
-                    max="180"
-                    value={activeElement.rotation || 0}
-                    onChange={(e) => onUpdateProp('rotation', Number(e.target.value))}
-                    className="w-full cursor-pointer accent-[#0058be]"
-                  />
-                  <div className="flex justify-between items-center text-[10px] text-slate-500 font-semibold mt-0.5">
-                    <span>-180°</span>
-                    <span className="text-[#0058be] font-bold">{activeElement.rotation || 0}°</span>
-                    <span>180°</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Thứ Tự Ô Ảnh</label>
+              <section className="rounded-md border border-slate-200 p-3">
+                <label className="block text-xs font-bold text-slate-700">
+                  Thu tu anh
                   <select
+                    name="slotOrder"
                     value={activeElement.order || 1}
-                    onChange={(e) => onUpdateProp('order', Number(e.target.value))}
-                    className="w-full px-2.5 py-2 bg-white border border-[#dee8ff] rounded-xl text-xs font-bold focus:outline-none focus:border-[#0058be] text-[#111c2d]"
+                    onChange={(event) => onUpdateProp('order', Number(event.target.value))}
+                    className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-xs font-semibold focus:border-rose-700 focus:outline-none"
                   >
-                    {[1, 2, 3, 4, 5, 6].map(num => (
-                      <option key={num} value={num}>Ô ảnh số {num}</option>
+                    {[1, 2, 3, 4, 5, 6].map((item) => (
+                      <option key={item} value={item}>
+                        Anh {item}
+                      </option>
                     ))}
                   </select>
-                </div>
-              </div>
+                </label>
+              </section>
             )}
 
             {selectedType === 'text' && (
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Nội dung text</label>
+              <section className="space-y-2 rounded-md border border-slate-200 p-3">
+                <label className="block text-xs font-bold text-slate-700">
+                  Noi dung
                   <input
+                    name="textContent"
                     type="text"
                     value={activeElement.content}
-                    onChange={(e) => onUpdateProp('content', e.target.value)}
-                    className="bg-white border border-[#dee8ff] rounded-xl px-3 py-2 w-full focus:outline-none focus:border-[#0058be] text-xs text-[#111c2d] font-medium"
+                    onChange={(event) => onUpdateProp('content', event.target.value)}
+                    className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-xs font-semibold focus:border-rose-700 focus:outline-none"
                   />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Font Chữ Nghệ Thuật</label>
+                </label>
+                <label className="block text-xs font-bold text-slate-700">
+                  Font
                   <select
+                    name="fontFamily"
                     value={activeElement.style?.fontFamily || 'Outfit'}
-                    onChange={(e) => onUpdateProp('fontFamily', e.target.value)}
-                    className="bg-white border border-[#dee8ff] rounded-xl px-2 py-2 text-xs focus:outline-none focus:border-[#0058be] text-[#111c2d] font-semibold"
+                    onChange={(event) => onUpdateProp('fontFamily', event.target.value)}
+                    className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-xs font-semibold focus:border-rose-700 focus:outline-none"
                   >
-                    {GOOGLE_FONTS.map(f => (
-                      <option key={f.name} value={f.value}>{f.name}</option>
+                    {GOOGLE_FONTS.map((font) => (
+                      <option key={font.name} value={font.value}>
+                        {font.name}
+                      </option>
                     ))}
                   </select>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Cỡ Chữ (px)</label>
-                    <span className="text-[10px] font-mono font-bold text-[#0058be]">{activeElement.style?.fontSize || 24} px</span>
-                  </div>
+                </label>
+                <NumberField label="Co chu" name="fontSize" value={activeElement.style?.fontSize || 24} onChange={(value) => onUpdateProp('fontSize', value)} />
+                <label className="flex items-center gap-2 text-xs font-bold text-slate-700">
+                  Mau
                   <input
-                    type="range"
-                    min="12"
-                    max="120"
-                    value={activeElement.style?.fontSize || 24}
-                    onChange={(e) => onUpdateProp('fontSize', parseInt(e.target.value))}
-                    className="w-full accent-[#0058be] cursor-pointer"
+                    aria-label="Mau chu"
+                    type="color"
+                    value={activeElement.style?.color || '#111827'}
+                    onChange={(event) => onUpdateProp('color', event.target.value)}
+                    className="h-8 w-12 rounded border border-slate-300 bg-white"
                   />
-                </div>
-
-                <div className="flex flex-col gap-1 bg-[#f0f3ff]/40 border border-[#dee8ff] rounded-xl p-2.5">
-                  <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1">Màu Sắc</label>
-                  <div className="flex gap-2.5 items-center">
-                    <input
-                      type="color"
-                      value={activeElement.style?.color || '#ffffff'}
-                      onChange={(e) => onUpdateProp('color', e.target.value)}
-                      className="bg-white border border-[#dee8ff] w-8 h-8 rounded-lg cursor-pointer p-0.5"
-                    />
-                    <span className="text-xs font-mono font-bold text-slate-700 uppercase">{activeElement.style?.color || '#ffffff'}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {selectedType === 'icon' && (
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-col gap-1">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Xoay Nghiêng (°)</label>
-                    <span className="text-[10px] font-mono font-bold text-[#0058be]">{activeElement.rotation || 0}°</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="-180"
-                    max="180"
-                    value={activeElement.rotation || 0}
-                    onChange={(e) => onUpdateProp('rotation', Number(e.target.value))}
-                    className="w-full cursor-pointer accent-[#0058be]"
-                  />
-                </div>
-              </div>
-            )}
-
-            {selectedType === 'image' && (
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-col gap-1">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Xoay Nghiêng (°)</label>
-                    <span className="text-[10px] font-mono font-bold text-[#0058be]">{activeElement.rotation || 0}°</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="-180"
-                    max="180"
-                    value={activeElement.rotation || 0}
-                    onChange={(e) => onUpdateProp('rotation', Number(e.target.value))}
-                    className="w-full cursor-pointer accent-[#0058be]"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between bg-[#f0f3ff]/40 p-2.5 rounded-xl border border-[#dee8ff]">
-                  <span className="text-[10px] font-bold text-slate-700 uppercase">Khóa Tỉ Lệ Ảnh Gốc</span>
-                  <input
-                    type="checkbox"
-                    checked={activeElement.lockRatio !== false}
-                    onChange={(e) => onUpdateProp('lockRatio', e.target.checked)}
-                    className="w-4 h-4 rounded border-[#dee8ff] text-[#0058be] focus:ring-0 cursor-pointer"
-                  />
-                </div>
-              </div>
+                </label>
+              </section>
             )}
 
             {selectedType === 'qr' && (
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-col gap-1">
-                  <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Link QR / Nội Dung</label>
+              <section className="rounded-md border border-slate-200 p-3">
+                <label className="block text-xs font-bold text-slate-700">
+                  Link QR
                   <input
-                    type="text"
+                    name="qrLink"
+                    type="url"
                     value={activeElement.content}
-                    onChange={(e) => onUpdateProp('content', e.target.value)}
-                    className="bg-white border border-[#dee8ff] rounded-xl px-3 py-2 w-full focus:outline-none focus:border-[#0058be] text-xs text-[#111c2d] font-medium"
-                    placeholder="https://facebook.com/..."
+                    onChange={(event) => onUpdateProp('content', event.target.value)}
+                    placeholder="https://..."
+                    autoComplete="off"
+                    className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-xs font-semibold focus:border-rose-700 focus:outline-none"
                   />
-                </div>
-              </div>
+                </label>
+              </section>
             )}
 
-            {/* Delete button */}
+            {selectedType === 'image' && (
+              <section className="rounded-md border border-slate-200 p-3">
+                <label className="flex items-center justify-between text-xs font-bold text-slate-700">
+                  Khoa ty le anh
+                  <input
+                    type="checkbox"
+                    checked={activeElement.lockRatio !== false}
+                    onChange={(event) => onUpdateProp('lockRatio', event.target.checked)}
+                    className="h-4 w-4 accent-rose-800"
+                  />
+                </label>
+              </section>
+            )}
+
             <button
+              type="button"
               onClick={() => onDeleteElement(selectedId!)}
-              className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white rounded-xl border border-rose-200 text-xs font-extrabold transition-all active:scale-95 shadow-xs"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-black text-rose-700 hover:bg-rose-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
             >
-              <Trash className="w-3.5 h-3.5" />
-              <span>Xóa Layer Đã Chọn</span>
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+              Xoa layer dang chon
             </button>
-          </div>
-        ) : (
-          <div className="bg-[#f0f3ff]/30 border border-[#dee8ff] rounded-2xl p-4 flex flex-col gap-3.5 shadow-xs animate-fade-in">
-            <div className="flex items-center gap-2 text-[#0058be] border-b border-[#dee8ff] pb-2">
-              <Layers className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-wider">Tổng Quan Bản Vẽ</span>
-            </div>
-
-            <div className="grid grid-cols-3 gap-1.5 text-center">
-              <div className="bg-white p-2 rounded-xl border border-[#dee8ff] shadow-xs">
-                <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider">Kích Thước</p>
-                <p className="text-[10px] font-black text-[#111c2d] mt-1 truncate">{canvasWidth}x{canvasHeight}</p>
-              </div>
-              <div className="bg-white p-2 rounded-xl border border-[#dee8ff] shadow-xs">
-                <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider">Ô Ảnh (Slots)</p>
-                <p className="text-[10px] font-black text-emerald-600 mt-1">{slotsCount} ô</p>
-              </div>
-              <div className="bg-white p-2 rounded-xl border border-[#dee8ff] shadow-xs">
-                <p className="text-[8px] text-slate-500 font-bold uppercase tracking-wider">Sticker/Chữ</p>
-                <p className="text-[10px] font-black text-[#0058be] mt-1">{elementsCount} lớp</p>
-              </div>
-            </div>
-
-            <div className="bg-amber-50 border border-amber-250/30 rounded-xl p-3 flex items-start gap-2">
-              <span className="text-amber-500 font-extrabold text-xs">💡</span>
-              <p className="text-[9px] text-amber-800 font-semibold leading-normal">
-                Để chỉnh sửa thuộc tính hoặc di chuyển vị trí, bạn hãy nhấp chọn bất kỳ đối tượng nào trên Canvas hoặc bấm vào tab **LAYERS** ở bên trái!
-              </p>
-            </div>
           </div>
         )}
       </div>
     </aside>
   );
 };
+
 export default Inspector;

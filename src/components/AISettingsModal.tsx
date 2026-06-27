@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Check, Brain, Eye, EyeOff, Save } from 'lucide-react';
+import { Bot, Key, Settings2, X, Check, Brain, Eye, EyeOff, Save } from 'lucide-react';
+import { useUI } from '../contexts/UIContext';
 import { apiService } from '../services/api';
 
 interface AISettingsModalProps {
@@ -10,6 +11,7 @@ interface AISettingsModalProps {
 export const AISettingsModal: React.FC<AISettingsModalProps> = ({ isOpen, onClose }) => {
   const [modelName, setModelName] = useState<string>('imagen-3.0-generate-002');
   const [apiKey, setApiKey] = useState<string>('');
+  const { showToast } = useUI();
   const [prefix, setPrefix] = useState<string>('');
   const [suffix, setSuffix] = useState<string>(', ultra-modern 2026 premium wedding backdrop, minimal sleek elegant aesthetic, soft pastel gradient mesh, smooth liquid blurred colors, subtle cinematic analog film grain texture, high-end fine art editorial photography, contemporary clean design, thin classy minimalist gold borders on the very edges, completely clean uncluttered spacious center area, high resolution, award-winning contemporary event styling, natural soft diffused lighting, organic high-fashion atmosphere, no retro elements, no clip-art, no cheap plastic flowers, no text, no watermarks, no camera icons, no grid lines.');
   const [aspectRatio, setAspectRatio] = useState<string>('1.5');
@@ -55,12 +57,13 @@ export const AISettingsModal: React.FC<AISettingsModalProps> = ({ isOpen, onClos
     try {
       await apiService.saveAISettings(payload);
       setSuccess(true);
+      showToast('Đã lưu cấu hình thành công', 'success');
       setTimeout(() => {
         setSuccess(false);
         onClose();
       }, 1200);
     } catch (e) {
-      alert('Không thể lưu cấu hình. Đang chạy ở chế độ offline.');
+      showToast('Không thể lưu cấu hình. Đang chạy ở chế độ offline.', 'error');
       onClose();
     } finally {
       setIsSaving(false);

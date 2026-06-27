@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Download, Check, RefreshCw, CheckCircle2, Wand2, Calendar, User, Layout } from 'lucide-react';
 import JSZip from 'jszip';
+import { useUI } from '../../contexts/UIContext';
 import { TEMPLATES, formatDate, generateDslrboothId } from './utils';
 import { apiService } from '../../services/api';
 
@@ -10,6 +11,7 @@ export const CoupleTab: React.FC = () => {
   const [weddingDate, setWeddingDate] = useState<string>('30.12.2026');
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | string>(1);
   const [isPackaging, setIsPackaging] = useState<boolean>(false);
+  const { showToast } = useUI();
   const [packageSuccess, setPackageSuccess] = useState<boolean>(false);
   const [showGuide, setShowGuide] = useState<boolean>(true);
 
@@ -410,7 +412,8 @@ export const CoupleTab: React.FC = () => {
       setPackageSuccess(true);
       setTimeout(() => setPackageSuccess(false), 2500);
     } catch (e) {
-      alert('Không thể đóng gói ZIP: ' + e);
+      console.error(e);
+      showToast('Không thể đóng gói ZIP: ' + e, 'error');
     } finally {
       setIsPackaging(false);
     }

@@ -1,28 +1,44 @@
-import { useState } from 'react';
-import { CanvasEditor } from './components/CanvasEditor';
-import { Header } from './components/Header';
+'use client';
+
+import { lazy, Suspense, useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Inspector } from './components/Inspector';
 import { ExportModal } from './components/ExportModal';
-import { AISettingsModal } from './components/AISettingsModal';
 import { EditorToolbar } from './components/EditorToolbar';
 import { ViewportControls } from './components/ViewportControls';
-import { usePWA } from './hooks/usePWA';
+import { AppNav } from './components/AppNav';
+import { CreateFrameModal, NewFrameConfig } from './components/CreateFrameModal';
+import { FrameLibrary } from './components/FrameLibrary';
+import { FramePreviewStep } from './components/FramePreviewStep';
+import { SaveFrameModal } from './components/SaveFrameModal';
 import { useCanvasState } from './hooks/useCanvasState';
 import { useCanvasLayers } from './hooks/useCanvasLayers';
 import { useExport } from './hooks/useExport';
 import { useTemplateDB } from './hooks/useTemplateDB';
-import { applyPersonalizationToElements, DEFAULT_PERSONALIZATION } from './utils/personalization';
+import { DEFAULT_PERSONALIZATION } from './utils/personalization';
+import { apiService } from './services/api';
+import { useUI } from './contexts/UIContext';
+
+type AppView = 'library' | 'editor' | 'preview';
+
+const CanvasEditor = lazy(() =>
+  import('./components/CanvasEditor').then((module) => ({ default: module.CanvasEditor }))
+);
+
+const AISettingsModal = lazy(() =>
+  import('./components/AISettingsModal').then((module) => ({ default: module.AISettingsModal }))
+);
 
 export function App() {
-  const { isOnline, isInstalled, isInstallable, triggerInstall } = usePWA();
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [isMobileInspectorOpen, setIsMobileInspectorOpen] = useState(false);
+  const [view, setView] = useState<AppView>('editor');
+  const [isCreateFrameOpen, setIsCreateFrameOpen] = useState(false);
+  const [isSaveFrameOpen, setIsSaveFrameOpen] = useState(false);
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
   const [personalization, setPersonalization] = useState(DEFAULT_PERSONALIZATION);
 
   const cs = useCanvasState();
   const layers = useCanvasLayers({ width: cs.width, height: cs.height });
+  const { showToast, showConfirm, showPrompt } = useUI();
 
   const exp = useExport({
     width: cs.width,
@@ -66,187 +82,281 @@ export function App() {
     }
   );
 
-  const closeMobilePanels = () => {
-    setIsMobileSidebarOpen(false);
-    setIsMobileInspectorOpen(false);
+  const resetFrame = (config: NewFrameConfig) => {
+    cs.setFrameName(config.name);
+    cs.setPaperSize(config.paperSize);
+    cs.setOrientation(config.orientation);
+    cs.setWidth(config.width);
+    cs.setHeight(config.height);
+    cs.setBgImageUrl(null);
+    cs.setBackgroundType('color');
+    cs.setBackgroundColor('#ffffff');
+    cs.setPrompt('');
+    layers.setSlots([]);
+    layers.setElements([]);
+    layers.setSelectedId(null);
+    layers.setSelectedType(null);
+    layers.setActiveSidebarTab('layers');
+    tpl.setEditingTemplateId(null);
+    exp.setExportResult(null);
+    setView('editor');
   };
 
-  const loadTemplateIntoStudio = (frame: any) => {
+  const handleCreateFrame = (config: NewFrameConfig) => {
+    resetFrame(config);
+    setIsCreateFrameOpen(false);
+  };
+
+  const handleNewFrame = async () => {
+    if (layers.slots.length > 0 || layers.elements.length > 0) {
+      const ok = await showConfirm({
+        title: 'Tạo khung mới',
+        message: 'Tạo khung mới? Các thay đổi chưa lưu sẽ bị xóa khỏi canvas hiện tại.',
+        confirmText: 'Đồng ý',
+        cancelText: 'Hủy'
+      });
+      if (!ok) return;
+    }
+    setIsCreateFrameOpen(true);
+  };
+
+  const loadTemplateIntoEditor = (frame: any) => {
     tpl.handleLoadSavedFrame(frame);
-    tpl.setEditingTemplateId(frame.id && !String(frame.id).startsWith('template_') ? frame.id : null);
-    setIsMobileSidebarOpen(false);
-    setIsMobileInspectorOpen(false);
+    tpl.setEditingTemplateId(frame.id && !String(frame.id).startsWith('template_') && !String(frame.id).startsWith('demo_') ? frame.id : null);
+    layers.setActiveSidebarTab('layers');
+    setView('editor');
   };
 
-  const handleNewFrame = () => {
-    if (window.confirm('Tạo frame mới? Tất cả thiết kế chưa lưu trên canvas sẽ bị xóa.')) {
-      cs.setFrameName('My Premium AI Frame');
-      cs.handlePaperSizeChange('4x6'); // Resets width/height to 1200x1800 or orientation equivalents
-      cs.setBgImageUrl(null);
-      cs.setBackgroundType('color');
-      cs.setBackgroundColor('#ffffff');
-      cs.setPrompt('');
-      layers.setSlots([]);
-      layers.setElements([]);
-      layers.setSelectedId(null);
-      layers.setSelectedType(null);
-      tpl.setEditingTemplateId(null);
-      exp.setExportResult(null);
+  const handleDuplicateFrame = (frame: any) => {
+    const clone = {
+      ...frame,
+      id: `draft_${Date.now()}`,
+      name: `${frame.name || 'Frame'} copy`,
+      slots: (frame.slots || []).map((slot: any) => ({ ...slot, id: `${slot.id || 'slot'}_copy_${Date.now()}` })),
+      elements: (frame.elements || []).map((element: any) => ({ ...element, id: `${element.id || element.type}_copy_${Date.now()}` }))
+    };
+    loadTemplateIntoEditor(clone);
+    tpl.setEditingTemplateId(null);
+  };
+
+  const handleDeleteFrame = async (frame: any) => {
+    if (!frame.id || String(frame.id).startsWith('demo_')) {
+      showToast('Đây là mẫu minh họa, không có bản ghi để xóa.', 'info');
+      return;
+    }
+    if (tpl.userRole !== 'admin') {
+      showToast('Chỉ quản trị viên mới có quyền xóa mẫu.', 'error');
+      return;
+    }
+    const ok = await showConfirm({
+      title: 'Xác nhận xóa',
+      message: `Bạn có chắc chắn muốn xóa mẫu "${frame.name}"? Hành động này không thể hoàn tác.`,
+      confirmText: 'Tiếp tục',
+      cancelText: 'Hủy'
+    });
+    if (!ok) return;
+
+    const password = await showPrompt({
+      title: 'Xác thực bảo mật',
+      message: 'Vui lòng nhập mật khẩu quản trị viên để xác nhận xóa:',
+      type: 'password',
+      placeholder: 'Nhập mật khẩu...',
+      confirmText: 'Xóa vĩnh viễn',
+      cancelText: 'Hủy'
+    });
+
+    if (password === null) return;
+    
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'theanh2002';
+    if (password !== adminPassword) {
+      showToast('Mật khẩu không đúng. Không thể xóa!', 'error');
+      return;
+    }
+
+    try {
+      await apiService.deleteFrame(frame.id);
+      showToast('Đã xóa mẫu thành công!', 'success');
+      await tpl.fetchSavedFrames();
+    } catch (error) {
+      showToast('Không thể xóa mẫu: ' + String(error), 'error');
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('lumibooth_auth_token');
-    localStorage.removeItem('lumibooth_username');
-    window.location.reload();
+  const handleRequestSave = async () => {
+    setIsSaveFrameOpen(true);
   };
 
-  return (
-    <div className="w-screen h-screen flex flex-col overflow-hidden bg-[#f9f9ff] text-[#111c2d]">
-      <Header
-        isOnline={isOnline}
-        isInstalled={isInstalled}
-        isInstallable={isInstallable}
-        onTriggerInstall={triggerInstall}
+  const handleSaveFrameName = async (name: string, password?: string) => {
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'theanh2002';
+    if (password !== adminPassword) {
+      showToast('Mật khẩu không đúng. Không thể lưu!', 'error');
+      return;
+    }
+
+    if (!name.trim()) {
+      showToast('Vui lòng nhập tên frame!', 'error');
+      return;
+    }
+
+    if (tpl.editingTemplateId) {
+      const ok = await tpl.handleUpdateTemplateInDb(name.trim());
+      if (ok) {
+        cs.setFrameName(name.trim());
+        setIsSaveFrameOpen(false);
+      }
+    } else {
+      const ok = await tpl.handleSaveNewTemplateToDb(name);
+      if (ok) {
+        cs.setFrameName(name.trim());
+        setIsSaveFrameOpen(false);
+      }
+    }
+  };
+
+  const handleRenameFrame = async (frameId: string, newName: string) => {
+    try {
+      const frame = tpl.savedFrames.find(f => f.id === frameId);
+      if (!frame) return false;
+
+      await apiService.updateFrame({
+        id: frameId,
+        name: newName,
+        width: frame.width,
+        height: frame.height,
+        backgroundPrompt: frame.background_prompt,
+        backgroundImageUrl: frame.background_image_url,
+        slots: frame.slots,
+        elements: frame.elements
+      });
+      showToast('Đã đổi tên frame thành công!', 'success');
+      
+      // If we are currently editing this frame, update canvas state too
+      if (tpl.editingTemplateId === frameId) {
+        cs.setFrameName(newName);
+      }
+      
+      await tpl.fetchSavedFrames();
+      return true;
+    } catch (error) {
+      showToast('Lỗi đổi tên frame: ' + String(error), 'error');
+      return false;
+    }
+  };
+
+  const renderEditor = () => (
+    <main className="flex min-w-0 min-h-0 flex-1 flex-col bg-slate-50">
+      <EditorToolbar
+        selectedId={layers.selectedId}
+        onAddSlot={layers.handleAddSlot}
+        onAddText={layers.handleAddText}
+        onAddSticker={layers.handleAddSticker}
+        onAddImage={layers.handleAddImage}
+        onAddQr={layers.handleAddQr}
+        onAddBackgroundFrame={(file) => layers.handleAddBackgroundFrame(file, cs.setBgImageUrl, cs.setBackgroundType)}
+        onDeleteElement={layers.handleDeleteElement}
+        onClearCanvas={() => {
+          if (layers.handleClearCanvas()) cs.setBgImageUrl(null);
+        }}
+        onUndo={layers.handleUndo}
+        onRedo={layers.handleRedo}
+        canUndo={layers.canUndo}
+        canRedo={layers.canRedo}
+        userRole={tpl.userRole}
+        editingTemplateId={tpl.editingTemplateId}
+        isSavingTemplate={tpl.isSavingTemplate}
+        onUpdateTemplateInDb={handleRequestSave}
+        isExporting={exp.isExporting}
+        onExportPNG={exp.handleExportPNG}
+        isExportingZip={exp.isExportingZip}
+        zipExportSuccess={exp.zipExportSuccess}
+        onExportDslrboothZip={exp.handleExportDslrboothZip}
+        onNewFrame={handleNewFrame}
+        onOpenPreview={() => setView('preview')}
+        onOpenLibrary={() => setView('library')}
         frameName={cs.frameName}
-        onFrameNameChange={cs.setFrameName}
-        onLogout={handleLogout}
-        onToggleSidebar={() => {
-          setIsMobileSidebarOpen(!isMobileSidebarOpen);
-          setIsMobileInspectorOpen(false);
-        }}
-        onToggleInspector={() => {
-          setIsMobileInspectorOpen(!isMobileInspectorOpen);
-          setIsMobileSidebarOpen(false);
-        }}
+        onEditFrameName={() => setIsSaveFrameOpen(true)}
       />
 
-      <div className="flex-1 flex overflow-hidden relative">
-        {isMobileSidebarOpen && (
-          <div
-            onClick={() => setIsMobileSidebarOpen(false)}
-            className="md:hidden fixed inset-0 z-20 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300"
-          />
-        )}
+      <div className="flex min-h-0 flex-1 overflow-hidden">
+        <Sidebar
+          onOpenAISettings={() => setIsAISettingsOpen(true)}
+          onAddSticker={layers.handleAddSticker}
+          onAddImage={layers.handleAddImage}
+          slots={layers.slots}
+          elements={layers.elements}
+          onSlotsChange={layers.setSlots}
+          onElementsChange={layers.setElements}
+          selectedId={layers.selectedId}
+          onSelectElement={(id, type) => {
+            layers.setSelectedId(id);
+            layers.setSelectedType(type);
+          }}
+          onDeleteElement={layers.handleDeleteElement}
+          paperSize={cs.paperSize}
+          onPaperSizeChange={cs.handlePaperSizeChange}
+          orientation={cs.orientation}
+          onOrientationChange={cs.handleOrientationChange}
+          width={cs.width}
+          onWidthChange={cs.setWidth}
+          height={cs.height}
+          onHeightChange={cs.setHeight}
+          resolution={cs.resolution}
+          onResolutionChange={cs.setResolution}
+          backgroundType={cs.backgroundType}
+          onBackgroundTypeChange={cs.setBackgroundType}
+          backgroundColor={cs.backgroundColor}
+          onBackgroundColorChange={cs.setBackgroundColor}
+          onBgGradientChange={cs.setBgGradient}
+          bgImageUrl={cs.bgImageUrl}
+          onBgImageUrlChange={cs.setBgImageUrl}
+          activeTab={layers.activeSidebarTab}
+          onActiveTabChange={layers.setActiveSidebarTab}
+          personalization={personalization}
+          onPersonalizationChange={setPersonalization}
+          onApplyPersonalization={() => undefined}
+          savedFrames={tpl.savedFrames}
+          onLoadSavedFrame={loadTemplateIntoEditor}
+          isExporting={exp.isExporting}
+          onExportPNG={exp.handleExportPNG}
+          isExportingZip={exp.isExportingZip}
+          zipExportSuccess={exp.zipExportSuccess}
+          onExportDslrboothZip={exp.handleExportDslrboothZip}
+          userRole={tpl.userRole}
+          editingTemplateId={tpl.editingTemplateId}
+          isSavingTemplate={tpl.isSavingTemplate}
+          onUpdateTemplateInDb={handleRequestSave}
+        />
 
-        <div
-          className={`fixed inset-y-0 left-0 z-30 transition-transform duration-300 transform md:static md:translate-x-0 md:flex md:z-10 h-full flex shrink-0 ${isMobileSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
-            }`}
-        >
-          <Sidebar
-            onOpenAISettings={() => setIsAISettingsOpen(true)}
-            onAddSticker={(url) => {
-              layers.handleAddSticker(url);
-              setIsMobileSidebarOpen(false);
-            }}
-            onAddImage={(file) => {
-              layers.handleAddImage(file);
-              setIsMobileSidebarOpen(false);
-            }}
-            slots={layers.slots}
-            elements={layers.elements}
-            onSlotsChange={layers.setSlots}
-            onElementsChange={layers.setElements}
-            selectedId={layers.selectedId}
-            onSelectElement={(id, type) => {
-              layers.setSelectedId(id);
-              layers.setSelectedType(type);
-              if (id) {
-                setIsMobileInspectorOpen(true);
-                setIsMobileSidebarOpen(false);
-              }
-            }}
-            onDeleteElement={layers.handleDeleteElement}
-            paperSize={cs.paperSize}
-            onPaperSizeChange={cs.handlePaperSizeChange}
-            orientation={cs.orientation}
-            onOrientationChange={cs.handleOrientationChange}
-            width={cs.width}
-            onWidthChange={cs.setWidth}
-            height={cs.height}
-            onHeightChange={cs.setHeight}
-            resolution={cs.resolution}
-            onResolutionChange={cs.setResolution}
-            backgroundType={cs.backgroundType}
-            onBackgroundTypeChange={cs.setBackgroundType}
-            backgroundColor={cs.backgroundColor}
-            onBackgroundColorChange={cs.setBackgroundColor}
-            onBgGradientChange={cs.setBgGradient}
-            bgImageUrl={cs.bgImageUrl}
-            onBgImageUrlChange={cs.setBgImageUrl}
-            activeTab={layers.activeSidebarTab}
-            onActiveTabChange={layers.setActiveSidebarTab}
-            personalization={personalization}
-            onPersonalizationChange={setPersonalization}
-            onApplyPersonalization={() => {
-              layers.setElements(applyPersonalizationToElements(layers.elements, personalization));
-              layers.setActiveSidebarTab('layers');
-            }}
-            savedFrames={tpl.savedFrames}
-            onLoadSavedFrame={loadTemplateIntoStudio}
-            isExporting={exp.isExporting}
-            onExportPNG={exp.handleExportPNG}
-            isExportingZip={exp.isExportingZip}
-            zipExportSuccess={exp.zipExportSuccess}
-            onExportDslrboothZip={exp.handleExportDslrboothZip}
-            userRole={tpl.userRole}
-            editingTemplateId={tpl.editingTemplateId}
-            isSavingTemplate={tpl.isSavingTemplate}
-            onUpdateTemplateInDb={tpl.handleUpdateTemplateInDb}
-            onSaveNewTemplateToDb={tpl.handleSaveNewTemplateToDb}
-          />
-        </div>
-
-        <main className="flex-1 min-w-0 flex flex-col relative bg-[#f0f3ff]">
-          <EditorToolbar
-            selectedId={layers.selectedId}
-            onAddSlot={layers.handleAddSlot}
-            onAddText={layers.handleAddText}
-            onAddSticker={layers.handleAddSticker}
-            onAddImage={layers.handleAddImage}
-            onAddQr={layers.handleAddQr}
-            onAddBackgroundFrame={(file) => layers.handleAddBackgroundFrame(file, cs.setBgImageUrl, cs.setBackgroundType)}
-            onDeleteElement={layers.handleDeleteElement}
-            onClearCanvas={() => {
-              if (layers.handleClearCanvas()) cs.setBgImageUrl(null);
-            }}
-            onUndo={layers.handleUndo}
-            onRedo={layers.handleRedo}
-            canUndo={layers.canUndo}
-            canRedo={layers.canRedo}
-            userRole={tpl.userRole}
-            editingTemplateId={tpl.editingTemplateId}
-            isSavingTemplate={tpl.isSavingTemplate}
-            onUpdateTemplateInDb={tpl.handleUpdateTemplateInDb}
-            onSaveNewTemplateToDb={tpl.handleSaveNewTemplateToDb}
-            isExporting={exp.isExporting}
-            onExportPNG={exp.handleExportPNG}
-            isExportingZip={exp.isExportingZip}
-            zipExportSuccess={exp.zipExportSuccess}
-            onExportDslrboothZip={exp.handleExportDslrboothZip}
-            onNewFrame={handleNewFrame}
-          />
-          <CanvasEditor
-            width={cs.width}
-            height={cs.height}
-            backgroundImageUrl={cs.bgImageUrl}
-            slots={layers.slots}
-            elements={layers.elements}
-            onSlotsChange={layers.setSlots}
-            onElementsChange={layers.setElements}
-            selectedId={layers.selectedId}
-            onSelectElement={(id, type) => {
-              layers.setSelectedId(id);
-              layers.setSelectedType(type);
-            }}
-            showGrid={cs.showGrid}
-            snapToGrid={cs.snapToGrid}
-            backgroundColor={cs.backgroundColor}
-            backgroundType={cs.backgroundType}
-            bgGradient={cs.bgGradient}
-            onAutoDetectSlots={exp.handleAutoDetectSlots}
-            isDetectingSlots={exp.isDetectingSlots}
-          />
+        <section className="relative flex min-w-0 min-h-0 flex-1 flex-col">
+          <Suspense
+            fallback={
+              <div className="flex flex-1 items-center justify-center bg-slate-900 text-sm font-bold text-slate-300">
+                Dang tai canvas...
+              </div>
+            }
+          >
+            <CanvasEditor
+              width={cs.width}
+              height={cs.height}
+              backgroundImageUrl={cs.bgImageUrl}
+              slots={layers.slots}
+              elements={layers.elements}
+              onSlotsChange={layers.setSlots}
+              onElementsChange={layers.setElements}
+              selectedId={layers.selectedId}
+              onSelectElement={(id, type) => {
+                layers.setSelectedId(id);
+                layers.setSelectedType(type);
+              }}
+              showGrid={cs.showGrid}
+              snapToGrid={cs.snapToGrid}
+              backgroundColor={cs.backgroundColor}
+              backgroundType={cs.backgroundType}
+              bgGradient={cs.bgGradient}
+              onAutoDetectSlots={exp.handleAutoDetectSlots}
+              isDetectingSlots={exp.isDetectingSlots}
+            />
+          </Suspense>
           <ViewportControls
             showGrid={cs.showGrid}
             snapToGrid={cs.snapToGrid}
@@ -254,66 +364,93 @@ export function App() {
             onToggleSnap={() => cs.setSnapToGrid(!cs.snapToGrid)}
           />
           <ExportModal exportResult={exp.exportResult} onClose={() => exp.setExportResult(null)} />
-          <AISettingsModal isOpen={isAISettingsOpen} onClose={() => setIsAISettingsOpen(false)} />
-        </main>
+        </section>
 
-        {isMobileInspectorOpen && (
-          <div
-            onClick={() => {
-              closeMobilePanels();
-              layers.setSelectedId(null);
-              layers.setSelectedType(null);
-            }}
-            className="md:hidden fixed inset-0 z-20 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300"
-          />
-        )}
-
-        <div
-          className={`fixed inset-y-0 right-0 z-30 transition-transform duration-300 transform md:static md:translate-x-0 md:flex md:z-10 h-full flex shrink-0 ${isMobileInspectorOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full md:translate-x-0'
-            }`}
-        >
-          <Inspector
-            selectedId={layers.selectedId}
-            selectedType={layers.selectedType}
-            activeElement={layers.activeElement}
-            onUpdateProp={layers.handleUpdateSelectedProp}
-            onDeleteElement={(id) => {
-              layers.handleDeleteElement(id);
-              setIsMobileInspectorOpen(false);
-            }}
-            onDuplicateElement={layers.handleDuplicateElement}
-            onMoveLayerOrder={layers.handleMoveLayerOrder}
-            onAlignElement={layers.handleAlignElement}
-            isExporting={exp.isExporting}
-            onExportPNG={() => {
-              exp.handleExportPNG();
-              setIsMobileInspectorOpen(false);
-            }}
-            isExportingZip={exp.isExportingZip}
-            zipExportSuccess={exp.zipExportSuccess}
-            onExportDslrboothZip={() => {
-              exp.handleExportDslrboothZip();
-              setIsMobileInspectorOpen(false);
-            }}
-            savedFrames={tpl.savedFrames}
-            onLoadSavedFrame={loadTemplateIntoStudio}
-            slotsCount={layers.slots.length}
-            elementsCount={layers.elements.length}
-            canvasWidth={cs.width}
-            canvasHeight={cs.height}
-            onClose={() => {
-              layers.setSelectedId(null);
-              layers.setSelectedType(null);
-              setIsMobileInspectorOpen(false);
-            }}
-            userRole={tpl.userRole}
-            editingTemplateId={tpl.editingTemplateId}
-            isSavingTemplate={tpl.isSavingTemplate}
-            onUpdateTemplateInDb={tpl.handleUpdateTemplateInDb}
-            onSaveNewTemplateToDb={tpl.handleSaveNewTemplateToDb}
-          />
-        </div>
+        <Inspector
+          selectedId={layers.selectedId}
+          selectedType={layers.selectedType}
+          activeElement={layers.activeElement}
+          onUpdateProp={layers.handleUpdateSelectedProp}
+          onDeleteElement={layers.handleDeleteElement}
+          onDuplicateElement={layers.handleDuplicateElement}
+          onMoveLayerOrder={layers.handleMoveLayerOrder}
+          onAlignElement={layers.handleAlignElement}
+          isExporting={exp.isExporting}
+          onExportPNG={exp.handleExportPNG}
+          isExportingZip={exp.isExportingZip}
+          zipExportSuccess={exp.zipExportSuccess}
+          onExportDslrboothZip={exp.handleExportDslrboothZip}
+          savedFrames={tpl.savedFrames}
+          onLoadSavedFrame={loadTemplateIntoEditor}
+          slotsCount={layers.slots.length}
+          elementsCount={layers.elements.length}
+          canvasWidth={cs.width}
+          canvasHeight={cs.height}
+          userRole={tpl.userRole}
+          editingTemplateId={tpl.editingTemplateId}
+          isSavingTemplate={tpl.isSavingTemplate}
+          onUpdateTemplateInDb={handleRequestSave}
+        />
       </div>
+    </main>
+  );
+
+  return (
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-white text-slate-950">
+      <AppNav />
+
+      {view === 'library' && (
+        <FrameLibrary
+          frames={tpl.savedFrames}
+          onCreateNew={() => setIsCreateFrameOpen(true)}
+          onEditFrame={loadTemplateIntoEditor}
+          onRefresh={tpl.fetchSavedFrames}
+          onDuplicateFrame={handleDuplicateFrame}
+          onDeleteFrame={handleDeleteFrame}
+          onRenameFrame={handleRenameFrame}
+          onOpenEditor={() => setView('editor')}
+        />
+      )}
+
+      {view === 'editor' && renderEditor()}
+
+      {view === 'preview' && (
+        <FramePreviewStep
+          frameName={cs.frameName}
+          width={cs.width}
+          height={cs.height}
+          slots={layers.slots}
+          elements={layers.elements}
+          backgroundType={cs.backgroundType}
+          backgroundColor={cs.backgroundColor}
+          bgGradient={cs.bgGradient}
+          bgImageUrl={cs.bgImageUrl}
+          isExporting={exp.isExporting}
+          isExportingZip={exp.isExportingZip}
+          onBack={() => setView('editor')}
+          onExportPNG={exp.handleExportPNG}
+          onExportZip={exp.handleExportDslrboothZip}
+        />
+      )}
+
+      <CreateFrameModal
+        isOpen={isCreateFrameOpen}
+        onClose={() => setIsCreateFrameOpen(false)}
+        onCreate={handleCreateFrame}
+      />
+      <SaveFrameModal
+        isOpen={isSaveFrameOpen}
+        defaultName={cs.frameName}
+        isSaving={tpl.isSavingTemplate}
+        onClose={() => setIsSaveFrameOpen(false)}
+        onSave={handleSaveFrameName}
+      />
+      {isAISettingsOpen && (
+        <Suspense fallback={null}>
+          <AISettingsModal isOpen={isAISettingsOpen} onClose={() => setIsAISettingsOpen(false)} />
+        </Suspense>
+      )}
+      {view !== 'editor' && <ExportModal exportResult={exp.exportResult} onClose={() => exp.setExportResult(null)} />}
     </div>
   );
 }

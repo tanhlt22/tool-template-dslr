@@ -4,6 +4,7 @@ import {
   Camera, Type, Settings, ChevronDown, ChevronUp, Check, Image as ImageIcon
 } from 'lucide-react';
 import { apiService } from '../../services/api';
+import { useUI } from '../../contexts/UIContext';
 
 interface Slot {
   id: string;
@@ -52,6 +53,7 @@ interface AdminTabProps {
 export const AdminTab: React.FC<AdminTabProps> = ({ onLoadTemplateToStudioAI }) => {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { showToast, showConfirm } = useUI();
   
   // Cloudinary credentials
   const [cloudName, setCloudName] = useState('');
@@ -127,17 +129,24 @@ export const AdminTab: React.FC<AdminTabProps> = ({ onLoadTemplateToStudioAI }) 
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa vĩnh viễn mẫu thiết kế này khỏi Supabase? Hành động này không thể hoàn tác.')) {
+  const handleDeleteFrame = async (frameId: string) => {
+    const ok = await showConfirm({
+      title: 'Cảnh báo',
+      message: 'Bạn có chắc chắn muốn xóa vĩnh viễn mẫu thiết kế này khỏi Supabase? Hành động này không thể hoàn tác.',
+      confirmText: 'Xóa vĩnh viễn',
+      cancelText: 'Hủy'
+    });
+    
+    if (!ok) {
       return;
     }
 
     try {
-      await apiService.deleteFrame(id);
-      setTemplates(templates.filter(t => t.id !== id));
-      alert('Đã xóa mẫu thiết kế thành công!');
-    } catch (e) {
-      alert('Lỗi khi xóa mẫu: ' + e);
+      await apiService.deleteFrame(frameId);
+      showToast('Đã xóa mẫu thiết kế thành công!', 'success');
+      fetchTemplates();
+    } catch (e: any) {
+      showToast('Lỗi khi xóa mẫu: ' + e, 'error');
     }
   };
 
@@ -305,7 +314,7 @@ export const AdminTab: React.FC<AdminTabProps> = ({ onLoadTemplateToStudioAI }) 
                     <div className="flex items-center justify-end gap-2 mt-auto">
                       {isDefault ? (
                         <button
-                          onClick={() => alert('Mẫu mặc định không được phép chỉnh sửa hoặc xóa để bảo vệ tính nhất quán của hệ thống. Bạn có thể tự do tạo mẫu mới!')}
+                          onClick={() => showToast('Mẫu mặc định không được phép chỉnh sửa hoặc xóa để bảo vệ tính nhất quán của hệ thống. Bạn có thể tự do tạo mẫu mới!', 'info')}
                           className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-500 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1 border border-slate-200/50"
                         >
                           <Lock className="w-3.5 h-3.5" /> Mặc Định (Fix)
@@ -313,7 +322,7 @@ export const AdminTab: React.FC<AdminTabProps> = ({ onLoadTemplateToStudioAI }) 
                       ) : (
                         <>
                           <button
-                            onClick={() => handleDelete(tmpl.id)}
+                            onClick={() => handleDeleteFrame(tmpl.id)}
                             className="px-3.5 py-2 hover:bg-rose-50 border border-rose-250 text-rose-600 rounded-xl text-xs font-bold transition-all active:scale-95"
                             title="Xóa mẫu"
                           >
