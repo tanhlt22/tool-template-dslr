@@ -192,6 +192,10 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const payload = await req.json();
+    const adminPassword = process.env.ADMIN_PASSWORD || 'theanh2002';
+    if (payload.password !== adminPassword) {
+      return NextResponse.json({ error: 'Mật khẩu quản trị không đúng. Truy cập bị từ chối!' }, { status: 401 });
+    }
     const frameId = crypto.randomUUID();
     const createdAt = new Date().toISOString();
 
@@ -250,6 +254,10 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const payload = await req.json();
+    const adminPassword = process.env.ADMIN_PASSWORD || 'theanh2002';
+    if (payload.password !== adminPassword) {
+      return NextResponse.json({ error: 'Mật khẩu quản trị không đúng. Truy cập bị từ chối!' }, { status: 401 });
+    }
     const { id, name, width, height, backgroundPrompt, backgroundImageUrl, slots, elements } = payload;
     
     if (!id) {
@@ -296,6 +304,13 @@ export async function PUT(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
+    const password = searchParams.get('password') || '';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'theanh2002';
+    
+    if (password !== adminPassword) {
+      return NextResponse.json({ error: 'Mật khẩu quản trị không đúng. Truy cập bị từ chối!' }, { status: 401 });
+    }
+
     const id = searchParams.get('id');
     if (!id) {
       return NextResponse.json({ error: 'Thiếu ID khung ảnh cần xóa' }, { status: 400 });

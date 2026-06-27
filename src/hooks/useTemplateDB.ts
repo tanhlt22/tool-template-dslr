@@ -67,9 +67,9 @@ export function useTemplateDB(
     }
   };
 
-  const handleUpdateTemplateInDb = async (templateName?: string) => {
+  const handleUpdateTemplateInDb = async (templateName?: string, password?: string) => {
     if (!editingTemplateId) {
-      return handleSaveNewTemplateToDb(templateName);
+      return handleSaveNewTemplateToDb(templateName, password);
     }
 
     setIsSavingTemplate(true);
@@ -82,7 +82,8 @@ export function useTemplateDB(
         backgroundPrompt: currentState.prompt,
         backgroundImageUrl: currentState.bgImageUrl,
         slots: currentState.slots,
-        elements: currentState.elements
+        elements: currentState.elements,
+        password: password
       });
       showToast('Đã lưu cập nhật mẫu thành công.', 'success');
       fetchSavedFrames();
@@ -95,7 +96,7 @@ export function useTemplateDB(
     }
   };
 
-  const handleSaveNewTemplateToDb = async (templateName?: string) => {
+  const handleSaveNewTemplateToDb = async (templateName?: string, password?: string) => {
     const finalName = (templateName || currentState.frameName || 'Mẫu mới').trim() || 'Mẫu mới';
 
     setIsSavingTemplate(true);
@@ -107,7 +108,8 @@ export function useTemplateDB(
         backgroundPrompt: currentState.prompt,
         backgroundImageUrl: currentState.bgImageUrl,
         slots: currentState.slots,
-        elements: currentState.elements
+        elements: currentState.elements,
+        password: password
       });
       if (result?.frame_id) {
         setEditingTemplateId(result.frame_id);

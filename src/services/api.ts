@@ -141,8 +141,8 @@ export const apiService = {
   /**
    * Delete a template
    */
-  async deleteFrame(frameId: string): Promise<any> {
-    const res = await fetch(`/api/frames?id=${frameId}`, {
+  async deleteFrame(frameId: string, password?: string): Promise<any> {
+    const res = await fetch(`/api/frames?id=${frameId}&password=${encodeURIComponent(password || '')}`, {
       method: 'DELETE'
     });
     if (!res.ok) {

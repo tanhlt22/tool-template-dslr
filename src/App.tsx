@@ -166,15 +166,9 @@ export function App() {
     });
 
     if (password === null) return;
-    
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'theanh2002';
-    if (password !== adminPassword) {
-      showToast('Mật khẩu không đúng. Không thể xóa!', 'error');
-      return;
-    }
 
     try {
-      await apiService.deleteFrame(frame.id);
+      await apiService.deleteFrame(frame.id, password);
       showToast('Đã xóa mẫu thành công!', 'success');
       await tpl.fetchSavedFrames();
     } catch (error) {
@@ -187,11 +181,6 @@ export function App() {
   };
 
   const handleSaveFrameName = async (name: string, password?: string) => {
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'theanh2002';
-    if (password !== adminPassword) {
-      showToast('Mật khẩu không đúng. Không thể lưu!', 'error');
-      return;
-    }
 
     if (!name.trim()) {
       showToast('Vui lòng nhập tên frame!', 'error');
@@ -199,13 +188,13 @@ export function App() {
     }
 
     if (tpl.editingTemplateId) {
-      const ok = await tpl.handleUpdateTemplateInDb(name.trim());
+      const ok = await tpl.handleUpdateTemplateInDb(name.trim(), password);
       if (ok) {
         cs.setFrameName(name.trim());
         setIsSaveFrameOpen(false);
       }
     } else {
-      const ok = await tpl.handleSaveNewTemplateToDb(name);
+      const ok = await tpl.handleSaveNewTemplateToDb(name, password);
       if (ok) {
         cs.setFrameName(name.trim());
         setIsSaveFrameOpen(false);
@@ -213,7 +202,7 @@ export function App() {
     }
   };
 
-  const handleRenameFrame = async (frameId: string, newName: string) => {
+  const handleRenameFrame = async (frameId: string, newName: string, password?: string) => {
     try {
       const frame = tpl.savedFrames.find(f => f.id === frameId);
       if (!frame) return false;
@@ -226,7 +215,8 @@ export function App() {
         backgroundPrompt: frame.background_prompt,
         backgroundImageUrl: frame.background_image_url,
         slots: frame.slots,
-        elements: frame.elements
+        elements: frame.elements,
+        password: password
       });
       showToast('Đã đổi tên frame thành công!', 'success');
       

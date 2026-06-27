@@ -25,7 +25,7 @@ interface FrameLibraryProps {
   onRefresh: () => void;
   onDuplicateFrame: (frame: TemplateRecord) => void;
   onDeleteFrame: (frame: TemplateRecord) => void;
-  onRenameFrame?: (frameId: string, newName: string) => Promise<boolean>;
+  onRenameFrame?: (frameId: string, newName: string, password?: string) => Promise<boolean>;
   onOpenEditor?: () => void;
 }
 
@@ -136,12 +136,6 @@ export const FrameLibrary: React.FC<FrameLibraryProps> = ({
     });
 
     if (password === null) return;
-    
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'theanh2002';
-    if (password !== adminPassword) {
-      showToast('Mật khẩu không đúng. Không thể đổi tên!', 'error');
-      return;
-    }
 
     const newName = await showPrompt({
       title: 'Đổi tên Frame',
@@ -153,7 +147,7 @@ export const FrameLibrary: React.FC<FrameLibraryProps> = ({
     });
 
     if (newName !== null && newName.trim() !== '' && newName.trim() !== frame.name) {
-      await onRenameFrame(frame.id, newName.trim());
+      await onRenameFrame(frame.id, newName.trim(), password);
     }
   };
 
