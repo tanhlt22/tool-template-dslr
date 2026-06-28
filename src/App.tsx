@@ -144,10 +144,11 @@ export function App() {
       showToast('Đây là mẫu minh họa, không có bản ghi để xóa.', 'info');
       return;
     }
-    if (tpl.userRole !== 'admin') {
-      showToast('Chỉ quản trị viên mới có quyền xóa mẫu.', 'error');
-      return;
-    }
+    // Bỏ check phân quyền ở frontend để user luôn thấy ô nhập pass admin
+    // if (tpl.userRole !== 'admin') {
+    //   showToast('Chỉ quản trị viên mới có quyền xóa mẫu.', 'error');
+    //   return;
+    // }
     const ok = await showConfirm({
       title: 'Xác nhận xóa',
       message: `Bạn có chắc chắn muốn xóa mẫu "${frame.name}"? Hành động này không thể hoàn tác.`,

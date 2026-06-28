@@ -153,7 +153,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside className="w-72 shrink-0 border-r border-slate-200 bg-white flex flex-col overflow-hidden">
       <div className="border-b border-slate-200 p-3">
         <label htmlFor="frame-select" className="mb-1 block text-xs font-black text-slate-700">
-          Frame của sự kiện
+          Frame mẫu
         </label>
         <select
           id="frame-select"
