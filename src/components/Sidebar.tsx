@@ -238,6 +238,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="text-[11px] font-bold text-slate-500">{layers.length}</span>
           </div>
 
+          <div className="flex items-center gap-2 mb-3">
+            <button
+              onClick={() => {
+                const layer = layers.find(l => l.id === selectedId);
+                if (layer) moveLayerUp(layer);
+              }}
+              disabled={!selectedId}
+              className="flex-1 flex flex-col items-center justify-center py-1.5 border border-slate-200 rounded-md hover:bg-slate-50 text-[#111c2d] disabled:opacity-40 transition-colors"
+            >
+              <ChevronUp className="w-4 h-4 mb-0.5" />
+              <span className="text-[10px] font-bold">Lên</span>
+            </button>
+            <button
+              onClick={() => {
+                const layer = layers.find(l => l.id === selectedId);
+                if (layer) moveLayerDown(layer);
+              }}
+              disabled={!selectedId}
+              className="flex-1 flex flex-col items-center justify-center py-1.5 border border-slate-200 rounded-md hover:bg-slate-50 text-[#111c2d] disabled:opacity-40 transition-colors"
+            >
+              <ChevronDown className="w-4 h-4 mb-0.5" />
+              <span className="text-[10px] font-bold">Xuống</span>
+            </button>
+            <button
+              onClick={() => {
+                const layer = layers.find(l => l.id === selectedId);
+                if (layer) duplicateLayer(layer);
+              }}
+              disabled={!selectedId}
+              className="flex-1 flex flex-col items-center justify-center py-1.5 border border-slate-200 rounded-md hover:bg-slate-50 text-[#111c2d] disabled:opacity-40 transition-colors"
+            >
+              <Copy className="w-4 h-4 mb-0.5" />
+              <span className="text-[10px] font-bold">Copy</span>
+            </button>
+          </div>
+
           <div className="space-y-1.5">
             {[...layers].reverse().map((layer) => {
               const isSelected = selectedId === layer.id;
@@ -272,33 +308,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => moveLayerUp(layer)}
-                    aria-label="Len"
-                    title="Lên"
-                    className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
-                  >
-                    <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => moveLayerDown(layer)}
-                    aria-label="Xuong"
-                    title="Xuống"
-                    className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
-                  >
-                    <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => duplicateLayer(layer)}
-                    aria-label="Copy"
-                    title="Copy"
-                    className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
-                  >
-                    <Copy className="h-3.5 w-3.5" aria-hidden="true" />
-                  </button>
                   <button
                     type="button"
                     onClick={() => toggleLock(layer)}
