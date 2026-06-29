@@ -182,7 +182,10 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       try {
         editorOnlyObjects.forEach((obj) => obj.set('visible', false));
         currentCanvas.renderAll();
-        const sourceCanvas = (currentCanvas as any).toCanvasElement?.(1) as HTMLCanvasElement | undefined;
+        const sourceCanvas = (
+          (currentCanvas as any).toCanvasElement?.(1) ||
+          (currentCanvas as any).lowerCanvasEl
+        ) as HTMLCanvasElement | undefined;
         const exportCanvas = document.createElement('canvas');
         exportCanvas.width = width;
         exportCanvas.height = height;

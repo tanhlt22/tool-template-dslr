@@ -270,7 +270,17 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
 
   // Delete, duplicate, z-index reorder, alignment
   const handleDeleteElement = (id: string) => {
-    setSlots(slots.filter(s => s.id !== id));
+    const deletedSlot = slots.find(s => s.id === id);
+    if (deletedSlot) {
+      setSlots(
+        slots
+          .filter(s => s.id !== id)
+          .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
+          .map((slot, index) => ({ ...slot, order: index + 1 }))
+      );
+    } else {
+      setSlots(slots.filter(s => s.id !== id));
+    }
     setElements(elements.filter(e => e.id !== id));
     if (selectedId === id) {
       setSelectedId(null);
