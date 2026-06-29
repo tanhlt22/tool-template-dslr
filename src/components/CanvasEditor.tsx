@@ -600,7 +600,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         lockRotation: isLocked,
         lockScalingX: isLocked,
         lockScalingY: isLocked,
-        hasControls: !isLocked
+        hasControls: !isLocked,
+        selectable: !isLocked,
+        evented: !isLocked
       });
     };
 
