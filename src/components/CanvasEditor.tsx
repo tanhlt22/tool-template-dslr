@@ -1015,14 +1015,14 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
             title="Tự động quét đục lỗ ô ảnh"
           >
             <Sparkles className="w-4 h-4 text-rose-800" />
-            Quét tạo bố cục
+            Quét vị trí ảnh
           </button>
         ) : (
           <div className="absolute top-4 right-4 z-10 bg-white border border-slate-200 rounded-md p-4 shadow-xl max-w-sm flex flex-col gap-3 animate-fade-in">
             <div className="flex items-center justify-between gap-6">
               <h4 className="text-xs font-black text-rose-800 uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-rose-800" />
-                QUÉT TẠO BỐ CỤC
+                NHẬN DIỆN VỊ TRÍ ẢNH
               </h4>
               <button
                 onClick={() => setDismissed(true)}
@@ -1033,7 +1033,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
               </button>
             </div>
             <p className="text-[11px] text-slate-500 font-bold leading-normal">
-              Tự động định vị tọa độ từ ảnh khung PNG (chỗ trong suốt), khối màu xanh hoặc khối màu trắng.
+              Tự động quét và nhận diện các khu vực để đặt ảnh chụp (vùng rỗng trong suốt, khối màu xanh hoặc trắng) từ ảnh nền.
             </p>
             <div className="flex items-center gap-2">
               <select
