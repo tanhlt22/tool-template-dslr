@@ -230,48 +230,53 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <div className="flex-1 overflow-y-auto p-3">
         <section className="mb-4">
-          <div className="mb-2 flex items-center justify-between">
-            <h2 className="inline-flex items-center gap-2 text-xs font-black text-slate-900">
-              <Layers className="h-4 w-4" aria-hidden="true" />
-              Lớp hiển thị
-            </h2>
-            <span className="text-[11px] font-bold text-slate-500">{layers.length}</span>
-          </div>
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h2 className="inline-flex items-center gap-1.5 text-xs font-black text-slate-900">
+                <Layers className="h-4 w-4" aria-hidden="true" />
+                Lớp hiển thị
+              </h2>
+              <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-full">{layers.length}</span>
+            </div>
 
-          <div className="flex items-center gap-2 mb-3">
-            <button
-              onClick={() => {
-                const layer = layers.find(l => l.id === selectedId);
-                if (layer) moveLayerUp(layer);
-              }}
-              disabled={!selectedId}
-              className="flex-1 flex flex-col items-center justify-center py-1.5 border border-slate-200 rounded-md hover:bg-slate-50 text-[#111c2d] disabled:opacity-40 transition-colors"
-            >
-              <ChevronUp className="w-4 h-4 mb-0.5" />
-              <span className="text-[10px] font-bold">Lên</span>
-            </button>
-            <button
-              onClick={() => {
-                const layer = layers.find(l => l.id === selectedId);
-                if (layer) moveLayerDown(layer);
-              }}
-              disabled={!selectedId}
-              className="flex-1 flex flex-col items-center justify-center py-1.5 border border-slate-200 rounded-md hover:bg-slate-50 text-[#111c2d] disabled:opacity-40 transition-colors"
-            >
-              <ChevronDown className="w-4 h-4 mb-0.5" />
-              <span className="text-[10px] font-bold">Xuống</span>
-            </button>
-            <button
-              onClick={() => {
-                const layer = layers.find(l => l.id === selectedId);
-                if (layer) duplicateLayer(layer);
-              }}
-              disabled={!selectedId}
-              className="flex-1 flex flex-col items-center justify-center py-1.5 border border-slate-200 rounded-md hover:bg-slate-50 text-[#111c2d] disabled:opacity-40 transition-colors"
-            >
-              <Copy className="w-4 h-4 mb-0.5" />
-              <span className="text-[10px] font-bold">Copy</span>
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => {
+                  const layer = layers.find(l => l.id === selectedId);
+                  if (layer) moveLayerUp(layer);
+                }}
+                disabled={!selectedId}
+                className="flex flex-col items-center justify-center w-8 h-8 border border-slate-200 rounded bg-white hover:bg-slate-50 text-slate-700 disabled:opacity-40 transition-colors"
+                title="Lên"
+              >
+                <ChevronUp className="w-3 h-3" />
+                <span className="text-[8px] font-bold leading-none mt-0.5">Lên</span>
+              </button>
+              <button
+                onClick={() => {
+                  const layer = layers.find(l => l.id === selectedId);
+                  if (layer) moveLayerDown(layer);
+                }}
+                disabled={!selectedId}
+                className="flex flex-col items-center justify-center w-8 h-8 border border-slate-200 rounded bg-white hover:bg-slate-50 text-slate-700 disabled:opacity-40 transition-colors"
+                title="Xuống"
+              >
+                <ChevronDown className="w-3 h-3" />
+                <span className="text-[8px] font-bold leading-none mt-0.5">Xuống</span>
+              </button>
+              <button
+                onClick={() => {
+                  const layer = layers.find(l => l.id === selectedId);
+                  if (layer) duplicateLayer(layer);
+                }}
+                disabled={!selectedId}
+                className="flex flex-col items-center justify-center w-8 h-8 border border-slate-200 rounded bg-white hover:bg-slate-50 text-slate-700 disabled:opacity-40 transition-colors"
+                title="Copy"
+              >
+                <Copy className="w-3 h-3 mb-0.5" />
+                <span className="text-[8px] font-bold leading-none">Copy</span>
+              </button>
+            </div>
           </div>
 
           <div className="space-y-1.5">
