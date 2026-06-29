@@ -210,12 +210,12 @@ export async function generateClientBase64(
 
   await renderBackground(ctx, width, height, bgOptions, elements);
 
-  // Punch slot holes
-  punchSlotHoles(ctx, slots, true);
-
   // Draw elements
   ctx.globalCompositeOperation = 'source-over';
   await renderAllElements(ctx, elements);
+
+  // Punch slot holes after all artwork so photo areas stay transparent.
+  punchSlotHoles(ctx, slots, true);
 
   return canvas.toDataURL('image/png');
 }

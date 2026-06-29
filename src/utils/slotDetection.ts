@@ -1,6 +1,6 @@
 import { FrameElement, FrameSlot } from '../types/canvas';
 
-export type DetectType = 'transparency' | 'solid-green' | 'solid-white';
+export type DetectType = 'transparency' | 'solid-green' | 'solid-white' | 'photo-placeholder';
 
 interface DetectedRect {
   x: number;
@@ -114,9 +114,16 @@ function buildBinaryMask(
       const minC = Math.min(r, g, b);
       const sat = maxC === 0 ? 0 : (maxC - minC) / maxC;
       mask[i] = (g > 40 && g === maxC && sat > 0.15 && g > r * 1.15 && g > b * 1.15) ? 1 : 0;
-    } else {
+    } else if (detectType === 'solid-white') {
       const gray = 0.299 * r + 0.587 * g + 0.114 * b;
       mask[i] = gray > 220 ? 1 : 0;
+    } else {
+      const maxC = Math.max(r, g, b);
+      const minC = Math.min(r, g, b);
+      const sat = maxC === 0 ? 0 : (maxC - minC) / maxC;
+      const skyBlue = b > 145 && g > 145 && r > 95 && b >= r + 18 && g >= r + 8 && sat < 0.45;
+      const photoGreen = g > 120 && g === maxC && g > r * 1.12 && g > b * 1.08 && sat > 0.18;
+      mask[i] = skyBlue || photoGreen ? 1 : 0;
     }
     if (mask[i] === 1) maskCount++;
   }

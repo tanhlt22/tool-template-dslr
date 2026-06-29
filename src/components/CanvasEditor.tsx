@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { fabric } from 'fabric';
 import { Hand, Sparkles, X, ZoomIn, ZoomOut } from 'lucide-react';
 import { FrameSlot, FrameElement } from '../types/canvas';
+import { DetectType } from '../utils/slotDetection';
 
 const globalFabricImageCache: Record<string, HTMLImageElement> = {};
 
@@ -20,6 +21,27 @@ const loadCachedFabricImage = (url: string, callback: (img: fabric.Image) => voi
   }
 };
 
+const punchSnapshotSlotHoles = (
+  ctx: CanvasRenderingContext2D,
+  slots: FrameSlot[]
+) => {
+  ctx.globalCompositeOperation = 'destination-out';
+  slots.filter((slot) => slot.visible !== false).forEach((slot) => {
+    ctx.save();
+    const theta = (slot.rotation || 0) * Math.PI / 180;
+    const cx = slot.x + (slot.width / 2) * Math.cos(theta) - (slot.height / 2) * Math.sin(theta);
+    const cy = slot.y + (slot.width / 2) * Math.sin(theta) + (slot.height / 2) * Math.cos(theta);
+    ctx.translate(cx, cy);
+    ctx.rotate(theta);
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.roundRect(-slot.width / 2, -slot.height / 2, slot.width, slot.height, 8);
+    ctx.fill();
+    ctx.restore();
+  });
+  ctx.globalCompositeOperation = 'source-over';
+};
+
 interface CanvasEditorProps {
   width: number;
   height: number;
@@ -35,8 +57,9 @@ interface CanvasEditorProps {
   backgroundColor: string;
   backgroundType: 'color' | 'gradient' | 'ai';
   bgGradient: string;
-  onAutoDetectSlots?: (type: 'transparency' | 'solid-green' | 'solid-white') => void;
+  onAutoDetectSlots?: (type: DetectType) => void;
   isDetectingSlots?: boolean;
+  onCanvasSnapshotReady?: (capture: (() => string | null) | null) => void;
 }
 
 export const CanvasEditor: React.FC<CanvasEditorProps> = ({
@@ -55,13 +78,15 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   backgroundType,
   bgGradient,
   onAutoDetectSlots,
-  isDetectingSlots = false
+  isDetectingSlots = false,
+  onCanvasSnapshotReady
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvas = useRef<fabric.Canvas | null>(null);
   const isUpdatingFromProps = useRef<boolean>(false);
   const zoomRef = useRef(1);
+  const slotsRef = useRef(slots);
   const resizeCanvasContainerRef = useRef<(() => void) | null>(null);
   const pointerDownRef = useRef<{ x: number; y: number } | null>(null);
   const hitCycleRef = useRef<{ signature: string; index: number; time: number }>({
@@ -96,7 +121,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
   // States for automatic slot detection popup on canvas
   const [dismissed, setDismissed] = useState(true);
-  const [detectType, setDetectType] = useState<'transparency' | 'solid-green' | 'solid-white'>('transparency');
+  const [detectType, setDetectType] = useState<DetectType>('transparency');
 
   const prevImageCountRef = useRef(0);
   const prevBgImageUrlRef = useRef<string | null>(null);
@@ -107,6 +132,10 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     zoomRef.current = zoom;
     resizeCanvasContainerRef.current?.();
   }, [zoom]);
+
+  useEffect(() => {
+    slotsRef.current = slots;
+  }, [slots]);
 
   useEffect(() => {
     // Automatically trigger suggestion when a new image is added/uploaded
@@ -137,6 +166,41 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     });
 
     fabricCanvas.current = canvas;
+
+    const captureCurrentCanvas = () => {
+      const currentCanvas = fabricCanvas.current;
+      if (!currentCanvas) return null;
+
+      const editorOnlyObjects = currentCanvas
+        .getObjects()
+        .filter((obj) => obj.data?.isGridLine || obj.data?.isSlotLabel || obj.data?.type === 'slot');
+      const previousVisibility = editorOnlyObjects.map((obj) => ({
+        obj,
+        visible: obj.visible
+      }));
+
+      try {
+        editorOnlyObjects.forEach((obj) => obj.set('visible', false));
+        currentCanvas.renderAll();
+        const sourceCanvas = (currentCanvas as any).toCanvasElement?.(1) as HTMLCanvasElement | undefined;
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = width;
+        exportCanvas.height = height;
+        const exportCtx = exportCanvas.getContext('2d');
+        if (!sourceCanvas || !exportCtx) return null;
+
+        exportCtx.drawImage(sourceCanvas, 0, 0, width, height);
+        punchSnapshotSlotHoles(exportCtx, slotsRef.current);
+        return exportCanvas.toDataURL('image/png');
+      } catch {
+        return null;
+      } finally {
+        previousVisibility.forEach(({ obj, visible }) => obj.set('visible', visible));
+        currentCanvas.renderAll();
+      }
+    };
+
+    onCanvasSnapshotReady?.(captureCurrentCanvas);
 
     // Prevent browser auto-scroll-to-focus on Fabric.js hidden accessibility textarea
     const hiddenTextarea = (canvas as any).hiddenTextarea;
@@ -501,12 +565,13 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
     return () => {
       console.log('[CanvasEditor] Disposing Fabric.js canvas');
+      onCanvasSnapshotReady?.(null);
       window.removeEventListener('resize', resizeCanvasContainer);
       resizeCanvasContainerRef.current = null;
       canvas.dispose();
       fabricCanvas.current = null;
     };
-  }, [width, height, snapToGrid]);
+  }, [width, height, snapToGrid, onCanvasSnapshotReady]);
 
   // 2. Sync background color / gradient
   useEffect(() => {
@@ -976,6 +1041,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
                 <option value="transparency">Vùng rỗng trong suốt (PNG)</option>
                 <option value="solid-green">Khối màu xanh lá cây đậm</option>
                 <option value="solid-white">Khối màu trắng tinh</option>
+                <option value="photo-placeholder">Canva photo placeholder</option>
               </select>
               <button
                 onClick={async () => {

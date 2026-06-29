@@ -23,6 +23,7 @@ interface UseExportOptions {
   setSlots: (slots: FrameSlot[]) => void;
   setActiveSidebarTab: (tab: SidebarTab) => void;
   personalization?: PersonalizationData;
+  getCanvasSnapshot?: () => string | null;
 }
 
 interface ExportResult {
@@ -36,7 +37,7 @@ export function useExport(options: UseExportOptions) {
   const {
     width, height, slots, elements, frameName,
     backgroundType, backgroundColor, bgGradient, bgImageUrl, prompt,
-    setBgImageUrl, setSlots, setActiveSidebarTab, personalization
+    setBgImageUrl, setSlots, setActiveSidebarTab, personalization, getCanvasSnapshot
   } = options;
 
   const [isGeneratingBg, setIsGeneratingBg] = useState(false);
@@ -73,7 +74,7 @@ export function useExport(options: UseExportOptions) {
     setExportResult(null);
 
     try {
-      const finalImageBase64 = await generateClientBase64(width, height, slots, getExportElements(), bgOptions);
+      const finalImageBase64 = getCanvasSnapshot?.() || await generateClientBase64(width, height, slots, getExportElements(), bgOptions);
       setExportResult({
         success: true,
         frame_id: `client_${Date.now().toString().slice(-6)}`,
@@ -113,9 +114,9 @@ export function useExport(options: UseExportOptions) {
         ctx.fillRect(0, 0, width, height);
       }
 
-      punchSlotHoles(ctx, slots, true);
       ctx.globalCompositeOperation = 'source-over';
       await renderAllElements(ctx, getExportElements());
+      punchSlotHoles(ctx, slots, true);
 
       setExportResult({
         success: true,

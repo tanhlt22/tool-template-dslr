@@ -1,6 +1,6 @@
 'use client';
 
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useCallback, useRef, useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Inspector } from './components/Inspector';
 import { ExportModal } from './components/ExportModal';
@@ -35,6 +35,10 @@ export function App() {
   const [isSaveFrameOpen, setIsSaveFrameOpen] = useState(false);
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
   const [personalization, setPersonalization] = useState(DEFAULT_PERSONALIZATION);
+  const canvasSnapshotRef = useRef<(() => string | null) | null>(null);
+  const handleCanvasSnapshotReady = useCallback((capture: (() => string | null) | null) => {
+    canvasSnapshotRef.current = capture;
+  }, []);
 
   const cs = useCanvasState();
   const layers = useCanvasLayers({ width: cs.width, height: cs.height });
@@ -52,6 +56,7 @@ export function App() {
     bgImageUrl: cs.bgImageUrl,
     prompt: cs.prompt,
     personalization,
+    getCanvasSnapshot: () => canvasSnapshotRef.current?.() ?? null,
     setBgImageUrl: cs.setBgImageUrl,
     setSlots: layers.setSlots,
     setActiveSidebarTab: layers.setActiveSidebarTab
@@ -346,6 +351,7 @@ export function App() {
               bgGradient={cs.bgGradient}
               onAutoDetectSlots={exp.handleAutoDetectSlots}
               isDetectingSlots={exp.isDetectingSlots}
+              onCanvasSnapshotReady={handleCanvasSnapshotReady}
             />
           </Suspense>
           <ViewportControls
