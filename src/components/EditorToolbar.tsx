@@ -230,22 +230,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
       <div className="mx-1 h-7 w-px bg-slate-200" />
 
-      <div className="flex items-center gap-1.5 px-2">
-        <span className="text-sm font-black text-slate-900" title={frameName}>
-          {frameName.length > 20 ? frameName.substring(0, 20) + '...' : frameName}
-        </span>
-        <button
-          type="button"
-          onClick={onEditFrameName}
-          className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-rose-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
-          title="Đổi tên Frame"
-        >
-          <Edit3 className="h-3.5 w-3.5" aria-hidden="true" />
-        </button>
-      </div>
-
-      <div className="mx-1 h-7 w-px bg-slate-200" />
-
       <div className="flex flex-wrap items-center gap-1.5">
         <button
           type="button"

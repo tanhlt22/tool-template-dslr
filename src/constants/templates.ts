@@ -74,6 +74,7 @@ export const PAPER_SIZES = [
 ];
 
 export const GOOGLE_FONTS = [
+  { name: 'NVN Motherland Signature', value: "'NVN Motherland Signature', cursive" },
   { name: 'Hanken Grotesk (Hiện đại)', value: "'Hanken Grotesk', sans-serif" },
   { name: 'Pacifico (Nghệ thuật)', value: "'Pacifico', cursive" },
   { name: 'Great Vibes (Mềm mại)', value: "'Great Vibes', cursive" },

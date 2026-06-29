@@ -29,42 +29,7 @@ interface FrameLibraryProps {
   onOpenEditor?: () => void;
 }
 
-const fallbackTemplates: TemplateRecord[] = [
-  {
-    id: 'demo_strip_3',
-    name: '3slot_D_cut',
-    width: 600,
-    height: 1800,
-    slots: [
-      { id: 'slot_1', x: 70, y: 120, width: 460, height: 390, rotation: 0, order: 1 },
-      { id: 'slot_2', x: 70, y: 585, width: 460, height: 390, rotation: 0, order: 2 },
-      { id: 'slot_3', x: 70, y: 1050, width: 460, height: 390, rotation: 0, order: 3 }
-    ],
-    elements: []
-  },
-  {
-    id: 'demo_4x6_2',
-    name: 'Frame moi 2',
-    width: 1200,
-    height: 1800,
-    slots: [
-      { id: 'slot_1', x: 145, y: 175, width: 910, height: 580, rotation: 0, order: 1 },
-      { id: 'slot_2', x: 145, y: 835, width: 910, height: 580, rotation: 0, order: 2 }
-    ],
-    elements: []
-  },
-  {
-    id: 'demo_landscape_2',
-    name: 'Frame moi 3 cat',
-    width: 1800,
-    height: 1200,
-    slots: [
-      { id: 'slot_1', x: 780, y: 230, width: 425, height: 650, rotation: 0, order: 1 },
-      { id: 'slot_2', x: 1250, y: 230, width: 425, height: 650, rotation: 0, order: 2 }
-    ],
-    elements: []
-  }
-];
+const fallbackTemplates: TemplateRecord[] = [];
 
 const getFrames = (frames: TemplateRecord[]) => (frames.length > 0 ? frames : fallbackTemplates);
 
