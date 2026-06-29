@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { fabric } from 'fabric';
-import { Hand, Sparkles, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { Hand, Sparkles, X, ZoomIn, ZoomOut, PlayCircle } from 'lucide-react';
 import { FrameSlot, FrameElement } from '../types/canvas';
 import { DetectType } from '../utils/slotDetection';
 
@@ -122,6 +122,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   // States for automatic slot detection popup on canvas
   const [dismissed, setDismissed] = useState(true);
   const [detectType, setDetectType] = useState<DetectType>('transparency');
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const prevImageCountRef = useRef(0);
   const prevBgImageUrlRef = useRef<string | null>(null);
@@ -225,11 +226,12 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     // Custom styling for active object borders & handles
     fabric.Object.prototype.transparentCorners = false;
     fabric.Object.prototype.cornerColor = '#ffffff';
-    fabric.Object.prototype.cornerStrokeColor = '#38bdf8';
-    fabric.Object.prototype.borderColor = '#38bdf8';
-    fabric.Object.prototype.cornerSize = 12;
+    fabric.Object.prototype.cornerStrokeColor = '#e11d48';
+    fabric.Object.prototype.borderColor = '#e11d48';
+    fabric.Object.prototype.cornerSize = 16;
     fabric.Object.prototype.cornerStyle = 'circle';
-    fabric.Object.prototype.borderScaleFactor = 2.5;
+    fabric.Object.prototype.borderScaleFactor = 4;
+    fabric.Object.prototype.padding = 6;
 
     const updateSlotLabelForObject = (target?: fabric.Object) => {
       if (!target || target.data?.type !== 'slot') return;
@@ -1024,17 +1026,43 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
                 <Sparkles className="w-4 h-4 text-rose-800" />
                 NHẬN DIỆN VỊ TRÍ ẢNH
               </h4>
-              <button
-                onClick={() => setDismissed(true)}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-100 transition-colors"
-                title="Bỏ qua"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setShowTutorial(!showTutorial)}
+                  className="flex items-center gap-1 px-2 py-1 rounded bg-rose-50 text-rose-700 hover:bg-rose-100 text-[10px] font-bold transition-colors"
+                >
+                  <PlayCircle className="w-3.5 h-3.5" />
+                  Hướng dẫn
+                </button>
+                <button
+                  onClick={() => setDismissed(true)}
+                  className="p-1 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-100 transition-colors"
+                  title="Bỏ qua"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
             <p className="text-[11px] text-slate-500 font-bold leading-normal">
               Tự động quét và nhận diện các khu vực để đặt ảnh chụp (vùng rỗng trong suốt, khối màu xanh hoặc trắng) từ ảnh nền.
             </p>
+            {showTutorial && (
+              <div className="rounded-md bg-slate-100 p-1.5 shadow-inner border border-slate-200 mt-1 mb-2 relative overflow-hidden">
+                <video
+                  className="aspect-video w-full rounded bg-slate-950 object-cover"
+                  controls
+                  muted
+                  playsInline
+                  preload="metadata"
+                  poster="/tutorials/slot-scan-guide-poster.jpg"
+                >
+                  <source src="/tutorials/slot-scan-guide.mp4" type="video/mp4" />
+                </video>
+                <p className="mt-2 text-[10.5px] font-bold leading-relaxed text-slate-600">
+                  Them frame, chon kieu quet, bam quet, kiem tra slot roi xuat PNG.
+                </p>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <select
                 value={detectType}

@@ -67,7 +67,7 @@ interface SidebarProps {
   editingTemplateId: string | null;
   isSavingTemplate: boolean;
   onUpdateTemplateInDb: () => void;
-  onSaveNewTemplateToDb: () => void;
+  onSaveNewTemplateToDb?: () => void;
 }
 
 type LayerItem = {

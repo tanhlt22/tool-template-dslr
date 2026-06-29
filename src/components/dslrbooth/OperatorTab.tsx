@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Upload, Sliders, RefreshCw, CheckCircle2, ShieldCheck, Image as ImageIcon, Cloud } from 'lucide-react';
+import { Download, Upload, Sliders, RefreshCw, CheckCircle2, ShieldCheck, Image as ImageIcon, Cloud, ChevronDown } from 'lucide-react';
 import JSZip from 'jszip';
 import { formatDate, generateDslrboothId } from './utils';
 import { apiService } from '../../services/api';

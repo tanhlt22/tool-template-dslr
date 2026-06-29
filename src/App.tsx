@@ -54,6 +54,7 @@ export function App() {
     backgroundColor: cs.backgroundColor,
     bgGradient: cs.bgGradient,
     bgImageUrl: cs.bgImageUrl,
+    resolution: cs.resolution,
     prompt: cs.prompt,
     personalization,
     getCanvasSnapshot: () => canvasSnapshotRef.current?.() ?? null,
@@ -250,8 +251,8 @@ export function App() {
         onAddQr={layers.handleAddQr}
         onAddBackgroundFrame={(file) => layers.handleAddBackgroundFrame(file, cs.setBgImageUrl, cs.setBackgroundType)}
         onDeleteElement={layers.handleDeleteElement}
-        onClearCanvas={() => {
-          if (layers.handleClearCanvas()) cs.setBgImageUrl(null);
+        onClearCanvas={async () => {
+          if (await layers.handleClearCanvas()) cs.setBgImageUrl(null);
         }}
         onUndo={layers.handleUndo}
         onRedo={layers.handleRedo}

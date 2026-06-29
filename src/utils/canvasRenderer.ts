@@ -235,41 +235,54 @@ export async function generateDslrboothZip(
     backgroundColor: string;
     bgGradient: string;
     bgImageUrl: string | null;
-  }
+  },
+  resolution = 300
 ): Promise<Blob> {
   const zip = new JSZip();
+  const exportScale = Math.max(resolution, 1) / 300;
+  const exportWidth = Math.round(width * exportScale);
+  const exportHeight = Math.round(height * exportScale);
+  const scaled = (value: number) => Math.round(value * exportScale);
 
   // A. background.jpg
   const bgCanvas = document.createElement('canvas');
-  bgCanvas.width = width;
-  bgCanvas.height = height;
+  bgCanvas.width = exportWidth;
+  bgCanvas.height = exportHeight;
   const bgCtx = bgCanvas.getContext('2d');
   if (bgCtx) {
-    await renderBackground(bgCtx, width, height, bgOptions, elements);
+    await renderBackground(bgCtx, exportWidth, exportHeight, bgOptions, elements);
+    bgCtx.save();
+    bgCtx.scale(exportScale, exportScale);
     await renderImageElements(bgCtx, elements);
+    bgCtx.restore();
   }
   const bgBlob = await new Promise<Blob | null>(res => bgCanvas.toBlob(res, 'image/jpeg', 0.95));
   if (bgBlob) zip.file('background.jpg', bgBlob);
 
   // B. overlay.png — decoration elements (text, sticker). QR không vào overlay.
   const overlayCanvas = document.createElement('canvas');
-  overlayCanvas.width = width;
-  overlayCanvas.height = height;
+  overlayCanvas.width = exportWidth;
+  overlayCanvas.height = exportHeight;
   const overCtx = overlayCanvas.getContext('2d');
   if (overCtx) {
     const nonQrElements = elements.filter(e => e.type !== 'qr');
+    overCtx.save();
+    overCtx.scale(exportScale, exportScale);
     await renderAllElements(overCtx, nonQrElements);
+    overCtx.restore();
   }
   const overBlob = await new Promise<Blob | null>(res => overlayCanvas.toBlob(res, 'image/png'));
   if (overBlob) zip.file('overlay.png', overBlob);
 
   // C. preview.png — ảnh xem trước tổng hợp (như bản gốc DSLRbooth)
   const previewCanvas = document.createElement('canvas');
-  previewCanvas.width = width;
-  previewCanvas.height = height;
+  previewCanvas.width = exportWidth;
+  previewCanvas.height = exportHeight;
   const prevCtx = previewCanvas.getContext('2d');
   if (prevCtx) {
-    await renderBackground(prevCtx, width, height, bgOptions, elements);
+    await renderBackground(prevCtx, exportWidth, exportHeight, bgOptions, elements);
+    prevCtx.save();
+    prevCtx.scale(exportScale, exportScale);
     await renderImageElements(prevCtx, elements);
     // Vẽ slot placeholder (ô tối mờ để dễ nhận biết vị trí ảnh)
     prevCtx.globalCompositeOperation = 'source-over';
@@ -291,7 +304,11 @@ export async function generateDslrboothZip(
       prevCtx.strokeRect(-s.width / 2, -s.height / 2, s.width, s.height);
       prevCtx.restore();
     }
+    prevCtx.restore();
+    prevCtx.save();
+    prevCtx.scale(exportScale, exportScale);
     await renderAllElements(prevCtx, elements);
+    prevCtx.restore();
   }
   const prevBlob = await new Promise<Blob | null>(res => previewCanvas.toBlob(res, 'image/png'));
   if (prevBlob) zip.file('preview.png', prevBlob);
@@ -318,7 +335,7 @@ export async function generateDslrboothZip(
 
   // BOM (EF BB BF) bắt buộc cho .NET XML parser của DSLRbooth
   let xmlStr = `\uFEFF<?xml version="1.0" encoding="UTF-8"?>\r\n`;
-  xmlStr += `<Template Name="dslrbooth_${frameName.replace(/\s+/g, '_')}" Width="${width}" Height="${height}" Dimensions="0" Resolution="300" BackgroundColor="#FFFFFFFF" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-HAIVUSTUDIO">\r\n`;
+  xmlStr += `<Template Name="dslrbooth_${frameName.replace(/\s+/g, '_')}" Width="${exportWidth}" Height="${exportHeight}" Dimensions="0" Resolution="${Math.round(resolution)}" BackgroundColor="#FFFFFFFF" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-HAIVUSTUDIO">\r\n`;
   xmlStr += `  <Elements>\r\n`;
 
   // QrCode element — DSLRbooth đọc Left/Top trực tiếp từ XML
@@ -329,11 +346,11 @@ export async function generateDslrboothZip(
     const qrLeft = qcx - qr.width / 2;
     const qrTop = qcy - qr.height / 2;
     const qrRotation = Math.round(((qr.rotation || 0) % 360 + 360) % 360);
-    xmlStr += `    <QrCode Name="QR Code" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" UseUploadUrl="True" Width="${Math.round(qr.width)}" Height="${Math.round(qr.height)}" BackgroundColor="#00FFFFFF" ZIndex="${qrZIndex}" Left="${Math.round(qrLeft)}" Top="${Math.round(qrTop)}" Rotation="${qrRotation}" />\r\n`;
+    xmlStr += `    <QrCode Name="QR Code" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" UseUploadUrl="True" Width="${scaled(qr.width)}" Height="${scaled(qr.height)}" BackgroundColor="#00FFFFFF" ZIndex="${qrZIndex}" Left="${scaled(qrLeft)}" Top="${scaled(qrTop)}" Rotation="${qrRotation}" />\r\n`;
   }
 
   // Overlay (ZIndex = photoCount, liệt kê trước Photos trong XML)
-  xmlStr += `    <Image Name="overlay" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${width}" Height="${height}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" Rotation="0" />\r\n`;
+  xmlStr += `    <Image Name="overlay" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${exportWidth}" Height="${exportHeight}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" Rotation="0" />\r\n`;
 
   // Photos: list theo thứ tự ZIndex giảm dần (Photo N → Photo 1), ZIndex = PhotoNumber
   const sortedSlots = [...visibleSlots].sort((a, b) => getPhotoNumber(b, 0) - getPhotoNumber(a, 0));
@@ -369,7 +386,7 @@ export async function generateDslrboothZip(
       dslrRotation = normalizedRot;
     }
 
-    xmlStr += `    <Photo Name="Photo ${photoNum}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${Math.round(dslrWidth)}" Height="${Math.round(dslrHeight)}" Top="${Math.round(dslrTop)}" Left="${Math.round(dslrLeft)}" ImagePath="" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${photoNum}" ZIndex="${photoNum}" Rotation="${dslrRotation}" />\r\n`;
+    xmlStr += `    <Photo Name="Photo ${photoNum}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${scaled(dslrWidth)}" Height="${scaled(dslrHeight)}" Top="${scaled(dslrTop)}" Left="${scaled(dslrLeft)}" ImagePath="" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${photoNum}" ZIndex="${photoNum}" Rotation="${dslrRotation}" />\r\n`;
   });
 
   xmlStr += `  </Elements>\r\n`;

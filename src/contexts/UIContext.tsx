@@ -24,6 +24,7 @@ interface PromptOptions {
   type?: 'text' | 'password';
   confirmText?: string;
   cancelText?: string;
+  defaultValue?: string;
 }
 
 interface UIContextType {
@@ -94,7 +95,7 @@ export const UIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
           confirmText: opts.confirmText || 'Xác nhận',
           cancelText: opts.cancelText || 'Hủy',
         },
-        value: '',
+        value: opts.defaultValue || '',
         resolve,
       });
     });

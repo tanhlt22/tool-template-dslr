@@ -18,6 +18,7 @@ interface UseExportOptions {
   backgroundColor: string;
   bgGradient: string;
   bgImageUrl: string | null;
+  resolution: number;
   prompt: string;
   setBgImageUrl: (url: string | null) => void;
   setSlots: (slots: FrameSlot[]) => void;
@@ -36,7 +37,7 @@ interface ExportResult {
 export function useExport(options: UseExportOptions) {
   const {
     width, height, slots, elements, frameName,
-    backgroundType, backgroundColor, bgGradient, bgImageUrl, prompt,
+    backgroundType, backgroundColor, bgGradient, bgImageUrl, resolution, prompt,
     setBgImageUrl, setSlots, setActiveSidebarTab, personalization, getCanvasSnapshot
   } = options;
 
@@ -134,7 +135,7 @@ export function useExport(options: UseExportOptions) {
     setZipExportSuccess(false);
 
     try {
-      const blob = await generateDslrboothZip(width, height, slots, getExportElements(), frameName, bgOptions);
+      const blob = await generateDslrboothZip(width, height, slots, getExportElements(), frameName, bgOptions, resolution);
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;

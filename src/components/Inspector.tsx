@@ -89,6 +89,23 @@ export const Inspector: React.FC<InspectorProps> = ({
   })();
 
   const HeaderIcon = header.icon;
+  const fitSelectedImageToCanvas = () => {
+    if (!activeElement || selectedType !== 'image') return;
+    const aspectRatio = activeElement.aspectRatio || (activeElement.width / Math.max(activeElement.height, 1)) || 1;
+    let nextWidth = canvasWidth;
+    let nextHeight = nextWidth / aspectRatio;
+    if (nextHeight > canvasHeight) {
+      nextHeight = canvasHeight;
+      nextWidth = nextHeight * aspectRatio;
+    }
+    onUpdateProp('bounds', {
+      x: Math.round((canvasWidth - nextWidth) / 2),
+      y: Math.round((canvasHeight - nextHeight) / 2),
+      width: Math.round(nextWidth),
+      height: Math.round(nextHeight),
+      rotation: 0
+    });
+  };
 
   return (
     <aside className="w-80 shrink-0 border-l border-slate-200 bg-white flex flex-col overflow-hidden">
@@ -295,9 +312,9 @@ export const Inspector: React.FC<InspectorProps> = ({
             )}
 
             {selectedType === 'image' && (
-              <section className="rounded-md border border-slate-200 p-3">
+              <section className="space-y-3 rounded-md border border-slate-200 p-3">
                 <label className="flex items-center justify-between text-xs font-bold text-slate-700">
-                  Khoa ty le anh
+                  Khóa tỷ lệ ảnh
                   <input
                     type="checkbox"
                     checked={activeElement.lockRatio !== false}
@@ -305,6 +322,13 @@ export const Inspector: React.FC<InspectorProps> = ({
                     className="h-4 w-4 accent-rose-800"
                   />
                 </label>
+                <button
+                  type="button"
+                  onClick={fitSelectedImageToCanvas}
+                  className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-800 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+                >
+                  Căn ảnh vừa khung
+                </button>
               </section>
             )}
 
@@ -314,7 +338,7 @@ export const Inspector: React.FC<InspectorProps> = ({
               className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-black text-rose-700 hover:bg-rose-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
             >
               <Trash2 className="h-4 w-4" aria-hidden="true" />
-              Xoa layer dang chon
+              Xóa layer đang chọn
             </button>
           </div>
         )}

@@ -50,7 +50,7 @@ interface EditorToolbarProps {
   editingTemplateId: string | null;
   isSavingTemplate: boolean;
   onUpdateTemplateInDb: () => void;
-  onSaveNewTemplateToDb: () => void;
+  onSaveNewTemplateToDb?: () => void;
   isExporting: boolean;
   onExportPNG: () => void;
   isExportingZip: boolean;

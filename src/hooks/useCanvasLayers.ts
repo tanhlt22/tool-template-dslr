@@ -238,18 +238,23 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
       img.onload = () => {
         const natW = img.naturalWidth || img.width;
         const natH = img.naturalHeight || img.height;
+        const fitScale = Math.min(width / natW, height / natH);
+        const finalW = Math.round(natW * fitScale);
+        const finalH = Math.round(natH * fitScale);
 
         const newBgElement: FrameElement = {
           id: `background_frame_${Date.now()}`,
           type: 'image',
           content: dataUrl,
-          x: 0,
-          y: 0,
-          width: natW,
-          height: natH,
+          x: Math.round((width - finalW) / 2),
+          y: Math.round((height - finalH) / 2),
+          width: finalW,
+          height: finalH,
           rotation: 0,
           visible: true,
           locked: false,
+          lockRatio: true,
+          aspectRatio: natW / natH,
           fileName: file.name,
           style: {
             order: -1
@@ -394,6 +399,9 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     if (selectedType === 'slot') {
       setSlots(slots.map(s => {
         if (s.id === selectedId) {
+          if (key === 'bounds') {
+            return { ...s, ...val };
+          }
           return { ...s, [key]: val };
         }
         return s;
@@ -401,6 +409,9 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     } else {
       setElements(elements.map(e => {
         if (e.id === selectedId) {
+          if (key === 'bounds') {
+            return { ...e, ...val };
+          }
           if (['content', 'lockRatio', 'rotation', 'x', 'y', 'width', 'height'].includes(key)) {
             return { ...e, [key]: val };
           }
