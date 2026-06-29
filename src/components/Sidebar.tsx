@@ -10,7 +10,10 @@ import {
   Unlock,
   UploadCloud,
   Type,
-  QrCode
+  QrCode,
+  ChevronUp,
+  ChevronDown,
+  Copy
 } from 'lucide-react';
 import { PAPER_SIZES } from '../constants/templates';
 import { FrameConfig, FrameElement, FrameSlot } from '../types/canvas';
@@ -135,10 +138,61 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const toggleVisible = (layer: LayerItem) => {
     if (layer.type === 'slot') {
-      onSlotsChange(slots.map((slot) => (slot.id === layer.id ? { ...slot, visible: !layer.visible } : slot)));
-      return;
+      onSlotsChange(slots.map(s => s.id === layer.id ? { ...s, visible: s.visible === false ? true : false } : s));
+    } else {
+      onElementsChange(elements.map(e => e.id === layer.id ? { ...e, visible: e.visible === false ? true : false } : e));
     }
-    onElementsChange(elements.map((element) => (element.id === layer.id ? { ...element, visible: !layer.visible } : element)));
+  };
+
+  const moveLayerUp = (layer: LayerItem) => {
+    if (layer.type === 'slot') {
+      const idx = slots.findIndex(s => s.id === layer.id);
+      if (idx < slots.length - 1) {
+        const newSlots = [...slots];
+        [newSlots[idx], newSlots[idx + 1]] = [newSlots[idx + 1], newSlots[idx]];
+        onSlotsChange(newSlots);
+      }
+    } else {
+      const idx = elements.findIndex(e => e.id === layer.id);
+      if (idx < elements.length - 1) {
+        const newElements = [...elements];
+        [newElements[idx], newElements[idx + 1]] = [newElements[idx + 1], newElements[idx]];
+        onElementsChange(newElements);
+      }
+    }
+  };
+
+  const moveLayerDown = (layer: LayerItem) => {
+    if (layer.type === 'slot') {
+      const idx = slots.findIndex(s => s.id === layer.id);
+      if (idx > 0) {
+        const newSlots = [...slots];
+        [newSlots[idx], newSlots[idx - 1]] = [newSlots[idx - 1], newSlots[idx]];
+        onSlotsChange(newSlots);
+      }
+    } else {
+      const idx = elements.findIndex(e => e.id === layer.id);
+      if (idx > 0) {
+        const newElements = [...elements];
+        [newElements[idx], newElements[idx - 1]] = [newElements[idx - 1], newElements[idx]];
+        onElementsChange(newElements);
+      }
+    }
+  };
+
+  const duplicateLayer = (layer: LayerItem) => {
+    const newId = Date.now().toString() + Math.random().toString(36).substring(7);
+    if (layer.type === 'slot') {
+      const slot = slots.find(s => s.id === layer.id);
+      if (slot) {
+        onSlotsChange([...slots, { ...slot, id: newId, x: (slot.x || 0) + 20, y: (slot.y || 0) + 20 }]);
+      }
+    } else {
+      const element = elements.find(e => e.id === layer.id);
+      if (element) {
+        onElementsChange([...elements, { ...element, id: newId, x: (element.x || 0) + 20, y: (element.y || 0) + 20 }]);
+      }
+    }
   };
 
   const toggleLock = (layer: LayerItem) => {
@@ -220,6 +274,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                   <button
                     type="button"
+                    onClick={() => moveLayerUp(layer)}
+                    aria-label="Len"
+                    title="Lên"
+                    className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+                  >
+                    <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveLayerDown(layer)}
+                    aria-label="Xuong"
+                    title="Xuống"
+                    className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+                  >
+                    <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => duplicateLayer(layer)}
+                    aria-label="Copy"
+                    title="Copy"
+                    className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+                  >
+                    <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => toggleLock(layer)}
                     aria-label={layer.locked ? 'Mo khoa layer' : 'Khoa layer'}
                     className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
@@ -238,6 +319,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     type="button"
                     onClick={() => onDeleteElement(layer.id)}
                     aria-label="Xoa layer"
+                    title="Xóa layer"
                     className="rounded p-1 text-slate-500 hover:bg-rose-50 hover:text-rose-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
