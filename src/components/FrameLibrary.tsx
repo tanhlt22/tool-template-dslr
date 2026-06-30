@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useUI } from '../contexts/UIContext';
 import { FrameConfig } from '../types/canvas';
+import { TemplateThumbnail } from './TemplateThumbnail';
 
 interface TemplateRecord extends FrameConfig {
   id: string;
@@ -33,42 +34,7 @@ const fallbackTemplates: TemplateRecord[] = [];
 
 const getFrames = (frames: TemplateRecord[]) => (frames.length > 0 ? frames : fallbackTemplates);
 
-const TemplateThumbnail: React.FC<{ frame: TemplateRecord }> = ({ frame }) => {
-  const image = frame.background_image_url || frame.backgroundImageUrl;
-  const width = frame.width || 1200;
-  const height = frame.height || 1800;
-  const isLandscape = width > height;
 
-  return (
-    <div className="flex h-28 items-center justify-center rounded-md bg-slate-100 p-2">
-      <div
-        className="relative overflow-hidden rounded-sm border border-slate-200 bg-[#f8eee5] shadow-sm"
-        style={{
-          width: isLandscape ? 92 : Math.max(42, Math.round((width / height) * 92)),
-          height: isLandscape ? Math.max(42, Math.round((height / width) * 92)) : 92,
-          backgroundImage: image ? `url(${image})` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        {frame.slots?.map((slot, index) => (
-          <div
-            key={slot.id || index}
-            className="absolute flex items-center justify-center rounded-[2px] border border-slate-300 bg-slate-200 text-[10px] font-black text-rose-800"
-            style={{
-              left: `${(slot.x / width) * 100}%`,
-              top: `${(slot.y / height) * 100}%`,
-              width: `${(slot.width / width) * 100}%`,
-              height: `${(slot.height / height) * 100}%`
-            }}
-          >
-            {slot.order || index + 1}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 export const FrameLibrary: React.FC<FrameLibraryProps> = ({
   frames,

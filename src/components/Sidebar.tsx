@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Camera,
   Eye,
@@ -59,8 +59,6 @@ interface SidebarProps {
   personalization: PersonalizationData;
   onPersonalizationChange: (data: PersonalizationData) => void;
   onApplyPersonalization: () => void;
-  savedFrames: TemplateRecord[];
-  onLoadSavedFrame: (frame: TemplateRecord) => void;
   isExporting: boolean;
   onExportPNG: () => void;
   isExportingZip: boolean;
@@ -101,10 +99,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onHeightChange,
   resolution,
   onResolutionChange,
+  backgroundType,
+  onBackgroundTypeChange,
   backgroundColor,
   onBackgroundColorChange,
-  savedFrames,
-  onLoadSavedFrame,
   onAddImage,
   bgImageUrl,
   onBgImageUrlChange,
@@ -205,29 +203,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside className="w-72 shrink-0 border-r border-slate-200 bg-white flex flex-col overflow-hidden">
-      <div className="border-b border-slate-200 p-3">
-        <label htmlFor="frame-select" className="mb-1 block text-xs font-black text-slate-700">
-          Frame mẫu
-        </label>
-        <select
-          id="frame-select"
-          name="frameSelect"
-          className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-900 focus:border-rose-700 focus:outline-none"
-          value={editingTemplateId || ''}
-          onChange={(event) => {
-            const selected = savedFrames.find((frame) => frame.id === event.target.value);
-            if (selected) onLoadSavedFrame(selected);
-          }}
-        >
-          <option value="" disabled hidden>Chọn Frame...</option>
-          {savedFrames.map((frame) => (
-            <option key={frame.id} value={frame.id}>
-              {frame.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
       <div className="flex-1 overflow-y-auto p-3">
         <section className="mb-4">
           <div className="mb-3 flex items-center justify-between">

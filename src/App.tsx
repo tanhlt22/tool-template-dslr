@@ -29,8 +29,9 @@ const AISettingsModal = lazy(() =>
   import('./components/AISettingsModal').then((module) => ({ default: module.AISettingsModal }))
 );
 
-export function App() {
-  const [view, setView] = useState<AppView>('editor');
+export function App({ initialView = 'editor' }: { initialView?: AppView }) {
+  const [view, setView] = useState<AppView>(initialView);
+  const isLibraryRoute = typeof window !== 'undefined' && window.location.pathname.includes('/library');
   const [isCreateFrameOpen, setIsCreateFrameOpen] = useState(false);
   const [isSaveFrameOpen, setIsSaveFrameOpen] = useState(false);
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
@@ -269,9 +270,12 @@ export function App() {
         onExportDslrboothZip={exp.handleExportDslrboothZip}
         onNewFrame={handleNewFrame}
         onOpenPreview={() => setView('preview')}
-        onOpenLibrary={() => setView('library')}
+        onOpenLibrary={isLibraryRoute ? () => setView('library') : undefined}
         frameName={cs.frameName}
         onEditFrameName={() => setIsSaveFrameOpen(true)}
+        savedFrames={tpl.savedFrames}
+        isLoadingFrames={tpl.isLoadingFrames}
+        onLoadSavedFrame={loadTemplateIntoEditor}
       />
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
@@ -312,6 +316,7 @@ export function App() {
           onPersonalizationChange={setPersonalization}
           onApplyPersonalization={() => undefined}
           savedFrames={tpl.savedFrames}
+          isLoadingFrames={tpl.isLoadingFrames}
           onLoadSavedFrame={loadTemplateIntoEditor}
           isExporting={exp.isExporting}
           onExportPNG={exp.handleExportPNG}

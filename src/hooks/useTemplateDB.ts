@@ -47,6 +47,7 @@ export function useTemplateDB(
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const { showToast } = useUI();
   const [savedFrames, setSavedFrames] = useState<any[]>([]);
+  const [isLoadingFrames, setIsLoadingFrames] = useState(true);
   const [userRole, setUserRole] = useState('user');
 
   useEffect(() => {
@@ -59,11 +60,14 @@ export function useTemplateDB(
   }, []);
 
   const fetchSavedFrames = async () => {
+    setIsLoadingFrames(true);
     try {
       const data = await apiService.getFrames();
       setSavedFrames(data);
     } catch {
       console.warn('API call offline or failed. Mock DB fallback mode active.');
+    } finally {
+      setIsLoadingFrames(false);
     }
   };
 
@@ -176,6 +180,7 @@ export function useTemplateDB(
     setEditingTemplateId,
     isSavingTemplate,
     savedFrames,
+    isLoadingFrames,
     userRole,
     handleUpdateTemplateInDb,
     handleSaveNewTemplateToDb,

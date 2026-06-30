@@ -29,8 +29,10 @@ import {
   Type,
   Undo2,
   Upload,
-  Edit3
+  Edit3,
+  X
 } from 'lucide-react';
+import { TemplateThumbnail } from './TemplateThumbnail';
 
 interface EditorToolbarProps {
   selectedId: string | null;
@@ -61,6 +63,9 @@ interface EditorToolbarProps {
   onOpenLibrary?: () => void;
   frameName: string;
   onEditFrameName: () => void;
+  savedFrames: any[];
+  isLoadingFrames?: boolean;
+  onLoadSavedFrame: (frame: any) => void;
 }
 
 const textPresets = [
@@ -187,9 +192,13 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   onOpenPreview,
   onOpenLibrary,
   frameName,
-  onEditFrameName
+  onEditFrameName,
+  savedFrames,
+  isLoadingFrames,
+  onLoadSavedFrame
 }) => {
   const [showShapes, setShowShapes] = useState(false);
+  const [showFrameModal, setShowFrameModal] = useState(false);
   const [showTextPresetMenu, setShowTextPresetMenu] = useState(false);
   const [showIconMenu, setShowIconMenu] = useState(false);
   const [textCategory, setTextCategory] = useState<'all' | 'wedding' | 'party' | 'general'>('all');
@@ -204,8 +213,16 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   };
 
   return (
-    <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-4 py-2">
+    <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-4 py-2 relative">
       <div className="flex flex-wrap items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setShowFrameModal(true)}
+          className="inline-flex items-center gap-2 rounded-md border border-rose-300 bg-rose-50 px-4 py-2 text-xs font-black text-rose-700 hover:bg-rose-100 hover:border-rose-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700 transition-colors shadow-sm"
+        >
+          <LayoutTemplate className="h-4 w-4" aria-hidden="true" />
+          <span>{editingTemplateId ? savedFrames.find((f) => f.id === editingTemplateId)?.name || 'Chọn Frame Mẫu' : 'Chọn Frame Mẫu'}</span>
+        </button>
         {onOpenLibrary && (
           <button
             type="button"
@@ -452,6 +469,60 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           Xuất file
         </button>
       </div>
+
+      {showFrameModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 p-4">
+          <div className="flex max-h-[80vh] w-full max-w-4xl flex-col rounded-lg bg-white shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+              <h2 className="text-sm font-black text-slate-900">Chọn Frame mẫu</h2>
+              <button
+                type="button"
+                onClick={() => setShowFrameModal(false)}
+                className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 bg-slate-50">
+              <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+                {isLoadingFrames ? (
+                  <div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-500">
+                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-rose-200 border-t-rose-700 mb-4"></div>
+                    <p className="text-sm font-bold">Đang tải danh sách frame...</p>
+                  </div>
+                ) : savedFrames.length > 0 ? (
+                  savedFrames.map((frame) => (
+                    <button
+                      key={frame.id}
+                      type="button"
+                      onClick={() => {
+                        onLoadSavedFrame(frame);
+                        setShowFrameModal(false);
+                      }}
+                      className={`group relative flex flex-col items-center rounded-md border p-3 text-left transition-colors ${
+                        editingTemplateId === frame.id
+                          ? 'border-rose-700 bg-white ring-2 ring-rose-700'
+                          : 'border-slate-200 bg-white hover:border-rose-300 hover:bg-rose-50'
+                      }`}
+                    >
+                      <div className="w-full flex justify-center">
+                        <TemplateThumbnail frame={frame} scale={1.8} />
+                      </div>
+                      <span className="mt-3 block w-full truncate text-center text-sm font-bold text-slate-900">
+                        {frame.name}
+                      </span>
+                    </button>
+                  ))
+                ) : (
+                  <div className="col-span-full py-8 text-center text-sm font-medium text-slate-500">
+                    Chưa có frame mẫu nào
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
