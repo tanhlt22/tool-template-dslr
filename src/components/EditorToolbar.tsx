@@ -19,6 +19,7 @@ import {
   RotateCw,
   Save,
   LayoutTemplate,
+  Scissors,
   Shapes,
   Smile,
   Sparkles,
@@ -66,6 +67,7 @@ interface EditorToolbarProps {
   savedFrames: any[];
   isLoadingFrames?: boolean;
   onLoadSavedFrame: (frame: any) => void;
+  onPunchHoles?: () => void;
 }
 
 const textPresets = [
@@ -195,7 +197,8 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   onEditFrameName,
   savedFrames,
   isLoadingFrames,
-  onLoadSavedFrame
+  onLoadSavedFrame,
+  onPunchHoles
 }) => {
   const [showShapes, setShowShapes] = useState(false);
   const [showFrameModal, setShowFrameModal] = useState(false);
@@ -276,6 +279,18 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             event.target.value = '';
           }}
         />
+
+        {onPunchHoles && (
+          <button
+            type="button"
+            onClick={onPunchHoles}
+            title="Đục lỗ ảnh nền theo khung (slot)"
+            className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+          >
+            <Scissors className="h-4 w-4" aria-hidden="true" />
+            Đục lỗ
+          </button>
+        )}
 
         <div className="relative">
           <button

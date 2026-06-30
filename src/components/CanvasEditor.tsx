@@ -831,6 +831,43 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
             scaleX: 1,
             scaleY: 1
           });
+        } else if (elem.type === 'image' || elem.type === 'icon') {
+          const fabricImg = existing as fabric.Image;
+          if (existing.data?.content !== elem.content) {
+            // Image source changed
+            fabricImg.setSrc(elem.content, () => {
+              fabricImg.set({
+                scaleX: elem.width / (fabricImg.width || 1),
+                scaleY: elem.height / (fabricImg.height || 1),
+              });
+              existing.data.content = elem.content;
+              existing.canvas?.requestRenderAll();
+            }, { crossOrigin: 'anonymous' });
+          } else {
+            // Just update scale if size changed
+            fabricImg.set({
+              scaleX: elem.width / (fabricImg.width || 1),
+              scaleY: elem.height / (fabricImg.height || 1),
+            });
+          }
+        } else if (elem.type === 'qr') {
+          const fabricImg = existing as fabric.Image;
+          if (existing.data?.content !== elem.content) {
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(elem.content)}&size=150x150`;
+            fabricImg.setSrc(qrUrl, () => {
+              fabricImg.set({
+                scaleX: elem.width / (fabricImg.width || 1),
+                scaleY: elem.height / (fabricImg.height || 1),
+              });
+              existing.data.content = elem.content;
+              existing.canvas?.requestRenderAll();
+            }, { crossOrigin: 'anonymous' });
+          } else {
+            fabricImg.set({
+              scaleX: elem.width / (fabricImg.width || 1),
+              scaleY: elem.height / (fabricImg.height || 1),
+            });
+          }
         }
       } else {
         if (elem.type === 'text') {

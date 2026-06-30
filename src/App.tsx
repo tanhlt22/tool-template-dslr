@@ -241,6 +241,107 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
     }
   };
 
+  const handlePunchHolesOnBackground = async () => {
+    if (layers.slots.length === 0) {
+      showToast('Cần thêm ít nhất 1 ô ảnh (slot) để đục lỗ', 'error');
+      return;
+    }
+
+    // 1. Check if an image is selected
+    const selectedElement = layers.elements.find(el => el.id === layers.selectedId && el.type === 'image');
+    
+    // 2. If no image selected, fallback to background if available
+    const isTargetingBackground = !selectedElement;
+    const targetImageUrl = selectedElement ? selectedElement.content : cs.bgImageUrl;
+    
+    if (!targetImageUrl) {
+      showToast('Vui lòng chọn một ảnh trên giao diện hoặc tải lên ảnh nền để đục lỗ', 'error');
+      return;
+    }
+
+    try {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = targetImageUrl;
+
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = cs.width;
+      canvas.height = cs.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Draw the target image
+      if (selectedElement) {
+        ctx.save();
+        ctx.translate(selectedElement.x, selectedElement.y);
+        ctx.rotate((selectedElement.rotation || 0) * Math.PI / 180);
+        ctx.drawImage(img, 0, 0, selectedElement.width, selectedElement.height);
+        ctx.restore();
+      } else {
+        ctx.drawImage(img, 0, 0, cs.width, cs.height);
+      }
+
+      ctx.globalCompositeOperation = 'destination-out';
+      layers.slots.filter((slot) => slot.visible !== false).forEach((slot) => {
+        ctx.save();
+        ctx.translate(slot.x, slot.y);
+        ctx.rotate((slot.rotation || 0) * Math.PI / 180);
+        ctx.fillStyle = 'black';
+        ctx.beginPath();
+        ctx.roundRect(0, 0, slot.width, slot.height, 8);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      const newDataUrl = canvas.toDataURL('image/png');
+      
+      if (selectedElement) {
+        layers.setElements(prev => prev.map(el => {
+          if (el.id === selectedElement.id) {
+            return {
+              ...el,
+              content: newDataUrl,
+              x: 0,
+              y: 0,
+              width: cs.width,
+              height: cs.height,
+              rotation: 0,
+              aspectRatio: cs.width / cs.height
+            };
+          }
+          return el;
+        }));
+        showToast('Đã đục lỗ ảnh đang chọn thành công!', 'success');
+      } else {
+        cs.setBgImageUrl(newDataUrl);
+        cs.setBackgroundType('color');
+        
+        layers.setElements(prev => prev.map(el => {
+          if (el.type === 'image' && el.content === cs.bgImageUrl) {
+            return {
+              ...el,
+              content: newDataUrl,
+              x: 0,
+              y: 0,
+              width: cs.width,
+              height: cs.height,
+              aspectRatio: cs.width / cs.height
+            };
+          }
+          return el;
+        }));
+        showToast('Đã đục lỗ ảnh nền thành công!', 'success');
+      }
+    } catch (error) {
+      showToast('Không thể đục lỗ ảnh. Lỗi CORS hoặc định dạng sai.', 'error');
+    }
+  };
+
   const renderEditor = () => (
     <main className="flex min-w-0 min-h-0 flex-1 flex-col bg-slate-50">
       <EditorToolbar
@@ -276,6 +377,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
         savedFrames={tpl.savedFrames}
         isLoadingFrames={tpl.isLoadingFrames}
         onLoadSavedFrame={loadTemplateIntoEditor}
+        onPunchHoles={handlePunchHolesOnBackground}
       />
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
