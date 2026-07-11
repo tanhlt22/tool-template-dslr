@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FrameSlot, FrameElement } from '../types/canvas';
-import { generateClientBase64, generateDslrboothZip, simulateLocalBackground, punchSlotHoles, renderAllElements } from '../utils/canvasRenderer';
+import { generateClientBase64, generateDslrboothZip, simulateLocalBackground, renderInterleaved } from '../utils/canvasRenderer';
 import { createCompositeCanvas, detectSlots, DetectType } from '../utils/slotDetection';
 import { useUI } from '../contexts/UIContext';
 import { applyPersonalizationToElements, PersonalizationData } from '../utils/personalization';
@@ -115,9 +115,7 @@ export function useExport(options: UseExportOptions) {
         ctx.fillRect(0, 0, width, height);
       }
 
-      ctx.globalCompositeOperation = 'source-over';
-      await renderAllElements(ctx, getExportElements());
-      punchSlotHoles(ctx, slots, true);
+      await renderInterleaved(ctx, getExportElements(), slots, true, true, false);
 
       setExportResult({
         success: true,
