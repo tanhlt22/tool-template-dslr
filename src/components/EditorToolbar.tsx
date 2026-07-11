@@ -511,27 +511,13 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                   savedFrames.map((frame) => (
                     <div
                       key={frame.id}
-                      onClick={() => {
-                        onLoadSavedFrame(frame);
-                        setShowFrameModal(false);
-                      }}
+                      onClick={() => setPreviewFrame(frame)}
                       className={`group relative flex cursor-pointer flex-col items-center rounded-md border p-3 text-left transition-colors ${
                         editingTemplateId === frame.id
                           ? 'border-rose-700 bg-white ring-2 ring-rose-700'
                           : 'border-slate-200 bg-white hover:border-rose-300 hover:bg-rose-50'
                       }`}
                     >
-                      <button 
-                        type="button"
-                        onClick={(e) => { 
-                          e.stopPropagation(); 
-                          setPreviewFrame(frame); 
-                        }}
-                        className="absolute top-2 right-2 p-1.5 bg-white/90 hover:bg-white rounded-full text-slate-500 hover:text-rose-600 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                        title="Xem trước mẫu"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
                       <div className="w-full flex justify-center">
                         <TemplateThumbnail frame={frame} scale={1.8} />
                       </div>
@@ -571,7 +557,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             <h3 className="text-xl font-black text-slate-900 mb-5">{previewFrame.name}</h3>
             
             <div className="border border-slate-200 rounded-xl bg-[#f8f9fa] p-4 shadow-inner flex items-center justify-center">
-              <TemplateThumbnail frame={previewFrame} scale={3.5} />
+              <TemplateThumbnail frame={previewFrame} scale={5.0} />
             </div>
 
             <div className="mt-6 flex items-center gap-3 w-full">
