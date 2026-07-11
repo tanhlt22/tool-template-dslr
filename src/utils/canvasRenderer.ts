@@ -130,68 +130,6 @@ export async function renderAllElements(
 }
 
 /**
- * Renders elements and slots interleaved by their z-index order.
- * This ensures that slots only punch holes (or draw placeholders) in layers that are beneath them.
- */
-export async function renderInterleaved(
-  ctx: CanvasRenderingContext2D,
-  elements: FrameElement[],
-  slots: FrameSlot[],
-  useRoundRect = false,
-  punchHoles = true,
-  drawSlotsForPreview = false
-): Promise<void> {
-  const layers = [
-    ...elements.filter(e => e.visible !== false).map(e => ({ type: 'element', item: e, order: e.style?.order ?? 0 })),
-    ...slots.filter(s => s.visible !== false).map(s => ({ type: 'slot', item: s, order: s.order ?? 0 }))
-  ].sort((a, b) => a.order - b.order);
-
-  for (const layer of layers) {
-    if (layer.type === 'element') {
-      ctx.globalCompositeOperation = 'source-over';
-      await renderAllElements(ctx, [layer.item as FrameElement]);
-    } else {
-      const slot = layer.item as FrameSlot;
-      if (punchHoles) {
-        punchSlotHoles(ctx, [slot], useRoundRect);
-      } else if (drawSlotsForPreview) {
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.save();
-        const theta = (slot.rotation || 0) * Math.PI / 180;
-        const cx = slot.x + (slot.width / 2) * Math.cos(theta) - (slot.height / 2) * Math.sin(theta);
-        const cy = slot.y + (slot.width / 2) * Math.sin(theta) + (slot.height / 2) * Math.cos(theta);
-        
-        ctx.translate(cx, cy);
-        ctx.rotate(theta);
-
-        ctx.globalAlpha = 0.20;
-        ctx.fillStyle = '#1e293b';
-        if (useRoundRect) {
-          ctx.beginPath();
-          ctx.roundRect(-slot.width / 2, -slot.height / 2, slot.width, slot.height, 8);
-          ctx.fill();
-        } else {
-          ctx.fillRect(-slot.width / 2, -slot.height / 2, slot.width, slot.height);
-        }
-        
-        ctx.globalAlpha = 1.0;
-        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-        ctx.lineWidth = 2;
-        if (useRoundRect) {
-          ctx.beginPath();
-          ctx.roundRect(-slot.width / 2, -slot.height / 2, slot.width, slot.height, 8);
-          ctx.stroke();
-        } else {
-          ctx.strokeRect(-slot.width / 2, -slot.height / 2, slot.width, slot.height);
-        }
-        ctx.restore();
-      }
-    }
-  }
-  ctx.globalCompositeOperation = 'source-over';
-}
-
-/**
  * Punches out slot areas using destination-out composite operation.
  */
 export function punchSlotHoles(
@@ -272,8 +210,12 @@ export async function generateClientBase64(
 
   await renderBackground(ctx, width, height, bgOptions, elements);
 
-  // Draw elements and punch holes interleaved
-  await renderInterleaved(ctx, elements, slots, true, true, false);
+  // Punch holes in the background so slots are transparent
+  punchSlotHoles(ctx, slots, true);
+
+  // Draw elements on top of holes so they are never cut
+  ctx.globalCompositeOperation = 'source-over';
+  await renderAllElements(ctx, elements);
 
   return canvas.toDataURL('image/png');
 }
@@ -322,7 +264,7 @@ export async function generateDslrboothZip(
     const nonQrElements = elements.filter(e => e.type !== 'qr');
     overCtx.save();
     overCtx.scale(exportScale, exportScale);
-    await renderInterleaved(overCtx, nonQrElements, slots, false, true, false);
+    await renderAllElements(overCtx, nonQrElements);
     overCtx.restore();
   }
   const overBlob = await new Promise<Blob | null>(res => overlayCanvas.toBlob(res, 'image/png'));
@@ -337,7 +279,28 @@ export async function generateDslrboothZip(
     await renderBackground(prevCtx, exportWidth, exportHeight, bgOptions, elements);
     prevCtx.save();
     prevCtx.scale(exportScale, exportScale);
-    await renderInterleaved(prevCtx, elements, slots, false, false, true);
+    // Draw slot placeholders
+    prevCtx.globalCompositeOperation = 'source-over';
+    for (const s of slots.filter(sl => sl.visible !== false)) {
+      prevCtx.save();
+      const theta = (s.rotation || 0) * Math.PI / 180;
+      const cx = s.x + (s.width / 2) * Math.cos(theta) - (s.height / 2) * Math.sin(theta);
+      const cy = s.y + (s.width / 2) * Math.sin(theta) + (s.height / 2) * Math.cos(theta);
+      
+      prevCtx.translate(cx, cy);
+      prevCtx.rotate(theta);
+
+      prevCtx.globalAlpha = 0.20;
+      prevCtx.fillStyle = '#1e293b';
+      prevCtx.fillRect(-s.width / 2, -s.height / 2, s.width, s.height);
+      prevCtx.globalAlpha = 1.0;
+      prevCtx.strokeStyle = 'rgba(255,255,255,0.12)';
+      prevCtx.lineWidth = 2;
+      prevCtx.strokeRect(-s.width / 2, -s.height / 2, s.width, s.height);
+      prevCtx.restore();
+    }
+    // Draw elements on top
+    await renderAllElements(prevCtx, elements);
     prevCtx.restore();
   }
   const prevBlob = await new Promise<Blob | null>(res => previewCanvas.toBlob(res, 'image/png'));
