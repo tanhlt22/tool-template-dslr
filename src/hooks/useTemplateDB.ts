@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { FrameElement, FrameSlot } from '../types/canvas';
 import { apiService } from '../services/api';
 import { useUI } from '../contexts/UIContext';
+import { uploadToCloudinary } from '../utils/cloudinary';
 
 interface UseTemplateDBOptions {
   setFrameName: (name: string) => void;
@@ -77,16 +78,37 @@ export function useTemplateDB(
     }
 
     setIsSavingTemplate(true);
+    showToast('Đang xử lý và tải ảnh lên Cloudinary...', 'info');
     try {
+      // 1. Upload background if it's base64
+      let finalBgUrl = currentState.bgImageUrl;
+      if (finalBgUrl && finalBgUrl.startsWith('data:image/')) {
+        finalBgUrl = await uploadToCloudinary(finalBgUrl);
+        setBgImageUrl(finalBgUrl); // Update local state so it doesn't re-upload later
+      }
+
+      // 2. Upload all image elements if they are base64
+      const finalElements = await Promise.all(
+        currentState.elements.map(async (el) => {
+          if ((el.type === 'image' || el.type === 'icon') && el.content && el.content.startsWith('data:image/')) {
+            const uploadedUrl = await uploadToCloudinary(el.content);
+            return { ...el, content: uploadedUrl };
+          }
+          return el;
+        })
+      );
+      // Update local elements with new URLs
+      setElements(finalElements);
+
       await apiService.updateFrame({
         id: editingTemplateId,
         name: templateName || currentState.frameName,
         width: currentState.width,
         height: currentState.height,
         backgroundPrompt: currentState.prompt,
-        backgroundImageUrl: currentState.bgImageUrl,
+        backgroundImageUrl: finalBgUrl,
         slots: currentState.slots,
-        elements: currentState.elements,
+        elements: finalElements,
         password: password
       });
       showToast('Đã lưu cập nhật mẫu thành công.', 'success');
@@ -104,15 +126,35 @@ export function useTemplateDB(
     const finalName = (templateName || currentState.frameName || 'Mẫu mới').trim() || 'Mẫu mới';
 
     setIsSavingTemplate(true);
+    showToast('Đang xử lý và tải ảnh lên Cloudinary...', 'info');
     try {
+      // 1. Upload background if it's base64
+      let finalBgUrl = currentState.bgImageUrl;
+      if (finalBgUrl && finalBgUrl.startsWith('data:image/')) {
+        finalBgUrl = await uploadToCloudinary(finalBgUrl);
+        setBgImageUrl(finalBgUrl);
+      }
+
+      // 2. Upload all image elements if they are base64
+      const finalElements = await Promise.all(
+        currentState.elements.map(async (el) => {
+          if ((el.type === 'image' || el.type === 'icon') && el.content && el.content.startsWith('data:image/')) {
+            const uploadedUrl = await uploadToCloudinary(el.content);
+            return { ...el, content: uploadedUrl };
+          }
+          return el;
+        })
+      );
+      setElements(finalElements);
+
       const result = await apiService.createFrame({
         name: finalName,
         width: currentState.width,
         height: currentState.height,
         backgroundPrompt: currentState.prompt,
-        backgroundImageUrl: currentState.bgImageUrl,
+        backgroundImageUrl: finalBgUrl,
         slots: currentState.slots,
-        elements: currentState.elements,
+        elements: finalElements,
         password: password
       });
       if (result?.frame_id) {
