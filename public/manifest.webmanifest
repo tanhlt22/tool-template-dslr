@@ -1,7 +1,7 @@
 {
-  "name": "Tanh Photobooth",
-  "short_name": "Tanh Photobooth",
-  "description": "Phần mềm thiết kế khung hình thông minh Tanh Photobooth",
+  "name": "Photobooth Design",
+  "short_name": "Photobooth Design",
+  "description": "Phần mềm thiết kế khung hình thông minh Photobooth Design",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",

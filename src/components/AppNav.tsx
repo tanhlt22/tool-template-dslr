@@ -8,7 +8,7 @@ export const AppNav: React.FC = () => {
         <Camera className="h-5 w-5" />
       </div>
       <div className="min-w-0">
-        <p className="truncate text-sm font-black tracking-tight text-slate-900">Tanh Photobooth</p>
+        <p className="truncate text-sm font-black tracking-tight text-slate-900">Photobooth Design</p>
         <p className="truncate text-[10px] font-semibold text-slate-500">Frame designer</p>
       </div>
     </header>
