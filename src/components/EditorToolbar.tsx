@@ -62,7 +62,6 @@ interface EditorToolbarProps {
   onExportDslrboothZip: () => void;
   onNewFrame?: () => void;
   onOpenPreview?: () => void;
-  onOpenLibrary?: () => void;
   frameName: string;
   onEditFrameName: () => void;
   savedFrames: any[];
@@ -193,7 +192,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   onExportDslrboothZip,
   onNewFrame,
   onOpenPreview,
-  onOpenLibrary,
   frameName,
   onEditFrameName,
   savedFrames,
@@ -229,16 +227,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           <LayoutTemplate className="h-4 w-4" aria-hidden="true" />
           <span>{editingTemplateId ? savedFrames.find((f) => f.id === editingTemplateId)?.name || 'Chọn Frame Mẫu' : 'Chọn Frame Mẫu'}</span>
         </button>
-        {onOpenLibrary && (
-          <button
-            type="button"
-            onClick={onOpenLibrary}
-            className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
-          >
-            <LayoutTemplate className="h-4 w-4" aria-hidden="true" />
-            Thư viện Frame
-          </button>
-        )}
         {onNewFrame && (
           <button
             type="button"
