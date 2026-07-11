@@ -31,7 +31,8 @@ import {
   Undo2,
   Upload,
   Edit3,
-  X
+  X,
+  Eye
 } from 'lucide-react';
 import { TemplateThumbnail } from './TemplateThumbnail';
 
@@ -202,6 +203,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 }) => {
   const [showShapes, setShowShapes] = useState(false);
   const [showFrameModal, setShowFrameModal] = useState(false);
+  const [previewFrame, setPreviewFrame] = useState<any>(null);
   const [showTextPresetMenu, setShowTextPresetMenu] = useState(false);
   const [showIconMenu, setShowIconMenu] = useState(false);
   const [textCategory, setTextCategory] = useState<'all' | 'wedding' | 'party' | 'general'>('all');
@@ -507,26 +509,36 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                   </div>
                 ) : savedFrames.length > 0 ? (
                   savedFrames.map((frame) => (
-                    <button
+                    <div
                       key={frame.id}
-                      type="button"
                       onClick={() => {
                         onLoadSavedFrame(frame);
                         setShowFrameModal(false);
                       }}
-                      className={`group relative flex flex-col items-center rounded-md border p-3 text-left transition-colors ${
+                      className={`group relative flex cursor-pointer flex-col items-center rounded-md border p-3 text-left transition-colors ${
                         editingTemplateId === frame.id
                           ? 'border-rose-700 bg-white ring-2 ring-rose-700'
                           : 'border-slate-200 bg-white hover:border-rose-300 hover:bg-rose-50'
                       }`}
                     >
+                      <button 
+                        type="button"
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          setPreviewFrame(frame); 
+                        }}
+                        className="absolute top-2 right-2 p-1.5 bg-white/90 hover:bg-white rounded-full text-slate-500 hover:text-rose-600 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        title="Xem trước mẫu"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
                       <div className="w-full flex justify-center">
                         <TemplateThumbnail frame={frame} scale={1.8} />
                       </div>
                       <span className="mt-3 block w-full truncate text-center text-sm font-bold text-slate-900">
                         {frame.name}
                       </span>
-                    </button>
+                    </div>
                   ))
                 ) : (
                   <div className="col-span-full py-8 text-center text-sm font-medium text-slate-500">
@@ -534,6 +546,54 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Frame Preview Modal */}
+      {previewFrame && (
+        <div 
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/80 p-4 backdrop-blur-sm"
+          onClick={() => setPreviewFrame(null)}
+        >
+          <div 
+            className="relative flex max-h-[90vh] flex-col items-center bg-white p-6 rounded-2xl shadow-2xl overflow-y-auto custom-scrollbar animate-fade-in"
+            onClick={e => e.stopPropagation()}
+          >
+            <button 
+              type="button"
+              onClick={() => setPreviewFrame(null)}
+              className="absolute top-3 right-3 p-2 bg-slate-100 hover:bg-rose-100 rounded-full text-slate-500 hover:text-rose-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="text-xl font-black text-slate-900 mb-5">{previewFrame.name}</h3>
+            
+            <div className="border border-slate-200 rounded-xl bg-[#f8f9fa] p-4 shadow-inner flex items-center justify-center">
+              <TemplateThumbnail frame={previewFrame} scale={3.5} />
+            </div>
+
+            <div className="mt-6 flex items-center gap-3 w-full">
+              <button
+                type="button"
+                onClick={() => setPreviewFrame(null)}
+                className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition-colors"
+              >
+                Đóng
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onLoadSavedFrame(previewFrame);
+                  setPreviewFrame(null);
+                  setShowFrameModal(false);
+                }}
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white text-sm font-bold rounded-xl shadow-md shadow-rose-600/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                Áp dụng mẫu này
+              </button>
             </div>
           </div>
         </div>
