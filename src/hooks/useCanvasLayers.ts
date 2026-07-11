@@ -272,6 +272,7 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
       };
     };
     reader.readAsDataURL(file);
+  };
 
   // Delete, duplicate, z-index reorder, alignment
   const handleDeleteElement = (id: string) => {
