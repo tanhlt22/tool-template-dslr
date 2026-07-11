@@ -31,7 +31,7 @@ const AISettingsModal = lazy(() =>
 
 export function App({ initialView = 'editor' }: { initialView?: AppView }) {
   const [view, setView] = useState<AppView>(initialView);
-  const isLibraryRoute = typeof window !== 'undefined' && window.location.pathname.includes('/library');
+  const isAdminRoute = typeof window !== 'undefined' && window.location.pathname.includes('/admin');
   const [isCreateFrameOpen, setIsCreateFrameOpen] = useState(false);
   const [isSaveFrameOpen, setIsSaveFrameOpen] = useState(false);
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
@@ -386,7 +386,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
         onExportDslrboothZip={exp.handleExportDslrboothZip}
         onNewFrame={handleNewFrame}
         onOpenPreview={() => setView('preview')}
-        onOpenLibrary={isLibraryRoute ? () => setView('library') : undefined}
+        onOpenLibrary={isAdminRoute ? () => setView('library') : undefined}
         frameName={cs.frameName}
         onEditFrameName={() => setIsSaveFrameOpen(true)}
         savedFrames={tpl.savedFrames}
