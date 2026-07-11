@@ -211,8 +211,7 @@ export async function GET() {
     dbFrames.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }
 
-  // Prepend default templates
-  return NextResponse.json([...DEFAULT_TEMPLATES.map(toFrameListRecord), ...dbFrames.map(toFrameListRecord)], {
+  return NextResponse.json(dbFrames.map(toFrameListRecord), {
     headers: {
       // s-maxage: Vercel CDN cache 10 phút
       // stale-while-revalidate: CDN serve cache cũ trong 2 phút khi đang fetch mới
@@ -357,6 +356,12 @@ export async function DELETE(req: Request) {
     }
 
     const id = searchParams.get('id');
+    if (id?.startsWith('template_')) {
+      return NextResponse.json(
+        { error: 'Mau mac dinh hardcoded khong nam trong Supabase nen khong the xoa bang DB.' },
+        { status: 404 }
+      );
+    }
     if (!id) {
       return NextResponse.json({ error: 'Thiếu ID khung ảnh cần xóa' }, { status: 400 });
     }
