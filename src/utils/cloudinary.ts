@@ -4,8 +4,8 @@ export async function uploadToCloudinary(dataUrl: string): Promise<string> {
     return dataUrl;
   }
 
-  const cloudName = localStorage.getItem('lumibooth_cloudinary_cloud_name') || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'drd21vvuv';
-  const uploadPreset = localStorage.getItem('lumibooth_cloudinary_upload_preset') || process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'photobooth-template';
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dktrhm7i1';
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'photobooth-template';
 
   const formData = new FormData();
   formData.append('file', dataUrl);
