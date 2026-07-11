@@ -184,7 +184,8 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
       const dataUrl = e.target?.result as string;
       const img = new Image();
       img.src = dataUrl;
-      img.onload = () => {
+      img.onload = async () => {
+        const compressedDataUrl = await compressImage(dataUrl);
         const natW = img.naturalWidth || img.width;
         const natH = img.naturalHeight || img.height;
 
@@ -201,7 +202,7 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
         const newImage: FrameElement = {
           id: `image_${Date.now()}`,
           type: 'image',
-          content: dataUrl,
+          content: compressedDataUrl,
           x: finalX,
           y: finalY,
           width: finalW,
@@ -235,7 +236,8 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
       const dataUrl = e.target?.result as string;
       const img = new Image();
       img.src = dataUrl;
-      img.onload = () => {
+      img.onload = async () => {
+        const compressedDataUrl = await compressImage(dataUrl);
         const natW = img.naturalWidth || img.width;
         const natH = img.naturalHeight || img.height;
         const fitScale = Math.min(width / natW, height / natH);
@@ -245,7 +247,7 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
         const newBgElement: FrameElement = {
           id: `background_frame_${Date.now()}`,
           type: 'image',
-          content: dataUrl,
+          content: compressedDataUrl,
           x: Math.round((width - finalW) / 2),
           y: Math.round((height - finalH) / 2),
           width: finalW,
@@ -266,12 +268,12 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
         setSelectedType('image');
         setActiveSidebarTab('layers');
 
-        onBgImageUrlChange(dataUrl);
+        // ALSO set it as the root background (so export uses it properly)
+        onBgImageUrlChange(compressedDataUrl);
         onBackgroundTypeChange('ai');
       };
     };
     reader.readAsDataURL(file);
-  };
 
   // Delete, duplicate, z-index reorder, alignment
   const handleDeleteElement = (id: string) => {

@@ -298,7 +298,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
         ctx.restore();
       });
 
-      const newDataUrl = canvas.toDataURL('image/png');
+      const newDataUrl = canvas.toDataURL('image/webp', 0.85);
       
       if (selectedElement) {
         layers.setElements(prev => prev.map(el => {
