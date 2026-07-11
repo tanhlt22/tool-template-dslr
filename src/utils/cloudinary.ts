@@ -4,8 +4,12 @@ export async function uploadToCloudinary(dataUrl: string): Promise<string> {
     return dataUrl;
   }
 
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dktrhm7i1';
-  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'photobooth-template';
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+
+  if (!cloudName || !uploadPreset) {
+    throw new Error('Thiếu cấu hình Cloudinary Cloud Name hoặc Upload Preset trong biến môi trường!');
+  }
 
   const formData = new FormData();
   formData.append('file', dataUrl);

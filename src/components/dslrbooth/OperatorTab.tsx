@@ -148,8 +148,8 @@ export const OperatorTab: React.FC = () => {
       if (!canvas) throw new Error('Canvas not loaded');
 
       // 1. Load Cloudinary credentials from localStorage or process.env defaults
-      const cloudName = localStorage.getItem('lumibooth_cloudinary_cloud_name') || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'drd21vvuv';
-      const uploadPreset = localStorage.getItem('lumibooth_cloudinary_upload_preset') || process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'photobooth-template';
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
       if (!cloudName || !uploadPreset) {
         throw new Error('Vui lòng cấu hình Cloud Name và Upload Preset trong tab Quản Trị Mẫu trước!');
