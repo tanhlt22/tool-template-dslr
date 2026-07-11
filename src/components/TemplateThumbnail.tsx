@@ -1,7 +1,8 @@
 import React from 'react';
+import { getCloudinaryThumbnailUrl } from '../utils/cloudinary';
 
 export const TemplateThumbnail: React.FC<{ frame: any; scale?: number }> = ({ frame, scale = 1 }) => {
-  const image = frame.background_image_url || frame.backgroundImageUrl;
+  const image = getCloudinaryThumbnailUrl(frame.background_image_url || frame.backgroundImageUrl, Math.round(240 * scale));
   const width = frame.width || 1200;
   const height = frame.height || 1800;
   const isLandscape = width > height;

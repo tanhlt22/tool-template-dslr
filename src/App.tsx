@@ -127,22 +127,36 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
     setIsCreateFrameOpen(true);
   };
 
-  const loadTemplateIntoEditor = (frame: any) => {
-    tpl.handleLoadSavedFrame(frame);
-    tpl.setEditingTemplateId(frame.id && !String(frame.id).startsWith('template_') && !String(frame.id).startsWith('demo_') ? frame.id : null);
-    layers.setActiveSidebarTab('layers');
-    setView('editor');
+  const resolveFrameDetail = async (frame: any) => {
+    if (!frame?.id || (!frame.is_list_item && Array.isArray(frame.elements))) {
+      return frame;
+    }
+
+    return apiService.getFrame(frame.id);
   };
 
-  const handleDuplicateFrame = (frame: any) => {
+  const loadTemplateIntoEditor = async (frame: any) => {
+    try {
+      const fullFrame = await resolveFrameDetail(frame);
+      tpl.handleLoadSavedFrame(fullFrame);
+      tpl.setEditingTemplateId(fullFrame.id && !String(fullFrame.id).startsWith('template_') && !String(fullFrame.id).startsWith('demo_') ? fullFrame.id : null);
+      layers.setActiveSidebarTab('layers');
+      setView('editor');
+    } catch (error) {
+      showToast('Khong the tai chi tiet frame: ' + String(error), 'error');
+    }
+  };
+
+  const handleDuplicateFrame = async (frame: any) => {
+    const fullFrame = await resolveFrameDetail(frame);
     const clone = {
-      ...frame,
+      ...fullFrame,
       id: `draft_${Date.now()}`,
-      name: `${frame.name || 'Frame'} copy`,
-      slots: (frame.slots || []).map((slot: any) => ({ ...slot, id: `${slot.id || 'slot'}_copy_${Date.now()}` })),
-      elements: (frame.elements || []).map((element: any) => ({ ...element, id: `${element.id || element.type}_copy_${Date.now()}` }))
+      name: `${fullFrame.name || 'Frame'} copy`,
+      slots: (fullFrame.slots || []).map((slot: any) => ({ ...slot, id: `${slot.id || 'slot'}_copy_${Date.now()}` })),
+      elements: (fullFrame.elements || []).map((element: any) => ({ ...element, id: `${element.id || element.type}_copy_${Date.now()}` }))
     };
-    loadTemplateIntoEditor(clone);
+    await loadTemplateIntoEditor(clone);
     tpl.setEditingTemplateId(null);
   };
 
@@ -212,8 +226,9 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
 
   const handleRenameFrame = async (frameId: string, newName: string, password?: string) => {
     try {
-      const frame = tpl.savedFrames.find(f => f.id === frameId);
-      if (!frame) return false;
+      const frameSummary = tpl.savedFrames.find(f => f.id === frameId);
+      if (!frameSummary) return false;
+      const frame = await resolveFrameDetail(frameSummary);
 
       await apiService.updateFrame({
         id: frameId,

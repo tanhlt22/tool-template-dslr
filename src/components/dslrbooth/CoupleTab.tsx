@@ -17,6 +17,7 @@ export const CoupleTab: React.FC = () => {
 
   const [templates, setTemplates] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [templateDetails, setTemplateDetails] = useState<Record<string, any>>({});
 
   const previewCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -42,8 +43,32 @@ export const CoupleTab: React.FC = () => {
     ...templates
   ];
 
-  const currentTemplate = allTemplates.find(t => t.id === selectedTemplateId) || allTemplates[0];
   const isLegacy = typeof selectedTemplateId === 'number';
+  const selectedTemplate = allTemplates.find(t => t.id === selectedTemplateId) || allTemplates[0];
+  const currentTemplate = !isLegacy && templateDetails[String(selectedTemplateId)]
+    ? templateDetails[String(selectedTemplateId)]
+    : selectedTemplate;
+
+  useEffect(() => {
+    if (isLegacy || !selectedTemplate?.id || !selectedTemplate.is_list_item || templateDetails[String(selectedTemplate.id)]) {
+      return;
+    }
+
+    let cancelled = false;
+    apiService.getFrame(String(selectedTemplate.id))
+      .then((detail) => {
+        if (!cancelled) {
+          setTemplateDetails((prev) => ({ ...prev, [String(selectedTemplate.id)]: detail }));
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load template detail:', err);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLegacy, selectedTemplate?.id, selectedTemplate?.is_list_item, templateDetails]);
 
   // Draw couple template preview
   useEffect(() => {

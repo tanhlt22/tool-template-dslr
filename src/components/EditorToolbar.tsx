@@ -67,7 +67,7 @@ interface EditorToolbarProps {
   onEditFrameName: () => void;
   savedFrames: any[];
   isLoadingFrames?: boolean;
-  onLoadSavedFrame: (frame: any) => void;
+  onLoadSavedFrame: (frame: any) => void | Promise<void>;
   onPunchHoles?: () => void;
 }
 
@@ -204,6 +204,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   const [showShapes, setShowShapes] = useState(false);
   const [showFrameModal, setShowFrameModal] = useState(false);
   const [previewFrame, setPreviewFrame] = useState<any>(null);
+  const [isApplyingFrame, setIsApplyingFrame] = useState(false);
   const [showTextPresetMenu, setShowTextPresetMenu] = useState(false);
   const [showIconMenu, setShowIconMenu] = useState(false);
   const [textCategory, setTextCategory] = useState<'all' | 'wedding' | 'party' | 'general'>('all');
@@ -570,12 +571,18 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  onLoadSavedFrame(previewFrame);
-                  setPreviewFrame(null);
-                  setShowFrameModal(false);
+                disabled={isApplyingFrame}
+                onClick={async () => {
+                  setIsApplyingFrame(true);
+                  try {
+                    await onLoadSavedFrame(previewFrame);
+                    setPreviewFrame(null);
+                    setShowFrameModal(false);
+                  } finally {
+                    setIsApplyingFrame(false);
+                  }
                 }}
-                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white text-sm font-bold rounded-xl shadow-md shadow-rose-600/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white text-sm font-bold rounded-xl shadow-md shadow-rose-600/20 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 Áp dụng mẫu này

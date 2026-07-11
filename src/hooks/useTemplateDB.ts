@@ -91,6 +91,9 @@ export function useTemplateDB(
       const finalElements = await Promise.all(
         currentState.elements.map(async (el) => {
           if ((el.type === 'image' || el.type === 'icon') && el.content && el.content.startsWith('data:image/')) {
+            if (finalBgUrl && el.content === currentState.bgImageUrl) {
+              return { ...el, content: finalBgUrl };
+            }
             const uploadedUrl = await uploadToCloudinary(el.content);
             return { ...el, content: uploadedUrl };
           }
@@ -139,6 +142,9 @@ export function useTemplateDB(
       const finalElements = await Promise.all(
         currentState.elements.map(async (el) => {
           if ((el.type === 'image' || el.type === 'icon') && el.content && el.content.startsWith('data:image/')) {
+            if (finalBgUrl && el.content === currentState.bgImageUrl) {
+              return { ...el, content: finalBgUrl };
+            }
             const uploadedUrl = await uploadToCloudinary(el.content);
             return { ...el, content: uploadedUrl };
           }

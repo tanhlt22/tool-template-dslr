@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { apiService } from '../../services/api';
 import { useUI } from '../../contexts/UIContext';
+import { getCloudinaryThumbnailUrl } from '../../utils/cloudinary';
 
 interface Slot {
   id: string;
@@ -42,7 +43,9 @@ interface Template {
   background_prompt?: string;
   background_image_url?: string | null;
   slots: Slot[];
-  elements: Element[];
+  elements?: Element[];
+  elements_count?: number;
+  is_list_item?: boolean;
   created_at?: string;
 }
 
@@ -126,6 +129,19 @@ export const AdminTab: React.FC<AdminTabProps> = ({ onLoadTemplateToStudioAI }) 
 
     if (onLoadTemplateToStudioAI) {
       onLoadTemplateToStudioAI(newTemplate);
+    }
+  };
+
+  const handleLoadTemplateToStudioAI = async (template: Template) => {
+    if (!onLoadTemplateToStudioAI) return;
+
+    try {
+      const fullTemplate = Array.isArray(template.elements)
+        && !template.is_list_item ? template
+        : await apiService.getFrame(template.id);
+      onLoadTemplateToStudioAI(fullTemplate);
+    } catch (error) {
+      showToast('Khong the tai chi tiet mau: ' + String(error), 'error');
     }
   };
 
@@ -261,7 +277,7 @@ export const AdminTab: React.FC<AdminTabProps> = ({ onLoadTemplateToStudioAI }) 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {templates.map((tmpl) => {
                 const isDefault = tmpl.id.startsWith('template_'); // Hardcoded default templates
-                const bgUrl = tmpl.background_image_url;
+                const bgUrl = getCloudinaryThumbnailUrl(tmpl.background_image_url, 360);
 
                 return (
                   <div 
@@ -331,7 +347,7 @@ export const AdminTab: React.FC<AdminTabProps> = ({ onLoadTemplateToStudioAI }) 
                           
                           {onLoadTemplateToStudioAI && (
                             <button
-                              onClick={() => onLoadTemplateToStudioAI(tmpl)}
+                              onClick={() => handleLoadTemplateToStudioAI(tmpl)}
                               className="flex-1 py-2 bg-gradient-to-r from-[#0058be] to-[#2170e4] hover:from-[#004b9e] hover:to-[#175cc0] text-white rounded-xl text-xs font-black flex items-center justify-center gap-1 transition-all border border-blue-600/10 hover:shadow-md hover:shadow-blue-600/10 active:scale-[0.98]"
                             >
                               <Sparkles className="w-3.5 h-3.5 animate-pulse" />

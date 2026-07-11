@@ -152,6 +152,39 @@ const DEFAULT_TEMPLATES = [
 // Fallback in-memory database
 const localFramesDb: Record<string, any> = {};
 
+const FRAME_LIST_COLUMNS = 'id,name,width,height,background_prompt,background_image_url,slots,created_at';
+
+function isBitmapDataUrl(value?: string | null) {
+  return !!value && value.startsWith('data:image/') && !value.includes('image/svg+xml');
+}
+
+function assertNoBitmapDataUrls(payload: any) {
+  if (isBitmapDataUrl(payload.backgroundImageUrl)) {
+    throw new Error('Anh nen van la base64. Can upload len Cloudinary truoc khi luu mau.');
+  }
+
+  const badElement = (payload.elements || []).find((element: any) => isBitmapDataUrl(element?.content));
+  if (badElement) {
+    throw new Error(`Layer "${badElement.id || badElement.fileName || 'image'}" van la base64. Can upload len Cloudinary truoc khi luu mau.`);
+  }
+}
+
+function toFrameListRecord(frame: any) {
+  return {
+    id: frame.id,
+    name: frame.name,
+    width: frame.width,
+    height: frame.height,
+    background_prompt: frame.background_prompt || '',
+    background_image_url: isBitmapDataUrl(frame.background_image_url) ? null : frame.background_image_url || null,
+    slots: frame.slots || [],
+    elements: [],
+    elements_count: Array.isArray(frame.elements) ? frame.elements.length : frame.elements_count || 0,
+    created_at: frame.created_at,
+    is_list_item: true
+  };
+}
+
 export async function GET() {
   let dbFrames: any[] = [];
   
@@ -160,7 +193,7 @@ export async function GET() {
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       const { data, error } = await supabase
         .from('frames')
-        .select('*')
+        .select(FRAME_LIST_COLUMNS)
         .order('created_at', { ascending: false });
       
       if (error) {
@@ -179,12 +212,12 @@ export async function GET() {
   }
 
   // Prepend default templates
-  return NextResponse.json([...DEFAULT_TEMPLATES, ...dbFrames], {
+  return NextResponse.json([...DEFAULT_TEMPLATES.map(toFrameListRecord), ...dbFrames.map(toFrameListRecord)], {
     headers: {
       // s-maxage: Vercel CDN cache 10 phút
       // stale-while-revalidate: CDN serve cache cũ trong 2 phút khi đang fetch mới
       // max-age: browser cache 5 phút
-      'Cache-Control': 'no-store',
+      'Cache-Control': 'public, max-age=300, s-maxage=600, stale-while-revalidate=120',
     },
   });
 }
@@ -192,6 +225,12 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const payload = await req.json();
+    try {
+      assertNoBitmapDataUrls(payload);
+    } catch (error: any) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     const adminPassword = process.env.ADMIN_PASSWORD || 'theanh2002';
     if (payload.password !== adminPassword) {
       return NextResponse.json({ error: 'Mật khẩu quản trị không đúng. Truy cập bị từ chối!' }, { status: 401 });
@@ -254,6 +293,12 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const payload = await req.json();
+    try {
+      assertNoBitmapDataUrls(payload);
+    } catch (error: any) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     const adminPassword = process.env.ADMIN_PASSWORD || 'theanh2002';
     if (payload.password !== adminPassword) {
       return NextResponse.json({ error: 'Mật khẩu quản trị không đúng. Truy cập bị từ chối!' }, { status: 401 });

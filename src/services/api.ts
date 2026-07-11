@@ -1,11 +1,25 @@
 import { FrameConfig } from '../types/canvas';
+import { isBitmapDataUrl } from '../utils/cloudinary';
 
 // ─── Client-side in-memory cache ────────────────────────────────────────────
-const CLIENT_CACHE_TTL = 0;
+const CLIENT_CACHE_TTL = 5 * 60 * 1000;
 let framesCache: { data: any[]; timestamp: number } | null = null;
+const frameDetailCache = new Map<string, any>();
 
 function invalidateFramesCache() {
   framesCache = null;
+  frameDetailCache.clear();
+}
+
+function assertNoBitmapDataUrls(payload: any) {
+  if (isBitmapDataUrl(payload.backgroundImageUrl)) {
+    throw new Error('Anh nen van la base64. Can upload len Cloudinary truoc khi luu mau.');
+  }
+
+  const badElement = (payload.elements || []).find((element: any) => isBitmapDataUrl(element?.content));
+  if (badElement) {
+    throw new Error(`Layer "${badElement.id || badElement.fileName || 'image'}" van la base64. Can upload len Cloudinary truoc khi luu mau.`);
+  }
 }
 // ────────────────────────────────────────────────────────────────────────────
 
@@ -66,11 +80,16 @@ export const apiService = {
    * Fetch detailed frame layout config
    */
   async getFrame(frameId: string): Promise<any> {
+    const cached = frameDetailCache.get(frameId);
+    if (cached) return cached;
+
     const res = await fetch(`/api/frames/${frameId}`);
     if (!res.ok) {
       throw new Error(`Failed to load frame configuration: ${frameId}`);
     }
-    return res.json();
+    const data = await res.json();
+    frameDetailCache.set(frameId, data);
+    return data;
   },
 
   /**
@@ -103,6 +122,8 @@ export const apiService = {
    * Save a new template
    */
   async createFrame(payload: any): Promise<any> {
+    assertNoBitmapDataUrls(payload);
+
     const res = await fetch('/api/frames', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -119,6 +140,8 @@ export const apiService = {
    * Update an existing template
    */
   async updateFrame(payload: any): Promise<any> {
+    assertNoBitmapDataUrls(payload);
+
     const res = await fetch('/api/frames', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
