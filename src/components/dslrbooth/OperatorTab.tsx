@@ -149,7 +149,7 @@ export const OperatorTab: React.FC = () => {
 
       // 1. Load Cloudinary credentials from localStorage or process.env defaults
       const cloudName = localStorage.getItem('lumibooth_cloudinary_cloud_name') || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'drd21vvuv';
-      const uploadPreset = localStorage.getItem('lumibooth_cloudinary_upload_preset') || process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'photoboth-template';
+      const uploadPreset = localStorage.getItem('lumibooth_cloudinary_upload_preset') || process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'photobooth-template';
 
       if (!cloudName || !uploadPreset) {
         throw new Error('Vui lòng cấu hình Cloud Name và Upload Preset trong tab Quản Trị Mẫu trước!');
