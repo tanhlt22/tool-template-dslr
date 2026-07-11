@@ -1,6 +1,6 @@
 export async function uploadToCloudinary(dataUrl: string): Promise<string> {
   // If it's already a URL or not a base64 image (like an SVG string), skip
-  if (!dataUrl.startsWith('data:image/')) {
+  if (!dataUrl.startsWith('data:image/') || dataUrl.includes('image/svg+xml')) {
     return dataUrl;
   }
 
