@@ -9,6 +9,7 @@ import { CreateFrameModal, NewFrameConfig } from './components/CreateFrameModal'
 import { FrameLibrary } from './components/FrameLibrary';
 import { FramePreviewStep } from './components/FramePreviewStep';
 import { SaveFrameModal } from './components/SaveFrameModal';
+import { ColorPunchModal } from './components/ColorPunchModal';
 import { useCanvasState } from './hooks/useCanvasState';
 import { useCanvasLayers } from './hooks/useCanvasLayers';
 import { useExport } from './hooks/useExport';
@@ -31,6 +32,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
   const [view, setView] = useState<AppView>(initialView);
   const [isCreateFrameOpen, setIsCreateFrameOpen] = useState(false);
   const [isSaveFrameOpen, setIsSaveFrameOpen] = useState(false);
+  const [isColorPunchOpen, setIsColorPunchOpen] = useState(false);
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
   const [personalization, setPersonalization] = useState(DEFAULT_PERSONALIZATION);
   const canvasSnapshotRef = useRef<(() => string | null) | null>(null);
@@ -354,6 +356,37 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
     }
   };
 
+  const getColorPunchTargetImage = (): string | null => {
+    const selectedElement = layers.elements.find((el) => el.id === layers.selectedId && el.type === 'image');
+    return selectedElement ? selectedElement.content : cs.bgImageUrl;
+  };
+
+  const handleOpenColorPunch = () => {
+    if (!getColorPunchTargetImage()) {
+      showToast('Vui lòng chọn một ảnh trên giao diện hoặc tải lên ảnh nền để đục lỗ theo màu', 'error');
+      return;
+    }
+    setIsColorPunchOpen(true);
+  };
+
+  const handleApplyColorPunch = (dataUrl: string) => {
+    const selectedElement = layers.elements.find((el) => el.id === layers.selectedId && el.type === 'image');
+    if (selectedElement) {
+      layers.setElements((prev) =>
+        prev.map((el) => (el.id === selectedElement.id ? { ...el, content: dataUrl } : el))
+      );
+      showToast('Đã đục lỗ theo màu trên ảnh đang chọn thành công!', 'success');
+    } else if (cs.bgImageUrl) {
+      const previousBg = cs.bgImageUrl;
+      cs.setBgImageUrl(dataUrl);
+      layers.setElements((prev) =>
+        prev.map((el) => (el.type === 'image' && el.content === previousBg ? { ...el, content: dataUrl } : el))
+      );
+      showToast('Đã đục lỗ theo màu trên ảnh nền thành công!', 'success');
+    }
+    setIsColorPunchOpen(false);
+  };
+
   const renderEditor = () => (
     <main className="flex min-w-0 min-h-0 flex-1 flex-col bg-slate-50">
       <EditorToolbar
@@ -389,6 +422,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
         isLoadingFrames={tpl.isLoadingFrames}
         onLoadSavedFrame={loadTemplateIntoEditor}
         onPunchHoles={handlePunchHolesOnBackground}
+        onColorPunch={handleOpenColorPunch}
       />
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
@@ -560,6 +594,12 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
         isSaving={tpl.isSavingTemplate}
         onClose={() => setIsSaveFrameOpen(false)}
         onSave={handleSaveFrameName}
+      />
+      <ColorPunchModal
+        isOpen={isColorPunchOpen}
+        imageUrl={getColorPunchTargetImage()}
+        onClose={() => setIsColorPunchOpen(false)}
+        onApply={handleApplyColorPunch}
       />
       {isAISettingsOpen && (
         <Suspense fallback={null}>
