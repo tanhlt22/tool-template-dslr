@@ -322,7 +322,7 @@ export const AdminTab: React.FC<AdminTabProps> = ({ onLoadTemplateToStudioAI }) 
                       
                       <div className="flex items-center gap-4 text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-4 border-b border-slate-100 pb-3">
                         <span className="flex items-center gap-1"><Camera className="w-3.5 h-3.5 text-slate-400" /> {tmpl.slots.length} ô ảnh</span>
-                        <span className="flex items-center gap-1"><Type className="w-3.5 h-3.5 text-slate-400" /> {tmpl.elements.length} Chữ</span>
+                        <span className="flex items-center gap-1"><Type className="w-3.5 h-3.5 text-slate-400" /> {(tmpl.elements ?? []).length} Chữ</span>
                       </div>
                     </div>
 

@@ -69,6 +69,9 @@ interface SidebarProps {
   isSavingTemplate: boolean;
   onUpdateTemplateInDb: () => void;
   onSaveNewTemplateToDb?: () => void;
+  savedFrames?: any[];
+  isLoadingFrames?: boolean;
+  onLoadSavedFrame?: (frame: any) => void;
 }
 
 type LayerItem = {

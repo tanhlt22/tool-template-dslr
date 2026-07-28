@@ -108,6 +108,16 @@ function getSupabase() {
   return createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
+function checkAdmin(password: string): { ok: boolean; error?: string; status?: number } {
+  if (!ADMIN_PASSWORD) {
+    return { ok: false, error: 'ADMIN_PASSWORD is not configured on this server', status: 500 };
+  }
+  if (password !== ADMIN_PASSWORD) {
+    return { ok: false, error: 'Mật khẩu quản trị không đúng. Truy cập bị từ chối!', status: 401 };
+  }
+  return { ok: true };
+}
+
 // GET /api/frames — list all frames
 router.get('/frames', async (req, res) => {
   const supabase = getSupabase();
@@ -131,13 +141,29 @@ router.get('/frames', async (req, res) => {
 router.post('/frames', async (req, res) => {
   try {
     const payload = req.body;
+    const authPost = checkAdmin(payload.password || '');
+    if (!authPost.ok) return res.status(authPost.status!).json({ error: authPost.error });
+    const frameId = crypto.randomUUID();
+    const createdAt = new Date().toISOString();
+    const record = {
+      id: frameId,
+      name: payload.name || 'Untitled Premium Layout',
+      width: Number(payload.width) || 1200,
+      height: Number(payload.height) || 1800,
+      background_prompt: payload.backgroundPrompt || '',
+      background_image_url: payload.backgroundImageUrl || null,
+      slots: payload.slots || [],
+      elements: payload.elements || [],
+      created_at: createdAt,
+    };
     const supabase = getSupabase();
     if (supabase) {
-      const { data, error } = await supabase.from('frames').insert([payload]).select();
+      const { data, error } = await supabase.from('frames').insert([record]).select();
       if (error) throw error;
-      return res.status(201).json(data?.[0] || payload);
+      const saved = data?.[0] || record;
+      return res.status(201).json({ frame_id: saved.id, ...saved });
     }
-    return res.status(201).json(payload);
+    return res.status(201).json({ frame_id: record.id, ...record });
   } catch (err: any) {
     return res.status(500).json({ error: err.message || 'Lỗi tạo mẫu thiết kế mới' });
   }
@@ -147,17 +173,26 @@ router.post('/frames', async (req, res) => {
 router.put('/frames', async (req, res) => {
   try {
     const payload = req.body;
+    const authPut = checkAdmin(payload.password || '');
+    if (!authPut.ok) return res.status(authPut.status!).json({ error: authPut.error });
+    const { id, name, width, height, backgroundPrompt, backgroundImageUrl, slots, elements } = payload;
+    if (!id) return res.status(400).json({ error: 'Thiếu ID khung ảnh cần cập nhật' });
+    const updatedRecord = {
+      name: name || 'Untitled Premium Layout',
+      width: Number(width) || 1200,
+      height: Number(height) || 1800,
+      background_prompt: backgroundPrompt || '',
+      background_image_url: backgroundImageUrl || null,
+      slots: slots || [],
+      elements: elements || [],
+    };
     const supabase = getSupabase();
     if (supabase) {
-      const { data, error } = await supabase
-        .from('frames')
-        .update(payload)
-        .eq('id', payload.id)
-        .select();
+      const { data, error } = await supabase.from('frames').update(updatedRecord).eq('id', id).select();
       if (error) throw error;
-      return res.json(data?.[0] || payload);
+      return res.json(data?.[0] || { id, ...updatedRecord });
     }
-    return res.json(payload);
+    return res.json({ id, ...updatedRecord });
   } catch (err: any) {
     return res.status(500).json({ error: err.message || 'Lỗi cập nhật cấu hình mẫu' });
   }
@@ -168,7 +203,8 @@ router.delete('/frames', async (req, res) => {
   try {
     const { id, password } = req.query as { id: string; password: string };
     if (!id) return res.status(400).json({ error: 'Missing frame id' });
-    if (password !== ADMIN_PASSWORD) return res.status(403).json({ error: 'Mật khẩu không đúng' });
+    const authDel = checkAdmin(password || '');
+    if (!authDel.ok) return res.status(authDel.status!).json({ error: authDel.error });
     const supabase = getSupabase();
     if (supabase) {
       const { error } = await supabase.from('frames').delete().eq('id', id);
@@ -281,7 +317,8 @@ router.post('/frames/generate-bg', async (req, res) => {
           }),
         });
         if (response.ok) {
-          const resData = await response.json();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const resData: any = await response.json();
           if (resData?.generatedImages?.[0]?.image?.imageBytes) {
             return res.json({
               image: `data:image/png;base64,${resData.generatedImages[0].image.imageBytes}`,
