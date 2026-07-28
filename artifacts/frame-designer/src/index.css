@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&family=Great+Vibes&family=Pacifico&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@400;600;800&family=Bungee&family=Dancing+Script:wght@400;700&family=Cinzel:wght@400;700&family=Alex+Brush&family=Pinyon+Script&family=Lobster&family=Sacramento&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Hanken Grotesk', 'Inter', sans-serif;
+    background-color: #f9f9ff;
+    color: #111c2d;
+  }
+}
+
+/* Custom premium light scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f0f3ff;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cfdaf2;
+  border-radius: 8px;
+  border: 1px solid #dee8ff;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #adc6ff;
+}
+
+/* Precision Engineering Glassmorphism utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #dee8ff;
+  box-shadow: 0 12px 32px -4px rgba(30, 41, 59, 0.06);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid #e7eeff;
+  box-shadow: 0 8px 24px -4px rgba(30, 41, 59, 0.04);
+}
+
+/* Custom interactive animation for UI widgets */
+.glow-on-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glow-on-hover:hover {
+  box-shadow: 0 8px 20px rgba(0, 88, 190, 0.15);
+  border-color: #0058be;
+  transform: translateY(-1px);
+}
+
+/* Custom Fabric.js canvas alignment helper styling */
+.canvas-container {
+  box-shadow: 0 20px 40px -10px rgba(30, 41, 59, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1.5px solid #dee8ff;
+}
+
+/* Prevent Fabric.js hidden textarea focus scrolling from shifting layout */
+.fabric-hidden-textarea,
+textarea.fabric-hidden-textarea,
+.canvas-container textarea {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Prevent double click selection and scroll on canvas elements */
+.canvas-container,
+.canvas-scaler,
+canvas {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}

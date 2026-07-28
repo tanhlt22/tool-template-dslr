@@ -18,3 +18,11 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = "dktrhm7i1"
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET = "photobooth-template"
+SUPABASE_BUCKET = "frames-bucket"
+SUPABASE_URL = "https://agpammxwmtgewxhsspgc.supabase.co"
