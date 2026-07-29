@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "cd artifacts/frame-designer && BASE_PATH=/ PORT=3000 pnpm run build",
+  "buildCommand": "cd artifacts/frame-designer && BASE_PATH=/ PORT=3000 pnpm run build && cd ../api-server && pnpm run build:vercel",
   "outputDirectory": "artifacts/frame-designer/dist/public",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index" },

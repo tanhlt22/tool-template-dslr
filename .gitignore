@@ -47,3 +47,7 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Generated Vercel serverless function bundle (built by
+# artifacts/api-server/build-vercel.mjs during Vercel's buildCommand)
+/api/
