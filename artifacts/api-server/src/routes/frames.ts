@@ -120,6 +120,7 @@ function checkAdmin(password: string): { ok: boolean; error?: string; status?: n
 
 // GET /api/frames — list all frames
 router.get('/frames', async (req, res) => {
+  res.setHeader('Cache-Control', 's-maxage=18000, stale-while-revalidate');
   const supabase = getSupabase();
   if (supabase) {
     try {
@@ -371,6 +372,7 @@ router.post('/frames/export', async (req, res) => {
 
 // GET /api/frames/:id
 router.get('/frames/:id', async (req, res) => {
+  res.setHeader('Cache-Control', 's-maxage=18000, stale-while-revalidate');
   const frameId = req.params.id;
   const defaultTemplate = DEFAULT_TEMPLATES.find((t) => t.id === frameId);
   if (defaultTemplate) return res.json(defaultTemplate);
