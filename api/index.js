@@ -54111,7 +54111,6 @@ function checkAdmin(password) {
   return { ok: true };
 }
 router2.get("/frames", async (req, res) => {
-  res.setHeader("Cache-Control", "s-maxage=18000, stale-while-revalidate");
   const supabase = getSupabase();
   if (supabase) {
     try {
@@ -54328,7 +54327,6 @@ router2.post("/frames/export", async (req, res) => {
   }
 });
 router2.get("/frames/:id", async (req, res) => {
-  res.setHeader("Cache-Control", "s-maxage=18000, stale-while-revalidate");
   const frameId = req.params.id;
   const defaultTemplate = DEFAULT_TEMPLATES.find((t) => t.id === frameId);
   if (defaultTemplate) return res.json(defaultTemplate);
