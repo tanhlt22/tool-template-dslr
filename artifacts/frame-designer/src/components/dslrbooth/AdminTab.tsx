@@ -67,9 +67,9 @@ export const AdminTab: React.FC<AdminTabProps> = ({ onLoadTemplateToStudioAI }) 
   useEffect(() => {
     fetchTemplates();
     
-    // Load Cloudinary config from localStorage or env
-    const savedCloudName = localStorage.getItem('lumibooth_cloudinary_cloud_name') || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '';
-    const savedUploadPreset = localStorage.getItem('lumibooth_cloudinary_upload_preset') || process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '';
+    // Load Cloudinary config from localStorage or Vite env
+    const savedCloudName = localStorage.getItem('lumibooth_cloudinary_cloud_name') || import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
+    const savedUploadPreset = localStorage.getItem('lumibooth_cloudinary_upload_preset') || import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || '';
     setCloudName(savedCloudName);
     setUploadPreset(savedUploadPreset);
   }, []);

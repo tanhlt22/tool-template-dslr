@@ -147,9 +147,9 @@ export const OperatorTab: React.FC = () => {
       const canvas = operatorCanvasRef.current;
       if (!canvas) throw new Error('Canvas not loaded');
 
-      // 1. Load Cloudinary credentials from localStorage or process.env defaults
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+      // 1. Load Cloudinary credentials from localStorage or Vite env defaults
+      const cloudName = localStorage.getItem('lumibooth_cloudinary_cloud_name') || import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
+      const uploadPreset = localStorage.getItem('lumibooth_cloudinary_upload_preset') || import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || '';
 
       if (!cloudName || !uploadPreset) {
         throw new Error('Vui lòng cấu hình Cloud Name và Upload Preset trong tab Quản Trị Mẫu trước!');

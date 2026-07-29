@@ -5,11 +5,13 @@ export async function uploadToCloudinary(dataUrl: string): Promise<string> {
   }
 
   const cloudName =
-    process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
-    (typeof window !== 'undefined' ? localStorage.getItem('lumibooth_cloudinary_cloud_name') || '' : '');
+    (typeof window !== 'undefined' ? localStorage.getItem('lumibooth_cloudinary_cloud_name') || '' : '') ||
+    import.meta.env.VITE_CLOUDINARY_CLOUD_NAME ||
+    '';
   const uploadPreset =
-    process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ||
-    (typeof window !== 'undefined' ? localStorage.getItem('lumibooth_cloudinary_upload_preset') || '' : '');
+    (typeof window !== 'undefined' ? localStorage.getItem('lumibooth_cloudinary_upload_preset') || '' : '') ||
+    import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET ||
+    '';
 
   if (!cloudName || !uploadPreset) {
     throw new Error('Thiếu cấu hình Cloudinary Cloud Name hoặc Upload Preset trong biến môi trường!');
