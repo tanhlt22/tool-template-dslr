@@ -103,10 +103,6 @@ Thumbs.db
 .cache/
 .local/
 
-# Generated Vercel serverless function bundle (built by
-# artifacts/api-server/build-vercel.mjs during Vercel's buildCommand)
-/api/
-
 # AI and Temp Files
 .agents/
 .codex/
