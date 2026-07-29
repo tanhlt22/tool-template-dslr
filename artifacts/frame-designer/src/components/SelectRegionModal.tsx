@@ -41,7 +41,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
   // --- Color mode state ---
   const colorCanvasRef = useRef<HTMLCanvasElement>(null);
   const sourceDataRef = useRef<ImageData | null>(null);
-  const [tolerance, setTolerance] = useState(30);
+  const [tolerance, setTolerance] = useState(10);
   const [pickedColor, setPickedColor] = useState<[number, number, number] | null>(null);
   const [matchCount, setMatchCount] = useState(0);
 
@@ -54,7 +54,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     if (!isOpen || !imageUrl) return;
     setPickedColor(null);
     setMatchCount(0);
-    setTolerance(30);
+    setTolerance(10);
     setMode('color');
 
     const img = new Image();
