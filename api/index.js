@@ -54097,9 +54097,13 @@ var DEFAULT_TEMPLATES = [
     created_at: "2026-05-30T10:02:00Z"
   }
 ];
+var _supabaseClient = null;
 function getSupabase() {
   if (!SUPABASE_URL || !SUPABASE_KEY) return null;
-  return createClient(SUPABASE_URL, SUPABASE_KEY);
+  if (!_supabaseClient) {
+    _supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+  return _supabaseClient;
 }
 function checkAdmin(password) {
   if (!ADMIN_PASSWORD) {

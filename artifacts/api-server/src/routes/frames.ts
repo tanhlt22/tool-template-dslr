@@ -103,9 +103,13 @@ const DEFAULT_TEMPLATES = [
   },
 ];
 
+let _supabaseClient: ReturnType<typeof createClient> | null = null;
 function getSupabase() {
   if (!SUPABASE_URL || !SUPABASE_KEY) return null;
-  return createClient(SUPABASE_URL, SUPABASE_KEY);
+  if (!_supabaseClient) {
+    _supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+  return _supabaseClient;
 }
 
 function checkAdmin(password: string): { ok: boolean; error?: string; status?: number } {
