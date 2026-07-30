@@ -236,28 +236,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
               backgroundPosition: 'center'
             }}
           >
-            {/* 1. Background elements */}
-            {bgElements.map((el: any, index: number) => {
-              if (el.visible === false) return null;
-              return (
-                <img
-                  key={el.id || `bg_${index}`}
-                  src={el.content}
-                  alt={el.fileName || 'bg'}
-                  className="absolute object-cover pointer-events-none"
-                  style={{
-                    left: `${(el.x / width) * 100}%`,
-                    top: `${(el.y / height) * 100}%`,
-                    width: `${(el.width / width) * 100}%`,
-                    height: `${(el.height / height) * 100}%`,
-                    transform: el.rotation ? `rotate(${el.rotation}deg)` : undefined,
-                    transformOrigin: 'center center'
-                  }}
-                />
-              );
-            })}
-
-            {/* 2. Slot Placeholder Boxes */}
+            {/* 1. Slot Placeholder Boxes */}
             {frame.slots?.map((slot: any, index: number) => (
               <div
                 key={slot.id || `slot_box_${index}`}
@@ -271,8 +250,8 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
               />
             ))}
 
-            {/* 3. Foreground elements (stickers, overlay frames, text) */}
-            {fgElements.map((el: any, index: number) => {
+            {/* 2. All Elements in exact array order (backgrounds, images, stickers, overlay frames, text) */}
+            {frame.elements?.map((el: any, index: number) => {
               if (el.visible === false) return null;
               const leftPct = (el.x / width) * 100;
               const topPct = (el.y / height) * 100;
@@ -306,7 +285,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
               if (el.content) {
                 return (
                   <img
-                    key={el.id || `fg_${index}`}
+                    key={el.id || `el_${index}`}
                     src={el.content}
                     alt={el.fileName || 'element'}
                     className="absolute object-contain pointer-events-none"
@@ -325,11 +304,11 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
               return null;
             })}
 
-            {/* 4. Slot Number Labels (ALWAYS ON TOP of all layers) */}
+            {/* 3. Slot Number Labels (ALWAYS ON TOP of all layers) */}
             {frame.slots?.map((slot: any, index: number) => (
               <div
                 key={slot.id || `slot_label_${index}`}
-                className="absolute pointer-events-none flex items-center justify-center text-xs md:text-sm font-black text-rose-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]"
+                className="absolute pointer-events-none flex items-center justify-center text-xs md:text-sm font-black text-rose-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]"
                 style={{
                   left: `${(slot.x / width) * 100}%`,
                   top: `${(slot.y / height) * 100}%`,
