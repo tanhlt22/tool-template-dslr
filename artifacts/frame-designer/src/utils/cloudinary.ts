@@ -45,7 +45,8 @@ export function isBitmapDataUrl(value?: string | null): boolean {
 }
 
 export function getCloudinaryThumbnailUrl(url?: string | null, width = 360): string | null {
-  if (!url || isBitmapDataUrl(url)) return null;
+  if (!url) return null;
+  if (isBitmapDataUrl(url)) return url;
   if (!url.includes('res.cloudinary.com') || !url.includes('/image/upload/')) return url;
 
   return url.replace('/image/upload/', `/image/upload/f_auto,q_auto,w_${width},c_limit/`);

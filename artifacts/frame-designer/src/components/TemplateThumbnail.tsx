@@ -20,7 +20,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
 
     return (
       <div className="flex items-center justify-center w-full h-full min-h-0 min-w-0 p-2 md:p-4 overflow-hidden">
-        <div className="relative flex max-w-full max-h-full rounded-lg border border-slate-300 bg-[#f8eee5] shadow-lg overflow-hidden transition-all">
+        <div className="relative inline-block max-w-full max-h-full rounded-lg border border-slate-300 bg-[#f8eee5] shadow-lg overflow-hidden transition-all">
           
           {/* Spacer Image ensures perfect scaling */}
           <img 
@@ -67,7 +67,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
         style={{
           width: isLandscape ? baseSize : Math.max(42 * scale, Math.round((width / height) * baseSize)),
           height: isLandscape ? Math.max(42 * scale, Math.round((height / width) * baseSize)) : baseSize,
-          backgroundImage: image ? `url(${image})` : undefined,
+          backgroundImage: image ? `url("${image}")` : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
