@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useLayoutEffect } from 'react';
 import { getCloudinaryThumbnailUrl } from '../utils/cloudinary';
 
 export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent?: boolean }> = ({ 
@@ -6,6 +6,28 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
   scale = 1,
   fitParent = false
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
+
+  useLayoutEffect(() => {
+    if (!fitParent || !containerRef.current) return;
+
+    const updateSize = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setContainerSize({
+          w: Math.max(0, rect.width - 32),
+          h: Math.max(0, rect.height - 32)
+        });
+      }
+    };
+
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [fitParent]);
+
   const image = getCloudinaryThumbnailUrl(
     frame.background_image_url || frame.backgroundImageUrl, 
     fitParent ? 1200 : Math.round(240 * scale)
@@ -15,24 +37,24 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
   const isLandscape = width > height;
 
   if (fitParent) {
-    // Generate a transparent SVG with viewBox to force the browser to maintain aspect ratio flawlessly
-    const svgDataUri = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${width}' height='${height}'%3E%3C/svg%3E`;
+    const { w: containerW, h: containerH } = containerSize;
+    
+    // Compute exact fit scale based on measured parent pixel dimensions
+    const fitScale = (containerW > 0 && containerH > 0)
+      ? Math.min(containerW / width, containerH / height)
+      : 0.2;
+
+    const renderWidth = Math.round(width * fitScale);
+    const renderHeight = Math.round(height * fitScale);
 
     return (
-      <div className="flex items-center justify-center w-full h-full min-h-0 min-w-0 p-2 md:p-4 overflow-hidden">
-        <div className="relative inline-block max-w-full max-h-full rounded-lg border border-slate-300 bg-[#f8eee5] shadow-lg overflow-hidden transition-all">
-          
-          {/* Spacer Image ensures perfect scaling */}
-          <img 
-            src={svgDataUri} 
-            alt="spacer" 
-            className="block max-w-full max-h-full w-auto h-auto opacity-0 pointer-events-none" 
-          />
-
-          {/* Absolute content container */}
+      <div ref={containerRef} className="flex items-center justify-center w-full h-full min-h-0 min-w-0 p-4 overflow-hidden">
+        {renderWidth > 0 && renderHeight > 0 && (
           <div
-            className="absolute inset-0 w-full h-full"
+            className="relative rounded-lg border border-slate-300 bg-[#f8eee5] shadow-lg overflow-hidden transition-all flex-none"
             style={{
+              width: renderWidth,
+              height: renderHeight,
               backgroundImage: image ? `url("${image}")` : undefined,
               backgroundSize: 'cover',
               backgroundPosition: 'center'
@@ -53,7 +75,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
               </div>
             ))}
           </div>
-        </div>
+        )}
       </div>
     );
   }
