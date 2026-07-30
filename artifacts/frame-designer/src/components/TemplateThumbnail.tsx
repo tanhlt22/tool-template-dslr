@@ -47,6 +47,9 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
     const renderWidth = Math.round(width * fitScale);
     const renderHeight = Math.round(height * fitScale);
 
+    const bgElements = frame.elements?.filter((el: any) => el.id === 'background_frame' || (el.style?.order !== undefined && el.style?.order < 0)) || [];
+    const fgElements = frame.elements?.filter((el: any) => el.id !== 'background_frame' && (el.style?.order === undefined || el.style?.order >= 0)) || [];
+
     return (
       <div ref={containerRef} className="flex items-center justify-center w-full h-full min-h-0 min-w-0 p-4 overflow-hidden">
         {renderWidth > 0 && renderHeight > 0 && (
@@ -60,6 +63,28 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
               backgroundPosition: 'center'
             }}
           >
+            {/* Background elements */}
+            {bgElements.map((el: any, index: number) => {
+              if (el.visible === false) return null;
+              return (
+                <img
+                  key={el.id || `bg_${index}`}
+                  src={el.content}
+                  alt={el.fileName || 'bg'}
+                  className="absolute object-cover pointer-events-none"
+                  style={{
+                    left: `${(el.x / width) * 100}%`,
+                    top: `${(el.y / height) * 100}%`,
+                    width: `${(el.width / width) * 100}%`,
+                    height: `${(el.height / height) * 100}%`,
+                    transform: el.rotation ? `rotate(${el.rotation}deg)` : undefined,
+                    transformOrigin: 'center center'
+                  }}
+                />
+              );
+            })}
+
+            {/* Slots */}
             {frame.slots?.map((slot: any, index: number) => (
               <div
                 key={slot.id || index}
@@ -74,6 +99,60 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
                 {slot.order || index + 1}
               </div>
             ))}
+
+            {/* Foreground elements (stickers, icons, text) */}
+            {fgElements.map((el: any, index: number) => {
+              if (el.visible === false) return null;
+              const leftPct = (el.x / width) * 100;
+              const topPct = (el.y / height) * 100;
+              const widthPct = (el.width / width) * 100;
+              const heightPct = (el.height / height) * 100;
+              const rotation = el.rotation || 0;
+
+              if (el.type === 'image' || el.type === 'icon' || el.type === 'qr') {
+                return (
+                  <img
+                    key={el.id || `fg_${index}`}
+                    src={el.content}
+                    alt={el.fileName || 'element'}
+                    className="absolute object-contain pointer-events-none"
+                    style={{
+                      left: `${leftPct}%`,
+                      top: `${topPct}%`,
+                      width: `${widthPct}%`,
+                      height: `${heightPct}%`,
+                      transform: rotation ? `rotate(${rotation}deg)` : undefined,
+                      transformOrigin: 'center center'
+                    }}
+                  />
+                );
+              }
+
+              if (el.type === 'text') {
+                return (
+                  <div
+                    key={el.id || `text_${index}`}
+                    className="absolute pointer-events-none flex items-center justify-center overflow-hidden whitespace-nowrap"
+                    style={{
+                      left: `${leftPct}%`,
+                      top: `${topPct}%`,
+                      width: `${widthPct}%`,
+                      height: `${heightPct}%`,
+                      transform: rotation ? `rotate(${rotation}deg)` : undefined,
+                      transformOrigin: 'center center',
+                      color: el.style?.color || '#ffffff',
+                      fontFamily: el.style?.fontFamily || 'Outfit',
+                      fontSize: `${(el.style?.fontSize || 24) * (renderHeight / height)}px`,
+                      fontWeight: el.style?.fontWeight || 'bold'
+                    }}
+                  >
+                    {el.content}
+                  </div>
+                );
+              }
+
+              return null;
+            })}
           </div>
         )}
       </div>
@@ -81,19 +160,46 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
   }
 
   const baseSize = 92 * scale;
+  const thumbW = isLandscape ? baseSize : Math.max(42 * scale, Math.round((width / height) * baseSize));
+  const thumbH = isLandscape ? Math.max(42 * scale, Math.round((height / width) * baseSize)) : baseSize;
+
+  const bgElements = frame.elements?.filter((el: any) => el.id === 'background_frame' || (el.style?.order !== undefined && el.style?.order < 0)) || [];
+  const fgElements = frame.elements?.filter((el: any) => el.id !== 'background_frame' && (el.style?.order === undefined || el.style?.order >= 0)) || [];
 
   return (
     <div className="flex items-center justify-center rounded-md bg-slate-100 p-2 w-full" style={{ height: 112 * scale }}>
       <div
         className="relative overflow-hidden rounded-sm border border-slate-200 bg-[#f8eee5] shadow-sm"
         style={{
-          width: isLandscape ? baseSize : Math.max(42 * scale, Math.round((width / height) * baseSize)),
-          height: isLandscape ? Math.max(42 * scale, Math.round((height / width) * baseSize)) : baseSize,
+          width: thumbW,
+          height: thumbH,
           backgroundImage: image ? `url("${image}")` : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
       >
+        {/* Background elements */}
+        {bgElements.map((el: any, index: number) => {
+          if (el.visible === false) return null;
+          return (
+            <img
+              key={el.id || `bg_${index}`}
+              src={el.content}
+              alt={el.fileName || 'bg'}
+              className="absolute object-cover pointer-events-none"
+              style={{
+                left: `${(el.x / width) * 100}%`,
+                top: `${(el.y / height) * 100}%`,
+                width: `${(el.width / width) * 100}%`,
+                height: `${(el.height / height) * 100}%`,
+                transform: el.rotation ? `rotate(${el.rotation}deg)` : undefined,
+                transformOrigin: 'center center'
+              }}
+            />
+          );
+        })}
+
+        {/* Slots */}
         {frame.slots?.map((slot: any, index: number) => (
           <div
             key={slot.id || index}
@@ -108,6 +214,60 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
             {slot.order || index + 1}
           </div>
         ))}
+
+        {/* Foreground elements */}
+        {fgElements.map((el: any, index: number) => {
+          if (el.visible === false) return null;
+          const leftPct = (el.x / width) * 100;
+          const topPct = (el.y / height) * 100;
+          const widthPct = (el.width / width) * 100;
+          const heightPct = (el.height / height) * 100;
+          const rotation = el.rotation || 0;
+
+          if (el.type === 'image' || el.type === 'icon' || el.type === 'qr') {
+            return (
+              <img
+                key={el.id || `fg_${index}`}
+                src={el.content}
+                alt={el.fileName || 'element'}
+                className="absolute object-contain pointer-events-none"
+                style={{
+                  left: `${leftPct}%`,
+                  top: `${topPct}%`,
+                  width: `${widthPct}%`,
+                  height: `${heightPct}%`,
+                  transform: rotation ? `rotate(${rotation}deg)` : undefined,
+                  transformOrigin: 'center center'
+                }}
+              />
+            );
+          }
+
+          if (el.type === 'text') {
+            return (
+              <div
+                key={el.id || `text_${index}`}
+                className="absolute pointer-events-none flex items-center justify-center overflow-hidden whitespace-nowrap"
+                style={{
+                  left: `${leftPct}%`,
+                  top: `${topPct}%`,
+                  width: `${widthPct}%`,
+                  height: `${heightPct}%`,
+                  transform: rotation ? `rotate(${rotation}deg)` : undefined,
+                  transformOrigin: 'center center',
+                  color: el.style?.color || '#ffffff',
+                  fontFamily: el.style?.fontFamily || 'Outfit',
+                  fontSize: `${(el.style?.fontSize || 24) * (thumbH / height)}px`,
+                  fontWeight: el.style?.fontWeight || 'bold'
+                }}
+              >
+                {el.content}
+              </div>
+            );
+          }
+
+          return null;
+        })}
       </div>
     </div>
   );
