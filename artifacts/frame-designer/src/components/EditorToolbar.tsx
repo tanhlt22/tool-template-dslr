@@ -201,7 +201,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 }) => {
   const [showShapes, setShowShapes] = useState(false);
   const [showFrameModal, setShowFrameModal] = useState(false);
-  const [visibleFramesCount, setVisibleFramesCount] = useState(24);
   const [previewFrame, setPreviewFrame] = useState<any>(null);
   const [isZoomed, setIsZoomed] = useState(false);
   const [isApplyingFrame, setIsApplyingFrame] = useState(false);
@@ -494,17 +493,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div 
-              className="flex-1 overflow-y-auto p-4 bg-slate-50"
-              onScroll={(e) => {
-                const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
-                if (scrollHeight - scrollTop <= clientHeight + 50) {
-                  if (visibleFramesCount < savedFrames.length) {
-                    setVisibleFramesCount((prev) => prev + 8);
-                  }
-                }
-              }}
-            >
+            <div className="flex-1 overflow-y-auto p-4 bg-slate-50">
               <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
                 {isLoadingFrames ? (
                   <div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-500">
@@ -513,7 +502,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                   </div>
                 ) : savedFrames.length > 0 ? (
                   <>
-                    {savedFrames.slice(0, visibleFramesCount).map((frame) => (
+                    {savedFrames.map((frame) => (
                       <div
                         key={frame.id}
                         onClick={() => {
