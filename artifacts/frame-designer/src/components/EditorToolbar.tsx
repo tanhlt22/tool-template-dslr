@@ -565,11 +565,9 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
               <X className="w-5 h-5" />
             </button>
 
-            {/* Left side - Scrollable Preview Area */}
-            <div className="flex-1 overflow-auto custom-scrollbar bg-[#f8f9fa] p-6 md:p-10 flex flex-col border-b md:border-b-0 md:border-r border-slate-200">
-              <div className="m-auto w-fit border border-slate-200 rounded-2xl bg-white p-6 shadow-md">
-                <TemplateThumbnail frame={previewFrame} scale={7.5} />
-              </div>
+            {/* Left side - Responsive Preview Area */}
+            <div className="flex-1 min-h-0 bg-[#f8f9fa] p-4 md:p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-200 overflow-hidden">
+              <TemplateThumbnail frame={previewFrame} fitParent={true} />
             </div>
 
             {/* Right side - Info and Actions */}

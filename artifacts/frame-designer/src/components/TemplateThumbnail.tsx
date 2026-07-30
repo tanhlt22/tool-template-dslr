@@ -1,11 +1,51 @@
 import React from 'react';
 import { getCloudinaryThumbnailUrl } from '../utils/cloudinary';
 
-export const TemplateThumbnail: React.FC<{ frame: any; scale?: number }> = ({ frame, scale = 1 }) => {
-  const image = getCloudinaryThumbnailUrl(frame.background_image_url || frame.backgroundImageUrl, Math.round(240 * scale));
+export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent?: boolean }> = ({ 
+  frame, 
+  scale = 1,
+  fitParent = false
+}) => {
+  const image = getCloudinaryThumbnailUrl(
+    frame.background_image_url || frame.backgroundImageUrl, 
+    fitParent ? 1200 : Math.round(240 * scale)
+  );
   const width = frame.width || 1200;
   const height = frame.height || 1800;
   const isLandscape = width > height;
+
+  if (fitParent) {
+    return (
+      <div className="flex items-center justify-center w-full h-full p-2 md:p-4 overflow-hidden">
+        <div
+          className="relative overflow-hidden rounded-lg border border-slate-300 bg-[#f8eee5] shadow-lg transition-all"
+          style={{
+            aspectRatio: `${width} / ${height}`,
+            maxHeight: '100%',
+            maxWidth: '100%',
+            backgroundImage: image ? `url(${image})` : undefined,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          {frame.slots?.map((slot: any, index: number) => (
+            <div
+              key={slot.id || index}
+              className="absolute flex items-center justify-center rounded-sm border border-slate-400/60 bg-slate-200/80 text-xs md:text-sm font-black text-rose-800 shadow-xs backdrop-blur-[1px]"
+              style={{
+                left: `${(slot.x / width) * 100}%`,
+                top: `${(slot.y / height) * 100}%`,
+                width: `${(slot.width / width) * 100}%`,
+                height: `${(slot.height / height) * 100}%`
+              }}
+            >
+              {slot.order || index + 1}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const baseSize = 92 * scale;
 
@@ -39,3 +79,4 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number }> = ({ fr
     </div>
   );
 };
+
