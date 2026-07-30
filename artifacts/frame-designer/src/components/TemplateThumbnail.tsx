@@ -109,25 +109,6 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
               const heightPct = (el.height / height) * 100;
               const rotation = el.rotation || 0;
 
-              if (el.type === 'image' || el.type === 'icon' || el.type === 'qr') {
-                return (
-                  <img
-                    key={el.id || `fg_${index}`}
-                    src={el.content}
-                    alt={el.fileName || 'element'}
-                    className="absolute object-contain pointer-events-none"
-                    style={{
-                      left: `${leftPct}%`,
-                      top: `${topPct}%`,
-                      width: `${widthPct}%`,
-                      height: `${heightPct}%`,
-                      transform: rotation ? `rotate(${rotation}deg)` : undefined,
-                      transformOrigin: 'center center'
-                    }}
-                  />
-                );
-              }
-
               if (el.type === 'text') {
                 return (
                   <div
@@ -151,6 +132,25 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
                 );
               }
 
+              if (el.content) {
+                return (
+                  <img
+                    key={el.id || `fg_${index}`}
+                    src={el.content}
+                    alt={el.fileName || 'element'}
+                    className="absolute object-contain pointer-events-none"
+                    style={{
+                      left: `${leftPct}%`,
+                      top: `${topPct}%`,
+                      width: `${widthPct}%`,
+                      height: `${heightPct}%`,
+                      transform: rotation ? `rotate(${rotation}deg)` : undefined,
+                      transformOrigin: 'center center'
+                    }}
+                  />
+                );
+              }
+
               return null;
             })}
           </div>
@@ -165,11 +165,12 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
 
   const bgElements = frame.elements?.filter((el: any) => el.id === 'background_frame' || (el.style?.order !== undefined && el.style?.order < 0)) || [];
   const fgElements = frame.elements?.filter((el: any) => el.id !== 'background_frame' && (el.style?.order === undefined || el.style?.order >= 0)) || [];
+  const hasImage = !!image || (frame.elements && frame.elements.some((el: any) => el.content && el.type !== 'text'));
 
   return (
     <div className="flex items-center justify-center rounded-md bg-slate-100 p-2 w-full" style={{ height: 112 * scale }}>
       <div
-        className="relative overflow-hidden rounded-sm border border-slate-200 bg-[#f8eee5] shadow-sm"
+        className="relative overflow-hidden rounded-sm border border-slate-200 bg-[#f8eee5] shadow-sm flex-none"
         style={{
           width: thumbW,
           height: thumbH,
@@ -181,6 +182,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
         {/* Background elements */}
         {bgElements.map((el: any, index: number) => {
           if (el.visible === false) return null;
+          if (!el.content || el.type === 'text') return null;
           return (
             <img
               key={el.id || `bg_${index}`}
@@ -199,22 +201,6 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
           );
         })}
 
-        {/* Slots */}
-        {frame.slots?.map((slot: any, index: number) => (
-          <div
-            key={slot.id || index}
-            className="absolute flex items-center justify-center rounded-[2px] border border-slate-300 bg-slate-200 text-[10px] font-black text-rose-800"
-            style={{
-              left: `${(slot.x / width) * 100}%`,
-              top: `${(slot.y / height) * 100}%`,
-              width: `${(slot.width / width) * 100}%`,
-              height: `${(slot.height / height) * 100}%`
-            }}
-          >
-            {slot.order || index + 1}
-          </div>
-        ))}
-
         {/* Foreground elements */}
         {fgElements.map((el: any, index: number) => {
           if (el.visible === false) return null;
@@ -223,25 +209,6 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
           const widthPct = (el.width / width) * 100;
           const heightPct = (el.height / height) * 100;
           const rotation = el.rotation || 0;
-
-          if (el.type === 'image' || el.type === 'icon' || el.type === 'qr') {
-            return (
-              <img
-                key={el.id || `fg_${index}`}
-                src={el.content}
-                alt={el.fileName || 'element'}
-                className="absolute object-contain pointer-events-none"
-                style={{
-                  left: `${leftPct}%`,
-                  top: `${topPct}%`,
-                  width: `${widthPct}%`,
-                  height: `${heightPct}%`,
-                  transform: rotation ? `rotate(${rotation}deg)` : undefined,
-                  transformOrigin: 'center center'
-                }}
-              />
-            );
-          }
 
           if (el.type === 'text') {
             return (
@@ -266,8 +233,45 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
             );
           }
 
+          if (el.content) {
+            return (
+              <img
+                key={el.id || `fg_${index}`}
+                src={el.content}
+                alt={el.fileName || 'element'}
+                className="absolute object-contain pointer-events-none"
+                style={{
+                  left: `${leftPct}%`,
+                  top: `${topPct}%`,
+                  width: `${widthPct}%`,
+                  height: `${heightPct}%`,
+                  transform: rotation ? `rotate(${rotation}deg)` : undefined,
+                  transformOrigin: 'center center'
+                }}
+              />
+            );
+          }
+
           return null;
         })}
+
+        {/* Slots - transparent if frame has image design so the image is cleanly visible */}
+        {frame.slots?.map((slot: any, index: number) => (
+          <div
+            key={slot.id || index}
+            className={`absolute flex items-center justify-center rounded-[2px] border border-slate-300/60 ${
+              hasImage ? 'bg-transparent text-rose-900/60' : 'bg-slate-200 text-rose-800'
+            } text-[10px] font-black`}
+            style={{
+              left: `${(slot.x / width) * 100}%`,
+              top: `${(slot.y / height) * 100}%`,
+              width: `${(slot.width / width) * 100}%`,
+              height: `${(slot.height / height) * 100}%`
+            }}
+          >
+            {slot.order || index + 1}
+          </div>
+        ))}
       </div>
     </div>
   );
