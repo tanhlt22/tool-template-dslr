@@ -549,48 +549,48 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
       {/* Frame Preview Modal */}
       {previewFrame && (
         <div 
-          className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/80 p-4 md:p-8 backdrop-blur-sm"
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/80 p-3 md:p-6 backdrop-blur-sm"
           onClick={() => setPreviewFrame(null)}
         >
           <div 
-            className="relative flex w-full max-w-5xl h-[85vh] flex-col md:flex-row bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in"
+            className="relative flex w-full max-w-7xl h-[90vh] flex-col md:flex-row bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in"
             onClick={e => e.stopPropagation()}
           >
             {/* Close button */}
             <button 
               type="button"
               onClick={() => setPreviewFrame(null)}
-              className="absolute top-4 right-4 z-10 p-2 bg-slate-100/80 hover:bg-rose-100 rounded-full text-slate-500 hover:text-rose-600 transition-colors backdrop-blur-sm"
+              className="absolute top-4 right-4 z-10 p-2.5 bg-slate-100/90 hover:bg-rose-100 rounded-full text-slate-500 hover:text-rose-600 transition-colors backdrop-blur-sm shadow-sm"
             >
               <X className="w-5 h-5" />
             </button>
 
             {/* Left side - Scrollable Preview Area */}
             <div className="flex-1 overflow-auto custom-scrollbar bg-[#f8f9fa] p-6 md:p-10 flex flex-col border-b md:border-b-0 md:border-r border-slate-200">
-              <div className="m-auto w-fit border border-slate-200 rounded-xl bg-white p-4 shadow-sm">
-                <TemplateThumbnail frame={previewFrame} scale={7.0} />
+              <div className="m-auto w-fit border border-slate-200 rounded-2xl bg-white p-6 shadow-md">
+                <TemplateThumbnail frame={previewFrame} scale={7.5} />
               </div>
             </div>
 
             {/* Right side - Info and Actions */}
-            <div className="w-full md:w-[320px] lg:w-[380px] flex-none bg-white p-6 md:p-8 flex flex-col">
-              <div className="flex-1">
+            <div className="w-full md:w-[360px] lg:w-[420px] flex-none bg-white p-6 md:p-8 flex flex-col justify-between">
+              <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
                 <h3 className="text-2xl font-black text-slate-900 mb-6 pr-8 leading-tight">
                   {previewFrame.name}
                 </h3>
                 <div className="space-y-4 text-sm text-slate-600 font-medium">
-                  <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                  <div className="flex items-center gap-2 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
                     <span className="w-24 text-slate-400">Kích thước:</span>
                     <span className="text-slate-900 font-bold">{previewFrame.width} x {previewFrame.height} px</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                  <div className="flex items-center gap-2 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
                     <span className="w-24 text-slate-400">Số ô ảnh:</span>
                     <span className="text-slate-900 font-bold">{previewFrame.slots?.length || 0} ô</span>
                   </div>
                   {previewFrame.background_prompt && (
-                    <div className="flex flex-col gap-2 mt-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <div className="flex flex-col gap-2 mt-4 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
                       <span className="text-slate-400">Prompt nền (AI):</span>
-                      <p className="text-slate-700 italic text-xs leading-relaxed max-h-32 overflow-y-auto custom-scrollbar pr-1">
+                      <p className="text-slate-700 italic text-xs leading-relaxed max-h-36 overflow-y-auto custom-scrollbar pr-1">
                         {previewFrame.background_prompt}
                       </p>
                     </div>
@@ -598,7 +598,15 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                 </div>
               </div>
 
-              <div className="mt-8 flex flex-col gap-3">
+              {/* Action Buttons - Horizontal side by side */}
+              <div className="mt-6 pt-6 border-t border-slate-100 flex flex-row items-center gap-3 w-full">
+                <button
+                  type="button"
+                  onClick={() => setPreviewFrame(null)}
+                  className="w-1/3 px-4 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition-colors text-center"
+                >
+                  Huỷ
+                </button>
                 <button
                   type="button"
                   disabled={isApplyingFrame}
@@ -612,17 +620,10 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                       setIsApplyingFrame(false);
                     }
                   }}
-                  className="w-full px-4 py-3.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white text-base font-bold rounded-xl shadow-lg shadow-rose-600/20 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2"
+                  className="w-2/3 px-4 py-3.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white text-sm md:text-base font-bold rounded-xl shadow-lg shadow-rose-600/20 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2"
                 >
-                  <CheckCircle2 className="w-5 h-5" />
-                  {isApplyingFrame ? 'Đang áp dụng...' : 'Áp dụng mẫu này'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPreviewFrame(null)}
-                  className="w-full px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition-colors"
-                >
-                  Huỷ
+                  <CheckCircle2 className="w-5 h-5 shrink-0" />
+                  <span>{isApplyingFrame ? 'Đang áp dụng...' : 'Áp dụng mẫu này'}</span>
                 </button>
               </div>
             </div>
