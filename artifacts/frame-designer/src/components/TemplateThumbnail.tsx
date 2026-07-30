@@ -10,8 +10,8 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
     frame.background_image_url || frame.backgroundImageUrl, 
     fitParent ? 1200 : Math.round(240 * scale)
   );
-  const width = frame.width || 1200;
-  const height = frame.height || 1800;
+  const width = Number(frame.width) || 1200;
+  const height = Number(frame.height) || 1800;
   const isLandscape = width > height;
 
   if (fitParent) {
