@@ -201,6 +201,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 }) => {
   const [showShapes, setShowShapes] = useState(false);
   const [showFrameModal, setShowFrameModal] = useState(false);
+  const [visibleFramesCount, setVisibleFramesCount] = useState(8);
   const [previewFrame, setPreviewFrame] = useState<any>(null);
   const [isZoomed, setIsZoomed] = useState(false);
   const [isApplyingFrame, setIsApplyingFrame] = useState(false);
@@ -222,7 +223,10 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
       <div className="flex flex-wrap items-center gap-1.5">
         <button
           type="button"
-          onClick={() => setShowFrameModal(true)}
+          onClick={() => {
+            setShowFrameModal(true);
+            setVisibleFramesCount(8);
+          }}
           className="inline-flex items-center gap-2 rounded-md border border-rose-300 bg-rose-50 px-4 py-2 text-xs font-black text-rose-700 hover:bg-rose-100 hover:border-rose-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700 transition-colors shadow-sm"
         >
           <LayoutTemplate className="h-4 w-4" aria-hidden="true" />
@@ -498,27 +502,40 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                     <p className="text-sm font-bold">Đang tải danh sách frame...</p>
                   </div>
                 ) : savedFrames.length > 0 ? (
-                  savedFrames.map((frame) => (
-                    <div
-                      key={frame.id}
-                      onClick={() => {
-                        setPreviewFrame(frame);
-                        setIsZoomed(false);
-                      }}
-                      className={`group relative flex cursor-pointer flex-col items-center rounded-md border p-3 text-left transition-colors ${
-                        editingTemplateId === frame.id
-                          ? 'border-rose-700 bg-white ring-2 ring-rose-700'
-                          : 'border-slate-200 bg-white hover:border-rose-300 hover:bg-rose-50'
-                      }`}
-                    >
-                      <div className="w-full flex justify-center">
-                        <TemplateThumbnail frame={frame} scale={1.8} />
+                  <>
+                    {savedFrames.slice(0, visibleFramesCount).map((frame) => (
+                      <div
+                        key={frame.id}
+                        onClick={() => {
+                          setPreviewFrame(frame);
+                          setIsZoomed(false);
+                        }}
+                        className={`group relative flex cursor-pointer flex-col items-center rounded-md border p-3 text-left transition-colors ${
+                          editingTemplateId === frame.id
+                            ? 'border-rose-700 bg-white ring-2 ring-rose-700'
+                            : 'border-slate-200 bg-white hover:border-rose-300 hover:bg-rose-50'
+                        }`}
+                      >
+                        <div className="w-full flex justify-center">
+                          <TemplateThumbnail frame={frame} scale={1.8} />
+                        </div>
+                        <span className="mt-3 block w-full truncate text-center text-sm font-bold text-slate-900">
+                          {frame.name}
+                        </span>
                       </div>
-                      <span className="mt-3 block w-full truncate text-center text-sm font-bold text-slate-900">
-                        {frame.name}
-                      </span>
-                    </div>
-                  ))
+                    ))}
+                    {visibleFramesCount < savedFrames.length && (
+                      <div className="col-span-full mt-4 flex justify-center pb-4">
+                        <button
+                          type="button"
+                          onClick={() => setVisibleFramesCount((prev) => prev + 8)}
+                          className="rounded-full border border-slate-300 bg-white px-6 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-rose-700 transition-colors shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+                        >
+                          Tải thêm ({savedFrames.length - visibleFramesCount})
+                        </button>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="col-span-full py-8 text-center text-sm font-medium text-slate-500">
                     Chưa có frame mẫu nào
@@ -533,43 +550,56 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
       {/* Frame Preview Modal */}
       {previewFrame && (
         <div 
-          className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/80 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/80 p-4 md:p-8 backdrop-blur-sm"
           onClick={() => setPreviewFrame(null)}
         >
           <div 
-            className="relative flex max-h-[90vh] max-w-[90vw] flex-col bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in"
+            className="relative flex w-full max-w-5xl h-[85vh] flex-col md:flex-row bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex-none flex items-center justify-between border-b border-slate-100 px-6 py-4">
-              <h3 className="text-xl font-black text-slate-900 truncate pr-4">{previewFrame.name}</h3>
-              <button 
-                type="button"
-                onClick={() => setPreviewFrame(null)}
-                className="shrink-0 p-2 bg-slate-100 hover:bg-rose-100 rounded-full text-slate-500 hover:text-rose-600 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <div className={`flex-1 ${isZoomed ? 'overflow-y-auto custom-scrollbar items-start' : 'overflow-hidden items-center justify-center'} flex p-6 bg-[#f8f9fa]`}>
-              <div 
-                className={`mx-auto w-fit border border-slate-200 rounded-xl bg-white p-4 shadow-sm transition-transform duration-300 ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in hover:scale-[1.02]'}`}
-                onClick={() => setIsZoomed(!isZoomed)}
-                title={isZoomed ? "Nhấn để thu nhỏ" : "Nhấn để phóng to"}
-              >
-                <TemplateThumbnail frame={previewFrame} scale={isZoomed ? 6.0 : 3.5} />
+            {/* Close button */}
+            <button 
+              type="button"
+              onClick={() => setPreviewFrame(null)}
+              className="absolute top-4 right-4 z-10 p-2 bg-slate-100/80 hover:bg-rose-100 rounded-full text-slate-500 hover:text-rose-600 transition-colors backdrop-blur-sm"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Left side - Scrollable Preview Area */}
+            <div className="flex-1 overflow-auto custom-scrollbar bg-[#f8f9fa] p-6 md:p-10 flex flex-col border-b md:border-b-0 md:border-r border-slate-200">
+              <div className="m-auto w-fit border border-slate-200 rounded-xl bg-white p-4 shadow-sm">
+                <TemplateThumbnail frame={previewFrame} scale={7.0} />
               </div>
             </div>
 
-            <div className="flex-none border-t border-slate-100 bg-white px-6 py-4">
-              <div className="flex items-center gap-3 w-full max-w-md mx-auto">
-                <button
-                  type="button"
-                  onClick={() => setPreviewFrame(null)}
-                  className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition-colors"
-                >
-                  Đóng
-                </button>
+            {/* Right side - Info and Actions */}
+            <div className="w-full md:w-[320px] lg:w-[380px] flex-none bg-white p-6 md:p-8 flex flex-col">
+              <div className="flex-1">
+                <h3 className="text-2xl font-black text-slate-900 mb-6 pr-8 leading-tight">
+                  {previewFrame.name}
+                </h3>
+                <div className="space-y-4 text-sm text-slate-600 font-medium">
+                  <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <span className="w-24 text-slate-400">Kích thước:</span>
+                    <span className="text-slate-900 font-bold">{previewFrame.width} x {previewFrame.height} px</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <span className="w-24 text-slate-400">Số ô ảnh:</span>
+                    <span className="text-slate-900 font-bold">{previewFrame.slots?.length || 0} ô</span>
+                  </div>
+                  {previewFrame.background_prompt && (
+                    <div className="flex flex-col gap-2 mt-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                      <span className="text-slate-400">Prompt nền (AI):</span>
+                      <p className="text-slate-700 italic text-xs leading-relaxed max-h-32 overflow-y-auto custom-scrollbar pr-1">
+                        {previewFrame.background_prompt}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-8 flex flex-col gap-3">
                 <button
                   type="button"
                   disabled={isApplyingFrame}
@@ -583,10 +613,17 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                       setIsApplyingFrame(false);
                     }
                   }}
-                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white text-sm font-bold rounded-xl shadow-md shadow-rose-600/20 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2"
+                  className="w-full px-4 py-3.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white text-base font-bold rounded-xl shadow-lg shadow-rose-600/20 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
-                  Áp dụng mẫu này
+                  <CheckCircle2 className="w-5 h-5" />
+                  {isApplyingFrame ? 'Đang áp dụng...' : 'Áp dụng mẫu này'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewFrame(null)}
+                  className="w-full px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition-colors"
+                >
+                  Huỷ
                 </button>
               </div>
             </div>
