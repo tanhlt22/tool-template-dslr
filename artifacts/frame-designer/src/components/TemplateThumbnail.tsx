@@ -16,13 +16,15 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
 
   if (fitParent) {
     return (
-      <div className="flex items-center justify-center w-full h-full p-2 md:p-4 overflow-hidden">
+      <div className="flex items-center justify-center w-full h-full min-h-0 min-w-0 p-2 md:p-4 overflow-hidden">
         <div
           className="relative overflow-hidden rounded-lg border border-slate-300 bg-[#f8eee5] shadow-lg transition-all"
           style={{
             aspectRatio: `${width} / ${height}`,
-            maxHeight: '100%',
+            width: isLandscape ? '100%' : 'auto',
+            height: isLandscape ? 'auto' : '100%',
             maxWidth: '100%',
+            maxHeight: '100%',
             backgroundImage: image ? `url(${image})` : undefined,
             backgroundSize: 'cover',
             backgroundPosition: 'center'

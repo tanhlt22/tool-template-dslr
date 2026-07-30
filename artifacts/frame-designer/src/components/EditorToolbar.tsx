@@ -566,7 +566,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             </button>
 
             {/* Left side - Responsive Preview Area */}
-            <div className="flex-1 min-h-0 bg-[#f8f9fa] p-4 md:p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-200 overflow-hidden">
+            <div className="flex-1 w-full h-full min-h-0 min-w-0 bg-[#f8f9fa] p-4 md:p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-200 overflow-hidden">
               <TemplateThumbnail frame={previewFrame} fitParent={true} />
             </div>
 
