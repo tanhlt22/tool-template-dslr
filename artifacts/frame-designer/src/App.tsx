@@ -274,6 +274,11 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
   const handleApplySelectRegion = (dataUrl: string, resetToCanvasSize: boolean) => {
     const selectedElement = getSelectRegionTargetElement();
     if (selectedElement) {
+      // Sync bgImageUrl if we are punching holes in the background element
+      if (selectedElement.content === cs.bgImageUrl || selectedElement.id.startsWith('background_frame')) {
+        cs.setBgImageUrl(dataUrl);
+      }
+      
       layers.setElements((prev) =>
         prev.map((el) =>
           el.id === selectedElement.id
