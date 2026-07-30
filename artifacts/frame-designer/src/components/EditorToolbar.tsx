@@ -494,7 +494,17 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 bg-slate-50">
+            <div 
+              className="flex-1 overflow-y-auto p-4 bg-slate-50"
+              onScroll={(e) => {
+                const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+                if (scrollHeight - scrollTop <= clientHeight + 50) {
+                  if (visibleFramesCount < savedFrames.length) {
+                    setVisibleFramesCount((prev) => prev + 8);
+                  }
+                }
+              }}
+            >
               <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
                 {isLoadingFrames ? (
                   <div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-500">
@@ -524,17 +534,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                         </span>
                       </div>
                     ))}
-                    {visibleFramesCount < savedFrames.length && (
-                      <div className="col-span-full mt-4 flex justify-center pb-4">
-                        <button
-                          type="button"
-                          onClick={() => setVisibleFramesCount((prev) => prev + 8)}
-                          className="rounded-full border border-slate-300 bg-white px-6 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-rose-700 transition-colors shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
-                        >
-                          Tải thêm ({savedFrames.length - visibleFramesCount})
-                        </button>
-                      </div>
-                    )}
                   </>
                 ) : (
                   <div className="col-span-full py-8 text-center text-sm font-medium text-slate-500">
