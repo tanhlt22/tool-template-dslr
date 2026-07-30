@@ -22,86 +22,7 @@ let localAISettings = {
   aspect_ratio: '1.5',
 };
 
-// Hardcoded default templates
-const DEFAULT_TEMPLATES = [
-  {
-    id: 'template_korean_strip',
-    name: 'Dải Ảnh Hàn Quốc Cute (Strip 2x6)',
-    width: 600,
-    height: 1800,
-    background_prompt: 'Korean Cute Strip, pink pastel color, hearts background',
-    slots: [
-      { id: 'slot_k1', x: 50, y: 150, width: 500, height: 380, rotation: 0, order: 1 },
-      { id: 'slot_k2', x: 50, y: 580, width: 500, height: 380, rotation: 0, order: 2 },
-      { id: 'slot_k3', x: 50, y: 1010, width: 500, height: 380, rotation: 0, order: 3 },
-    ],
-    elements: [
-      {
-        id: 'text_ktitle',
-        type: 'text',
-        content: 'KOREAN MEMORIES',
-        x: 50,
-        y: 1450,
-        width: 500,
-        height: 60,
-        rotation: 0,
-        style: { color: '#ec4899', fontSize: 32, fontFamily: "'Pacifico', cursive", fontWeight: 'bold', order: 0 },
-      },
-    ],
-    created_at: '2026-05-30T10:00:00Z',
-  },
-  {
-    id: 'template_wedding_luxury',
-    name: 'Luxury Gold Wedding (Khổ 4x6)',
-    width: 1200,
-    height: 1800,
-    background_prompt: 'Elegant Navy background with gold luxury lines',
-    slots: [
-      { id: 'slot_w1', x: 80, y: 120, width: 480, height: 360, rotation: 0, order: 1 },
-      { id: 'slot_w2', x: 640, y: 120, width: 480, height: 360, rotation: 0, order: 2 },
-      { id: 'slot_w3', x: 80, y: 540, width: 480, height: 360, rotation: 0, order: 3 },
-      { id: 'slot_w4', x: 640, y: 540, width: 480, height: 360, rotation: 0, order: 4 },
-    ],
-    elements: [
-      {
-        id: 'text_wtitle1',
-        type: 'text',
-        content: 'HAPPY WEDDING',
-        x: 80,
-        y: 1560,
-        width: 800,
-        height: 80,
-        rotation: 0,
-        style: { color: '#dfb26b', fontSize: 48, fontFamily: "'Great Vibes', cursive", fontWeight: 'bold', order: 0 },
-      },
-      {
-        id: 'text_wtitle2',
-        type: 'text',
-        content: 'MINH & LAN • 30.05.2026',
-        x: 80,
-        y: 1660,
-        width: 800,
-        height: 40,
-        rotation: 0,
-        style: { color: '#ffffff', fontSize: 20, fontFamily: "'Outfit', sans-serif", fontWeight: 'bold', order: 1 },
-      },
-    ],
-    created_at: '2026-05-30T10:01:00Z',
-  },
-  {
-    id: 'template_vaporwave_neon',
-    name: 'Neon Vaporwave Landscape (1200x800)',
-    width: 1200,
-    height: 800,
-    background_prompt: 'Vaporwave retro sunset landscape with neon mountains',
-    slots: [
-      { id: 'slot_v1', x: 80, y: 120, width: 480, height: 360, rotation: -5, order: 1 },
-      { id: 'slot_v2', x: 640, y: 120, width: 480, height: 360, rotation: 5, order: 2 },
-    ],
-    elements: [],
-    created_at: '2026-05-30T10:02:00Z',
-  },
-];
+
 
 let _supabaseClient: ReturnType<typeof createClient> | null = null;
 function getSupabase() {
@@ -132,13 +53,13 @@ router.get('/frames', async (req, res) => {
         .select('*')
         .order('created_at', { ascending: false });
       if (!error && data) {
-        return res.json([...DEFAULT_TEMPLATES, ...data]);
+        return res.json(data);
       }
     } catch (err) {
-      req.log.warn('Failed to fetch frames from Supabase, using defaults');
+      req.log.warn('Failed to fetch frames from Supabase');
     }
   }
-  return res.json(DEFAULT_TEMPLATES);
+  return res.json([]);
 });
 
 // POST /api/frames — create frame
@@ -376,8 +297,6 @@ router.post('/frames/export', async (req, res) => {
 // GET /api/frames/:id
 router.get('/frames/:id', async (req, res) => {
   const frameId = req.params.id;
-  const defaultTemplate = DEFAULT_TEMPLATES.find((t) => t.id === frameId);
-  if (defaultTemplate) return res.json(defaultTemplate);
 
   const supabase = getSupabase();
   if (supabase) {

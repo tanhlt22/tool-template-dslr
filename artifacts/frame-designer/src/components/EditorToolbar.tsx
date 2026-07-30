@@ -202,6 +202,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   const [showShapes, setShowShapes] = useState(false);
   const [showFrameModal, setShowFrameModal] = useState(false);
   const [previewFrame, setPreviewFrame] = useState<any>(null);
+  const [isZoomed, setIsZoomed] = useState(false);
   const [isApplyingFrame, setIsApplyingFrame] = useState(false);
   const [showTextPresetMenu, setShowTextPresetMenu] = useState(false);
   const [showIconMenu, setShowIconMenu] = useState(false);
@@ -500,7 +501,10 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                   savedFrames.map((frame) => (
                     <div
                       key={frame.id}
-                      onClick={() => setPreviewFrame(frame)}
+                      onClick={() => {
+                        setPreviewFrame(frame);
+                        setIsZoomed(false);
+                      }}
                       className={`group relative flex cursor-pointer flex-col items-center rounded-md border p-3 text-left transition-colors ${
                         editingTemplateId === frame.id
                           ? 'border-rose-700 bg-white ring-2 ring-rose-700'
@@ -533,48 +537,58 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           onClick={() => setPreviewFrame(null)}
         >
           <div 
-            className="relative flex max-h-[90vh] flex-col items-center bg-white p-6 rounded-2xl shadow-2xl overflow-y-auto custom-scrollbar animate-fade-in"
+            className="relative flex max-h-[90vh] max-w-[90vw] flex-col bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in"
             onClick={e => e.stopPropagation()}
           >
-            <button 
-              type="button"
-              onClick={() => setPreviewFrame(null)}
-              className="absolute top-3 right-3 p-2 bg-slate-100 hover:bg-rose-100 rounded-full text-slate-500 hover:text-rose-600 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <h3 className="text-xl font-black text-slate-900 mb-5">{previewFrame.name}</h3>
-            
-            <div className="border border-slate-200 rounded-xl bg-[#f8f9fa] p-4 shadow-inner flex items-center justify-center">
-              <TemplateThumbnail frame={previewFrame} scale={5.0} />
-            </div>
-
-            <div className="mt-6 flex items-center gap-3 w-full">
-              <button
+            <div className="flex-none flex items-center justify-between border-b border-slate-100 px-6 py-4">
+              <h3 className="text-xl font-black text-slate-900 truncate pr-4">{previewFrame.name}</h3>
+              <button 
                 type="button"
                 onClick={() => setPreviewFrame(null)}
-                className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition-colors"
+                className="shrink-0 p-2 bg-slate-100 hover:bg-rose-100 rounded-full text-slate-500 hover:text-rose-600 transition-colors"
               >
-                Đóng
+                <X className="w-5 h-5" />
               </button>
-              <button
-                type="button"
-                disabled={isApplyingFrame}
-                onClick={async () => {
-                  setIsApplyingFrame(true);
-                  try {
-                    await onLoadSavedFrame(previewFrame);
-                    setPreviewFrame(null);
-                    setShowFrameModal(false);
-                  } finally {
-                    setIsApplyingFrame(false);
-                  }
-                }}
-                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white text-sm font-bold rounded-xl shadow-md shadow-rose-600/20 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2"
+            </div>
+            
+            <div className={`flex-1 ${isZoomed ? 'overflow-y-auto custom-scrollbar items-start' : 'overflow-hidden items-center justify-center'} flex p-6 bg-[#f8f9fa]`}>
+              <div 
+                className={`mx-auto w-fit border border-slate-200 rounded-xl bg-white p-4 shadow-sm transition-transform duration-300 ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in hover:scale-[1.02]'}`}
+                onClick={() => setIsZoomed(!isZoomed)}
+                title={isZoomed ? "Nhấn để thu nhỏ" : "Nhấn để phóng to"}
               >
-                <CheckCircle2 className="w-4 h-4" />
-                Áp dụng mẫu này
-              </button>
+                <TemplateThumbnail frame={previewFrame} scale={isZoomed ? 6.0 : 3.5} />
+              </div>
+            </div>
+
+            <div className="flex-none border-t border-slate-100 bg-white px-6 py-4">
+              <div className="flex items-center gap-3 w-full max-w-md mx-auto">
+                <button
+                  type="button"
+                  onClick={() => setPreviewFrame(null)}
+                  className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition-colors"
+                >
+                  Đóng
+                </button>
+                <button
+                  type="button"
+                  disabled={isApplyingFrame}
+                  onClick={async () => {
+                    setIsApplyingFrame(true);
+                    try {
+                      await onLoadSavedFrame(previewFrame);
+                      setPreviewFrame(null);
+                      setShowFrameModal(false);
+                    } finally {
+                      setIsApplyingFrame(false);
+                    }
+                  }}
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white text-sm font-bold rounded-xl shadow-md shadow-rose-600/20 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  Áp dụng mẫu này
+                </button>
+              </div>
             </div>
           </div>
         </div>
