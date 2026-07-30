@@ -15,8 +15,8 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
   const isLandscape = width > height;
 
   if (fitParent) {
-    // Generate a transparent SVG to force the browser to maintain aspect ratio flawlessly
-    const svgDataUri = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3E%3C/svg%3E`;
+    // Generate a transparent SVG with viewBox to force the browser to maintain aspect ratio flawlessly
+    const svgDataUri = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${width} ${height}' width='${width}' height='${height}'%3E%3C/svg%3E`;
 
     return (
       <div className="flex items-center justify-center w-full h-full min-h-0 min-w-0 p-2 md:p-4 overflow-hidden">
@@ -33,7 +33,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
           <div
             className="absolute inset-0 w-full h-full"
             style={{
-              backgroundImage: image ? `url(${image})` : undefined,
+              backgroundImage: image ? `url("${image}")` : undefined,
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}
