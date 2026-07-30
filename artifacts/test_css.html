@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Test</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-200 p-8 h-screen w-screen">
+
+  <div class="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/80 p-4 md:p-8">
+    <div class="relative flex w-full max-w-7xl h-[90vh] flex-col md:flex-row bg-white rounded-2xl shadow-2xl overflow-hidden">
+      
+      <!-- Left side -->
+      <div class="flex-1 w-full h-full min-h-0 min-w-0 bg-[#f8f9fa] p-4 md:p-8 flex items-center justify-center border-r border-slate-200 overflow-hidden">
+        
+        <!-- fitParent wrapper -->
+        <div class="flex items-center justify-center w-full h-full min-h-0 min-w-0 p-2 md:p-4 overflow-hidden bg-blue-100">
+          
+          <!-- Thumbnail Portrait -->
+          <div style="aspect-ratio: 600 / 1800; width: auto; height: 100%; max-width: 100%; max-height: 100%; background: red;">
+            Portrait
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right side -->
+      <div class="w-full md:w-[420px] flex-none bg-white p-8">
+        Right Panel
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

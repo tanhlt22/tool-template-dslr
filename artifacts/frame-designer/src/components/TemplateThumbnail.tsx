@@ -15,35 +15,44 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
   const isLandscape = width > height;
 
   if (fitParent) {
+    // Generate a transparent SVG to force the browser to maintain aspect ratio flawlessly
+    const svgDataUri = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3E%3C/svg%3E`;
+
     return (
       <div className="flex items-center justify-center w-full h-full min-h-0 min-w-0 p-2 md:p-4 overflow-hidden">
-        <div
-          className="relative overflow-hidden rounded-lg border border-slate-300 bg-[#f8eee5] shadow-lg transition-all"
-          style={{
-            aspectRatio: `${width} / ${height}`,
-            width: isLandscape ? '100%' : 'auto',
-            height: isLandscape ? 'auto' : '100%',
-            maxWidth: '100%',
-            maxHeight: '100%',
-            backgroundImage: image ? `url(${image})` : undefined,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        >
-          {frame.slots?.map((slot: any, index: number) => (
-            <div
-              key={slot.id || index}
-              className="absolute flex items-center justify-center rounded-sm border border-slate-400/60 bg-slate-200/80 text-xs md:text-sm font-black text-rose-800 shadow-xs backdrop-blur-[1px]"
-              style={{
-                left: `${(slot.x / width) * 100}%`,
-                top: `${(slot.y / height) * 100}%`,
-                width: `${(slot.width / width) * 100}%`,
-                height: `${(slot.height / height) * 100}%`
-              }}
-            >
-              {slot.order || index + 1}
-            </div>
-          ))}
+        <div className="relative flex max-w-full max-h-full rounded-lg border border-slate-300 bg-[#f8eee5] shadow-lg overflow-hidden transition-all">
+          
+          {/* Spacer Image ensures perfect scaling */}
+          <img 
+            src={svgDataUri} 
+            alt="spacer" 
+            className="block max-w-full max-h-full w-auto h-auto opacity-0 pointer-events-none" 
+          />
+
+          {/* Absolute content container */}
+          <div
+            className="absolute inset-0 w-full h-full"
+            style={{
+              backgroundImage: image ? `url(${image})` : undefined,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            {frame.slots?.map((slot: any, index: number) => (
+              <div
+                key={slot.id || index}
+                className="absolute flex items-center justify-center rounded-sm border border-slate-400/60 bg-slate-200/80 text-xs md:text-sm font-black text-rose-800 shadow-xs backdrop-blur-[1px]"
+                style={{
+                  left: `${(slot.x / width) * 100}%`,
+                  top: `${(slot.y / height) * 100}%`,
+                  width: `${(slot.width / width) * 100}%`,
+                  height: `${(slot.height / height) * 100}%`
+                }}
+              >
+                {slot.order || index + 1}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
