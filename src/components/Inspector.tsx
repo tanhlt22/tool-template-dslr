@@ -11,10 +11,12 @@ import {
   Layers,
   MousePointer,
   QrCode,
+  Sparkles,
   Trash2,
   Type,
   X
 } from 'lucide-react';
+
 import { GOOGLE_FONTS } from '../constants/templates';
 
 interface InspectorProps {
@@ -24,6 +26,9 @@ interface InspectorProps {
   onUpdateProp: (key: string, val: any) => void;
   onDeleteElement: (id: string) => void;
   onDuplicateElement: (id: string) => void;
+  onBatchDuplicateSlot?: (id: string, count: number, spacing?: number) => void;
+  onCopy?: (id?: string) => boolean;
+  onPaste?: () => boolean;
   onMoveLayerOrder: (id: string, dir: 'up' | 'down') => void;
   onAlignElement: (id: string, alignType: 'left' | 'center-h' | 'right' | 'top' | 'center-v' | 'bottom') => void;
   isExporting: boolean;
@@ -44,6 +49,7 @@ interface InspectorProps {
   onUpdateTemplateInDb?: () => void;
   onSaveNewTemplateToDb?: () => void;
 }
+
 
 const NumberField: React.FC<{
   label: string;
@@ -71,6 +77,9 @@ export const Inspector: React.FC<InspectorProps> = ({
   onUpdateProp,
   onDeleteElement,
   onDuplicateElement,
+  onBatchDuplicateSlot,
+  onCopy,
+  onPaste,
   onMoveLayerOrder,
   onAlignElement,
   slotsCount = 0,
@@ -79,6 +88,7 @@ export const Inspector: React.FC<InspectorProps> = ({
   canvasHeight = 1800,
   onClose
 }) => {
+
   const header = (() => {
     if (!activeElement) return { icon: MousePointer, title: 'Chọn đối tượng', subtitle: 'Nhấp vào lớp hoặc khung vẽ' };
     if (selectedType === 'slot') return { icon: Camera, title: `Ảnh chụp ${activeElement.order || 1}`, subtitle: 'Ô ảnh photobooth' };
@@ -234,24 +244,71 @@ export const Inspector: React.FC<InspectorProps> = ({
             </section>
 
             {selectedType === 'slot' && (
-              <section className="rounded-md border border-slate-200 p-3">
-                <label className="block text-xs font-bold text-slate-700">
-                  Thứ tự ảnh
-                  <select
-                    name="slotOrder"
-                    value={activeElement.order || 1}
-                    onChange={(event) => onUpdateProp('order', Number(event.target.value))}
-                    className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-xs font-semibold focus:border-rose-700 focus:outline-none"
-                  >
-                    {[1, 2, 3, 4, 5, 6].map((item) => (
-                      <option key={item} value={item}>
-                        Ảnh {item}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </section>
+              <>
+                <section className="rounded-md border border-slate-200 p-3">
+                  <label className="block text-xs font-bold text-slate-700">
+                    Thứ tự ảnh
+                    <select
+                      name="slotOrder"
+                      value={activeElement.order || 1}
+                      onChange={(event) => onUpdateProp('order', Number(event.target.value))}
+                      className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-xs font-semibold focus:border-rose-700 focus:outline-none"
+                    >
+                      {[1, 2, 3, 4, 5, 6].map((item) => (
+                        <option key={item} value={item}>
+                          Ảnh {item}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </section>
+
+                <section className="rounded-xl border border-rose-200 bg-rose-50/50 p-3 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-rose-900 flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5 text-rose-600" />
+                      Nhân bản hàng loạt
+                    </span>
+                    <span className="rounded bg-rose-200/70 px-1.5 py-0.5 text-[9px] font-bold text-rose-800">
+                      Canva
+                    </span>
+                  </div>
+                  <p className="text-[11px] font-medium text-slate-600 leading-tight">
+                    Tạo nhanh dải các ô ảnh thẳng hàng phía dưới ô hiện tại:
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onBatchDuplicateSlot?.(selectedId!, 3)}
+                      className="flex items-center justify-center gap-1.5 rounded-lg border border-rose-300 bg-white py-2 px-2 text-xs font-bold text-rose-800 hover:bg-rose-100 transition-colors shadow-sm"
+                    >
+                      <span>+ 3 ô (Dải 4 ảnh)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onBatchDuplicateSlot?.(selectedId!, 2)}
+                      className="flex items-center justify-center gap-1.5 rounded-lg border border-rose-300 bg-white py-2 px-2 text-xs font-bold text-rose-800 hover:bg-rose-100 transition-colors shadow-sm"
+                    >
+                      <span>+ 2 ô (Dải 3 ảnh)</span>
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2 pt-1 border-t border-rose-200/60">
+                    <button
+                      type="button"
+                      onClick={() => onDuplicateElement(selectedId!)}
+                      className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors shadow-sm"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                      <span>Nhân bản 1 ô (Ctrl+D)</span>
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-slate-500 italic">
+                    Phím tắt: <strong>Ctrl+C</strong> (sao chép), <strong>Ctrl+V</strong> (dán), <strong>Ctrl+D</strong> (nhân bản), <strong>mũi tên</strong> (di chuyển).
+                  </p>
+                </section>
+              </>
             )}
+
 
             {selectedType === 'text' && (
               <section className="space-y-2 rounded-md border border-slate-200 p-3">

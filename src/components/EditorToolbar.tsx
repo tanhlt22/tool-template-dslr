@@ -4,7 +4,9 @@ import {
   CheckCircle2,
   ChevronDown,
   Circle,
+  Copy,
   Crown,
+
   Gift,
   Heart,
   Download,
@@ -58,7 +60,10 @@ interface EditorToolbarProps {
   onAddQr: () => void;
   onAddBackgroundFrame: (file: File) => void;
   onDeleteElement: (id: string) => void;
+  onDuplicateElement?: (id: string) => void;
+  onAddPresetSlots?: (type: 'strip-4' | 'strip-dual-right' | 'grid-4') => void;
   onClearCanvas: () => void;
+
   onUndo: () => void;
   onRedo: () => void;
   canUndo: boolean;
@@ -190,7 +195,10 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   onAddQr,
   onAddBackgroundFrame,
   onDeleteElement,
+  onDuplicateElement,
+  onAddPresetSlots,
   onClearCanvas,
+
   onUndo,
   onRedo,
   canUndo,
@@ -312,6 +320,44 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                   </div>
                 </button>
 
+                {onAddPresetSlots && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowSlotMenu(false);
+                        onAddPresetSlots('strip-dual-right');
+                      }}
+                      className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/60 p-2 text-left hover:bg-amber-100/60 transition-colors"
+                    >
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-amber-600 text-white">
+                        <LayoutTemplate className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="block text-xs font-bold text-amber-900">4 ô cột phải (Khung dải đôi)</span>
+                        <span className="block text-[10.5px] font-medium text-amber-700/80">Chuẩn cho khung idol/mẫu 1 bên</span>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowSlotMenu(false);
+                        onAddPresetSlots('strip-4');
+                      }}
+                      className="flex items-start gap-2.5 rounded-lg border border-indigo-200 bg-indigo-50/60 p-2 text-left hover:bg-indigo-100/60 transition-colors"
+                    >
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-white">
+                        <Camera className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="block text-xs font-bold text-indigo-900">4 ô dải dọc (Khung strip)</span>
+                        <span className="block text-[10.5px] font-medium text-indigo-700/80">Xếp thẳng hàng ở giữa khung</span>
+                      </div>
+                    </button>
+                  </>
+                )}
+
                 <button
                   type="button"
                   onClick={() => {
@@ -325,12 +371,13 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                   </div>
                   <div className="min-w-0">
                     <span className="block text-xs font-bold text-slate-800">Thủ công</span>
-                    <span className="block text-[10.5px] font-medium text-slate-500">Thêm ô ảnh chữ nhật tuỳ chỉnh</span>
+                    <span className="block text-[10.5px] font-medium text-slate-500">Thêm 1 ô ảnh chữ nhật tuỳ chỉnh</span>
                   </div>
                 </button>
               </div>
             </div>
           )}
+
         </div>
 
         <button
@@ -520,15 +567,31 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
       <div className="ml-auto flex flex-wrap items-center gap-1.5">
         {selectedId && (
-          <button
-            type="button"
-            onClick={() => onDeleteElement(selectedId)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
-          >
-            <Trash2 className="h-4 w-4" aria-hidden="true" />
-            Xóa chọn
-          </button>
+          <>
+            {onDuplicateElement && (
+              <button
+                type="button"
+                onClick={() => onDuplicateElement(selectedId)}
+                title="Nhân bản đối tượng đang chọn (Ctrl+D)"
+                className="inline-flex items-center gap-1.5 rounded-md border border-indigo-200 bg-indigo-50 px-3 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 transition-colors shadow-sm"
+              >
+                <Copy className="h-4 w-4" aria-hidden="true" />
+                <span>Nhân bản</span>
+                <span className="hidden xl:inline text-[10px] text-indigo-500 font-semibold">(Ctrl+D)</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => onDeleteElement(selectedId)}
+              title="Xóa đối tượng đang chọn (Delete)"
+              className="inline-flex items-center gap-1.5 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+            >
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+              <span>Xóa chọn</span>
+            </button>
+          </>
         )}
+
 
         <button
           type="button"

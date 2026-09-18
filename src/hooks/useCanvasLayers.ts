@@ -107,6 +107,89 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     setActiveSidebarTab('layers');
   };
 
+  const handleAddPresetSlots = (type: 'strip-4' | 'strip-dual-right' | 'grid-4') => {
+    let newSlots: FrameSlot[] = [];
+
+    if (type === 'strip-4') {
+      const marginY = Math.round(height * 0.05);
+      const availableH = height - marginY * 2;
+      const spacing = Math.round(height * 0.02);
+      const slotH = Math.round((availableH - spacing * 3) / 4);
+      const slotW = Math.round(width * 0.82);
+      const slotX = Math.round((width - slotW) / 2);
+
+      for (let i = 0; i < 4; i++) {
+        newSlots.push({
+          id: `slot_preset_${Date.now()}_${i + 1}`,
+          x: slotX,
+          y: marginY + (slotH + spacing) * i,
+          width: slotW,
+          height: slotH,
+          rotation: 0,
+          order: i + 1,
+          visible: true,
+          locked: false
+        });
+      }
+    } else if (type === 'strip-dual-right') {
+      // Photobooth strip dải đôi: cột trái là ảnh mẫu/idol, cột phải là 4 ô ảnh chụp
+      const marginY = Math.round(height * 0.04);
+      const availableH = height - marginY * 2;
+      const spacing = Math.round(height * 0.015);
+      const slotH = Math.round((availableH - spacing * 3) / 4);
+      const slotW = Math.round(width * 0.44);
+      const slotX = Math.round(width * 0.52);
+
+      for (let i = 0; i < 4; i++) {
+        newSlots.push({
+          id: `slot_preset_${Date.now()}_${i + 1}`,
+          x: slotX,
+          y: marginY + (slotH + spacing) * i,
+          width: slotW,
+          height: slotH,
+          rotation: 0,
+          order: i + 1,
+          visible: true,
+          locked: false
+        });
+      }
+    } else if (type === 'grid-4') {
+      // 2x2 grid
+      const marginX = Math.round(width * 0.06);
+      const marginY = Math.round(height * 0.06);
+      const spacing = Math.round(width * 0.03);
+      const slotW = Math.round((width - marginX * 2 - spacing) / 2);
+      const slotH = Math.round((height - marginY * 2 - spacing) / 2);
+
+      const positions = [
+        { col: 0, row: 0 },
+        { col: 1, row: 0 },
+        { col: 0, row: 1 },
+        { col: 1, row: 1 }
+      ];
+
+      newSlots = positions.map((pos, idx) => ({
+        id: `slot_preset_${Date.now()}_${idx + 1}`,
+        x: marginX + pos.col * (slotW + spacing),
+        y: marginY + pos.row * (slotH + spacing),
+        width: slotW,
+        height: slotH,
+        rotation: 0,
+        order: idx + 1,
+        visible: true,
+        locked: false
+      }));
+    }
+
+    if (newSlots.length > 0) {
+      setSlots(newSlots);
+      setSelectedId(newSlots[0].id);
+      setSelectedType('slot');
+      setActiveSidebarTab('layers');
+    }
+  };
+
+
   const handleAddText = (customText?: string, customStyle?: Partial<FrameElement['style']>) => {
     const newText: FrameElement = {
       id: `text_${Date.now()}`,
@@ -294,14 +377,24 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     }
   };
 
+  // In-memory clipboard for Canva-style copy/paste
+  const clipboardRef = useRef<{ type: 'slot' | 'element'; data: any } | null>(null);
+
   const handleDuplicateElement = (id: string) => {
     const slot = slots.find(s => s.id === id);
     if (slot) {
+      // Smart stack: if there is room below, stack neatly aligned with spacing, else slight diagonal offset
+      const spacing = 16;
+      const canStackBelow = slot.y + slot.height * 2 + spacing <= height;
+      const nextY = canStackBelow ? slot.y + slot.height + spacing : Math.min(slot.y + 25, height - 50);
+      const nextX = canStackBelow ? slot.x : Math.min(slot.x + 25, width - 50);
+
       const duplicatedSlot: FrameSlot = {
         ...slot,
         id: `slot_${Date.now()}`,
-        x: Math.min(slot.x + 30, width - 100),
-        y: Math.min(slot.y + 30, height - 100)
+        x: nextX,
+        y: nextY,
+        order: slots.length + 1
       };
       setSlots([...slots, duplicatedSlot]);
       setSelectedId(duplicatedSlot.id);
@@ -314,8 +407,8 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
       const duplicatedElem: FrameElement = {
         ...elem,
         id: `${elem.type}_${Date.now()}`,
-        x: Math.min(elem.x + 30, width - 100),
-        y: Math.min(elem.y + 30, height - 100),
+        x: Math.min(elem.x + 25, width - 50),
+        y: Math.min(elem.y + 25, height - 50),
         style: {
           ...elem.style,
           order: elements.length
@@ -327,6 +420,107 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
       setActiveSidebarTab('layers');
     }
   };
+
+  // Batch duplicate: Creates multiple slots aligned vertically below the selected slot
+  const handleBatchDuplicateSlot = (id: string, count: number = 3, customSpacing?: number) => {
+    const slot = slots.find(s => s.id === id);
+    if (!slot) return;
+
+    const spacing = customSpacing !== undefined ? customSpacing : 16;
+    const newSlots: FrameSlot[] = [];
+
+    for (let i = 1; i <= count; i++) {
+      const nextY = slot.y + (slot.height + spacing) * i;
+      if (nextY + slot.height > height + 20) break; // Canvas boundary check
+
+      newSlots.push({
+        ...slot,
+        id: `slot_${Date.now()}_${i}`,
+        x: slot.x,
+        y: nextY,
+        order: slots.length + i,
+        visible: true,
+        locked: false
+      });
+    }
+
+    if (newSlots.length > 0) {
+      const allSlots = [...slots, ...newSlots];
+      setSlots(allSlots);
+      setSelectedId(newSlots[newSlots.length - 1].id);
+      setSelectedType('slot');
+      setActiveSidebarTab('layers');
+    }
+  };
+
+  // Canva-style copy
+  const handleCopy = (id?: string) => {
+    const targetId = id || selectedId;
+    if (!targetId) return false;
+
+    const slot = slots.find(s => s.id === targetId);
+    if (slot) {
+      clipboardRef.current = { type: 'slot', data: { ...slot } };
+      return true;
+    }
+    const elem = elements.find(e => e.id === targetId);
+    if (elem) {
+      clipboardRef.current = { type: 'element', data: { ...elem } };
+      return true;
+    }
+    return false;
+  };
+
+  // Canva-style paste
+  const handlePaste = () => {
+    if (!clipboardRef.current) return false;
+    const { type, data } = clipboardRef.current;
+
+    if (type === 'slot') {
+      const spacing = 16;
+      const canStackBelow = data.y + data.height * 2 + spacing <= height;
+      const nextY = canStackBelow ? data.y + data.height + spacing : Math.min(data.y + 25, height - 50);
+      const nextX = canStackBelow ? data.x : Math.min(data.x + 25, width - 50);
+
+      const newSlot: FrameSlot = {
+        ...data,
+        id: `slot_${Date.now()}`,
+        x: nextX,
+        y: nextY,
+        order: slots.length + 1
+      };
+      setSlots((prev) => [...prev, newSlot]);
+      setSelectedId(newSlot.id);
+      setSelectedType('slot');
+      // Update clipboard anchor for sequential pastes
+      clipboardRef.current = { type: 'slot', data: newSlot };
+      return true;
+    }
+
+    if (type === 'element') {
+      const nextX = Math.min(data.x + 25, width - 50);
+      const nextY = Math.min(data.y + 25, height - 50);
+
+      const newElem: FrameElement = {
+        ...data,
+        id: `${data.type}_${Date.now()}`,
+        x: nextX,
+        y: nextY,
+        style: {
+          ...data.style,
+          order: elements.length
+        }
+      };
+      setElements((prev) => [...prev, newElem]);
+      setSelectedId(newElem.id);
+      setSelectedType(newElem.type);
+      clipboardRef.current = { type: 'element', data: newElem };
+      return true;
+    }
+
+    return false;
+  };
+
 
   const handleMoveLayerOrder = (id: string, dir: 'up' | 'down') => {
     const isSlot = slots.some(s => s.id === id);
@@ -462,13 +656,18 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
 
     // Handlers
     handleAddSlot,
+    handleAddPresetSlots,
     handleAddText,
+
     handleAddQr,
     handleAddSticker,
     handleAddImage,
     handleAddBackgroundFrame,
     handleDeleteElement,
     handleDuplicateElement,
+    handleBatchDuplicateSlot,
+    handleCopy,
+    handlePaste,
     handleMoveLayerOrder,
     handleAlignElement,
     handleUpdateSelectedProp,
@@ -478,4 +677,5 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     canUndo: historyIndex > 0,
     canRedo: historyIndex < history.length - 1
   };
+
 }

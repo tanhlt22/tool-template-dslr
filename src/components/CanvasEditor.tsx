@@ -57,6 +57,12 @@ interface CanvasEditorProps {
   backgroundType: 'color' | 'gradient' | 'ai';
   bgGradient: string;
   onCanvasSnapshotReady?: (capture: (() => string | null) | null) => void;
+  onDuplicateElement?: (id: string) => void;
+  onDeleteElement?: (id: string) => void;
+  onCopy?: (id?: string) => boolean;
+  onPaste?: () => boolean;
+  onUndo?: () => void;
+  onRedo?: () => void;
 }
 
 export const CanvasEditor: React.FC<CanvasEditorProps> = ({
@@ -74,7 +80,13 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   backgroundColor,
   backgroundType,
   bgGradient,
-  onCanvasSnapshotReady
+  onCanvasSnapshotReady,
+  onDuplicateElement,
+  onDeleteElement,
+  onCopy,
+  onPaste,
+  onUndo,
+  onRedo
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -122,6 +134,100 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   useEffect(() => {
     slotsRef.current = slots;
   }, [slots]);
+
+  // Canva-style keyboard shortcuts (Ctrl+C, Ctrl+V, Ctrl+D, Delete/Backspace, Arrow keys, Undo/Redo)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is currently typing in an HTML input or textarea
+      const activeTagName = (document.activeElement?.tagName || '').toLowerCase();
+      if (activeTagName === 'input' || activeTagName === 'textarea') return;
+
+      // Ignore if Fabric is editing text
+      const activeFabricObject = fabricCanvas.current?.getActiveObject();
+      if (activeFabricObject && (activeFabricObject as any).isEditing) return;
+
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const isCmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+
+      // Copy: Ctrl + C
+      if (isCmdOrCtrl && e.key.toLowerCase() === 'c') {
+        if (selectedId) {
+          e.preventDefault();
+          onCopy?.(selectedId);
+        }
+        return;
+      }
+
+      // Paste: Ctrl + V
+      if (isCmdOrCtrl && e.key.toLowerCase() === 'v') {
+        e.preventDefault();
+        onPaste?.();
+        return;
+      }
+
+      // Duplicate: Ctrl + D
+      if (isCmdOrCtrl && e.key.toLowerCase() === 'd') {
+        if (selectedId) {
+          e.preventDefault();
+          onDuplicateElement?.(selectedId);
+        }
+        return;
+      }
+
+      // Delete: Delete or Backspace
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedId) {
+          e.preventDefault();
+          onDeleteElement?.(selectedId);
+        }
+        return;
+      }
+
+      // Undo: Ctrl + Z
+      if (isCmdOrCtrl && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        onUndo?.();
+        return;
+      }
+
+      // Redo: Ctrl + Y or Ctrl + Shift + Z
+      if ((isCmdOrCtrl && e.key.toLowerCase() === 'y') || (isCmdOrCtrl && e.key.toLowerCase() === 'z' && e.shiftKey)) {
+        e.preventDefault();
+        onRedo?.();
+        return;
+      }
+
+      // Arrow keys: Nudge selected object by 1px (or 10px with Shift)
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        if (!selectedId || !activeFabricObject) return;
+        e.preventDefault();
+        const step = e.shiftKey ? 10 : 1;
+        let dx = 0;
+        let dy = 0;
+        if (e.key === 'ArrowUp') dy = -step;
+        if (e.key === 'ArrowDown') dy = step;
+        if (e.key === 'ArrowLeft') dx = -step;
+        if (e.key === 'ArrowRight') dx = step;
+
+        activeFabricObject.set({
+          left: (activeFabricObject.left || 0) + dx,
+          top: (activeFabricObject.top || 0) + dy
+        });
+        activeFabricObject.setCoords();
+        fabricCanvas.current?.renderAll();
+
+        const isSlot = slots.some(s => s.id === selectedId);
+        if (isSlot) {
+          onSlotsChange(slots.map(s => s.id === selectedId ? { ...s, x: s.x + dx, y: s.y + dy } : s));
+        } else {
+          onElementsChange(elements.map(el => el.id === selectedId ? { ...el, x: el.x + dx, y: el.y + dy } : el));
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedId, onCopy, onPaste, onDuplicateElement, onDeleteElement, onUndo, onRedo, slots, elements, onSlotsChange, onElementsChange]);
 
   // 1. Initialize Canvas
   useEffect(() => {

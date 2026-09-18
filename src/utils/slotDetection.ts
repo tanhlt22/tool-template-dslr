@@ -133,6 +133,7 @@ function buildBinaryMask(
 
 /**
  * Find farthest transparent pixels within a cell, then expand outward in 4 directions.
+ * Constrains width and enforces density check to prevent leaking into adjacent columns.
  */
 function refineAndExpand(
   mask: Uint8Array,
@@ -162,37 +163,53 @@ function refineAndExpand(
   }
   if (realMaxX < realMinX) return null;
 
-  // Expand UP
+  const isVerticalStrip = targetH > targetW * 1.25;
+  const maxAllowedWidth = isVerticalStrip ? Math.round(targetW * 0.52) : Math.round(targetW * 0.95);
+
+  // Expand UP - requires at least 40% transparent pixels in the candidate row
   for (let ry = realMinY - 1; ry >= 0; ry--) {
-    let hasTransparent = false;
+    let transparentCount = 0;
+    const widthSpan = realMaxX - realMinX + 1;
     for (let rx = realMinX; rx <= realMaxX; rx++) {
-      if (mask[ry * targetW + rx] === 1) { hasTransparent = true; break; }
+      if (mask[ry * targetW + rx] === 1) transparentCount++;
     }
-    if (hasTransparent) realMinY = ry; else break;
+    if (transparentCount / widthSpan >= 0.40) realMinY = ry; else break;
   }
-  // Expand DOWN
+
+  // Expand DOWN - requires at least 40% transparent pixels in the candidate row
   for (let ry = realMaxY + 1; ry < targetH; ry++) {
-    let hasTransparent = false;
+    let transparentCount = 0;
+    const widthSpan = realMaxX - realMinX + 1;
     for (let rx = realMinX; rx <= realMaxX; rx++) {
-      if (mask[ry * targetW + rx] === 1) { hasTransparent = true; break; }
+      if (mask[ry * targetW + rx] === 1) transparentCount++;
     }
-    if (hasTransparent) realMaxY = ry; else break;
+    if (transparentCount / widthSpan >= 0.40) realMaxY = ry; else break;
   }
-  // Expand LEFT
+
+  // Expand LEFT - requires at least 45% transparent pixels in candidate col and respects maxAllowedWidth
   for (let rx = realMinX - 1; rx >= 0; rx--) {
-    let hasTransparent = false;
+    const candidateWidth = realMaxX - rx + 1;
+    if (candidateWidth > maxAllowedWidth) break;
+
+    let transparentCount = 0;
+    const heightSpan = realMaxY - realMinY + 1;
     for (let ry = realMinY; ry <= realMaxY; ry++) {
-      if (mask[ry * targetW + rx] === 1) { hasTransparent = true; break; }
+      if (mask[ry * targetW + rx] === 1) transparentCount++;
     }
-    if (hasTransparent) realMinX = rx; else break;
+    if (transparentCount / heightSpan >= 0.45) realMinX = rx; else break;
   }
-  // Expand RIGHT
+
+  // Expand RIGHT - requires at least 45% transparent pixels in candidate col and respects maxAllowedWidth
   for (let rx = realMaxX + 1; rx < targetW; rx++) {
-    let hasTransparent = false;
+    const candidateWidth = rx - realMinX + 1;
+    if (candidateWidth > maxAllowedWidth) break;
+
+    let transparentCount = 0;
+    const heightSpan = realMaxY - realMinY + 1;
     for (let ry = realMinY; ry <= realMaxY; ry++) {
-      if (mask[ry * targetW + rx] === 1) { hasTransparent = true; break; }
+      if (mask[ry * targetW + rx] === 1) transparentCount++;
     }
-    if (hasTransparent) realMaxX = rx; else break;
+    if (transparentCount / heightSpan >= 0.45) realMaxX = rx; else break;
   }
 
   const sx = Math.max(0, Math.round(realMinX * scaleX) - pad);
@@ -224,9 +241,9 @@ function projectionDetect(
   }
 
   // Find row bands
-  const ROW_THRESH = targetW * 0.10;
-  const MIN_BAND_H = Math.max(10, Math.round(targetH * 0.03));
-  const MAX_ROW_GAP = 0;
+  const ROW_THRESH = targetW * 0.12;
+  const MIN_BAND_H = Math.max(10, Math.round(targetH * 0.04));
+  const MAX_ROW_GAP = 1;
   const rawRowBands: Array<{ start: number; end: number }> = [];
   let bandStart = -1;
   let gapCount = 0;
@@ -258,8 +275,8 @@ function projectionDetect(
   console.log(`[SlotDetect] Found ${rawRowBands.length} row bands:`, rawRowBands.map(b => `[${b.start}-${b.end}] h=${b.end - b.start}`));
 
   // Column analysis per band
-  const MIN_SPAN_W = Math.max(10, Math.round(targetW * 0.03));
-  const MAX_COL_GAP = 0;
+  const MIN_SPAN_W = Math.max(10, Math.round(targetW * 0.04));
+  const MAX_COL_GAP = 1;
   const detected: DetectedRect[] = [];
   const scaleX = origW / targetW;
   const scaleY = origH / targetH;
@@ -274,9 +291,12 @@ function projectionDetect(
       }
     }
 
-    const COL_THRESH = bandH * 0.10;
+    // Increased COL_THRESH to prevent leaking into low-density areas
+    const COL_THRESH = bandH * 0.30;
     let spanStart = -1;
     let colGap = 0;
+    const bandSpans: Array<{ start: number; end: number }> = [];
+
     for (let x = 0; x < targetW; x++) {
       if (colCounts[x] >= COL_THRESH) {
         if (spanStart === -1) spanStart = x;
@@ -287,8 +307,7 @@ function projectionDetect(
           if (colGap > MAX_COL_GAP) {
             const spanEnd = x - colGap;
             if (spanEnd - spanStart >= MIN_SPAN_W) {
-              const slot = refineAndExpand(mask, targetW, targetH, origW, origH, band.start, band.end, spanStart, spanEnd, scaleX, scaleY, PAD);
-              if (slot) detected.push(slot);
+              bandSpans.push({ start: spanStart, end: spanEnd });
             }
             spanStart = -1;
             colGap = 0;
@@ -299,7 +318,42 @@ function projectionDetect(
     if (spanStart !== -1) {
       const spanEnd = targetW - 1 - colGap;
       if (spanEnd - spanStart >= MIN_SPAN_W) {
-        const slot = refineAndExpand(mask, targetW, targetH, origW, origH, band.start, band.end, spanStart, spanEnd, scaleX, scaleY, PAD);
+        bandSpans.push({ start: spanStart, end: spanEnd });
+      }
+    }
+
+    // For vertical photobooth strips, if a single span is wider than 58% of canvas,
+    // split it down the middle or inspect for a central valley separating columns
+    for (const span of bandSpans) {
+      const spanW = span.end - span.start + 1;
+      const isVerticalStrip = targetH > targetW * 1.25;
+
+      if (isVerticalStrip && spanW > targetW * 0.58) {
+        // Find minimum valley in the middle 30% of the span
+        const searchMinX = Math.round(span.start + spanW * 0.35);
+        const searchMaxX = Math.round(span.start + spanW * 0.65);
+        let minVal = Number.POSITIVE_INFINITY;
+        let valleyX = Math.round(span.start + spanW * 0.5);
+
+        for (let vx = searchMinX; vx <= searchMaxX; vx++) {
+          if (colCounts[vx] < minVal) {
+            minVal = colCounts[vx];
+            valleyX = vx;
+          }
+        }
+
+        // Split into left and right sub-spans
+        const leftSpan = { start: span.start, end: Math.max(span.start + 10, valleyX - 4) };
+        const rightSpan = { start: Math.min(span.end - 10, valleyX + 4), end: span.end };
+
+        [leftSpan, rightSpan].forEach((sub) => {
+          if (sub.end - sub.start >= MIN_SPAN_W) {
+            const slot = refineAndExpand(mask, targetW, targetH, origW, origH, band.start, band.end, sub.start, sub.end, scaleX, scaleY, PAD);
+            if (slot) detected.push(slot);
+          }
+        });
+      } else {
+        const slot = refineAndExpand(mask, targetW, targetH, origW, origH, band.start, band.end, span.start, span.end, scaleX, scaleY, PAD);
         if (slot) detected.push(slot);
       }
     }
@@ -373,7 +427,35 @@ export async function detectSlots(
   const detected = projectionDetect(mask, targetW, targetH, origW, origH);
   if (detected.length === 0) return [];
 
-  const sorted = sortDetected(detected);
+  // Post-processing: Ensure no slot spans across columns on vertical strips
+  const isVertical = origH > origW * 1.25;
+  const normalizedDetected: DetectedRect[] = [];
+
+  for (const s of detected) {
+    if (isVertical && s.w > origW * 0.58) {
+      // Slot accidentally spanned both columns, split into right and left column slots
+      const halfW = Math.round(s.w * 0.48);
+      const leftX = s.x;
+      const rightX = Math.round(s.x + s.w - halfW);
+      
+      normalizedDetected.push({
+        x: leftX,
+        y: s.y,
+        w: halfW,
+        h: s.h
+      });
+      normalizedDetected.push({
+        x: rightX,
+        y: s.y,
+        w: halfW,
+        h: s.h
+      });
+    } else {
+      normalizedDetected.push(s);
+    }
+  }
+
+  const sorted = sortDetected(normalizedDetected);
 
   return sorted.map((s, index) => {
     // Mở rộng ô ảnh ra ngoài 4px theo mọi hướng để trùm qua mép viền trong

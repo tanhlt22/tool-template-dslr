@@ -11,6 +11,7 @@ import { FramePreviewStep } from './components/FramePreviewStep';
 import { SaveFrameModal } from './components/SaveFrameModal';
 import { SelectRegionModal } from './components/SelectRegionModal';
 import { TransparentSlotPickerModal } from './components/TransparentSlotPickerModal';
+import { AdminPasswordModal } from './components/AdminPasswordModal';
 import { FrameSlot } from './types/canvas';
 import { useCanvasState } from './hooks/useCanvasState';
 import { useCanvasLayers } from './hooks/useCanvasLayers';
@@ -32,6 +33,14 @@ const AISettingsModal = lazy(() =>
 
 export function App({ initialView = 'editor' }: { initialView?: AppView }) {
   const [view, setView] = useState<AppView>(initialView);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem('photobooth_admin_auth') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [isAdminPasswordModalOpen, setIsAdminPasswordModalOpen] = useState(false);
   const [isCreateFrameOpen, setIsCreateFrameOpen] = useState(false);
   const [isSaveFrameOpen, setIsSaveFrameOpen] = useState(false);
   const [isSelectRegionOpen, setIsSelectRegionOpen] = useState(false);
@@ -41,6 +50,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
   const [pendingExportAfterSave, setPendingExportAfterSave] = useState(false);
   const [personalization, setPersonalization] = useState(DEFAULT_PERSONALIZATION);
   const canvasSnapshotRef = useRef<(() => string | null) | null>(null);
+
   const handleCanvasSnapshotReady = useCallback((capture: (() => string | null) | null) => {
     canvasSnapshotRef.current = capture;
   }, []);
@@ -411,7 +421,10 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
         onAddQr={layers.handleAddQr}
         onAddBackgroundFrame={(file) => layers.handleAddBackgroundFrame(file, cs.setBgImageUrl, cs.setBackgroundType)}
         onDeleteElement={layers.handleDeleteElement}
+        onDuplicateElement={layers.handleDuplicateElement}
+        onAddPresetSlots={layers.handleAddPresetSlots}
         onClearCanvas={async () => {
+
           if (await layers.handleClearCanvas()) {
             cs.setBgImageUrl(null);
             setIsUsingSystemTemplate(false);
@@ -526,7 +539,14 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
               backgroundType={cs.backgroundType}
               bgGradient={cs.bgGradient}
               onCanvasSnapshotReady={handleCanvasSnapshotReady}
+              onDuplicateElement={layers.handleDuplicateElement}
+              onDeleteElement={layers.handleDeleteElement}
+              onCopy={layers.handleCopy}
+              onPaste={layers.handlePaste}
+              onUndo={layers.handleUndo}
+              onRedo={layers.handleRedo}
             />
+
           </Suspense>
           <ViewportControls
             showGrid={cs.showGrid}
@@ -544,8 +564,12 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
           onUpdateProp={layers.handleUpdateSelectedProp}
           onDeleteElement={layers.handleDeleteElement}
           onDuplicateElement={layers.handleDuplicateElement}
+          onBatchDuplicateSlot={layers.handleBatchDuplicateSlot}
+          onCopy={layers.handleCopy}
+          onPaste={layers.handlePaste}
           onMoveLayerOrder={layers.handleMoveLayerOrder}
           onAlignElement={layers.handleAlignElement}
+
           isExporting={exp.isExporting}
           onExportPNG={exp.handleExportPNG}
           isExportingZip={exp.isExportingZip}
@@ -568,7 +592,20 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-white text-slate-950">
-      <AppNav />
+      <AppNav
+        currentView={view}
+        isAdminAuthenticated={isAdminAuthenticated}
+        onOpenAdminLogin={() => setIsAdminPasswordModalOpen(true)}
+        onLogoutAdmin={() => {
+          try {
+            sessionStorage.removeItem('photobooth_admin_auth');
+          } catch {}
+          setIsAdminAuthenticated(false);
+          setView('editor');
+          showToast('Đã đăng xuất quyền Quản trị viên!', 'info');
+        }}
+        onNavigateView={(targetView) => setView(targetView)}
+      />
 
       {view === 'library' && (
         <FrameLibrary
@@ -580,6 +617,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
           onDeleteFrame={handleDeleteFrame}
           onRenameFrame={handleRenameFrame}
           onOpenEditor={() => setView('editor')}
+          isAdmin={isAdminAuthenticated}
         />
       )}
 
@@ -603,6 +641,17 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
           onExportZip={handleExportZipWithGuard}
         />
       )}
+
+      <AdminPasswordModal
+        isOpen={isAdminPasswordModalOpen}
+        onClose={() => setIsAdminPasswordModalOpen(false)}
+        onSuccess={() => {
+          setIsAdminAuthenticated(true);
+          setIsAdminPasswordModalOpen(false);
+          setView('library');
+          showToast('Xác thực quyền Quản trị viên thành công!', 'success');
+        }}
+      />
 
       <CreateFrameModal
         isOpen={isCreateFrameOpen}
@@ -648,6 +697,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
       {view !== 'editor' && <ExportModal exportResult={exp.exportResult} onClose={() => exp.setExportResult(null)} />}
     </div>
   );
+
 }
 
 export default App;
