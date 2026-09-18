@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { fabric } from 'fabric';
 import { Hand, ZoomIn, ZoomOut } from 'lucide-react';
 import { FrameSlot, FrameElement } from '../types/canvas';
@@ -50,16 +50,18 @@ interface CanvasEditorProps {
   onSlotsChange: (slots: FrameSlot[]) => void;
   onElementsChange: (elements: FrameElement[]) => void;
   selectedId: string | null;
+  selectedIds?: string[];
   onSelectElement: (id: string | null, type: 'slot' | 'text' | 'icon' | 'image' | 'qr' | null) => void;
+  onSelectElements?: (ids: string[], type: 'slot' | 'text' | 'icon' | 'image' | 'qr' | null) => void;
   showGrid: boolean;
   snapToGrid: boolean;
   backgroundColor: string;
   backgroundType: 'color' | 'gradient' | 'ai';
   bgGradient: string;
   onCanvasSnapshotReady?: (capture: (() => string | null) | null) => void;
-  onDuplicateElement?: (id: string) => void;
-  onDeleteElement?: (id: string) => void;
-  onCopy?: (id?: string) => boolean;
+  onDuplicateElement?: (ids?: string[] | string) => void;
+  onDeleteElement?: (ids?: string[] | string) => void;
+  onCopy?: (ids?: string[] | string) => boolean;
   onPaste?: () => boolean;
   onUndo?: () => void;
   onRedo?: () => void;
@@ -74,7 +76,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   onSlotsChange,
   onElementsChange,
   selectedId,
+  selectedIds,
   onSelectElement,
+  onSelectElements,
   showGrid,
   snapToGrid,
   backgroundColor,
@@ -88,6 +92,10 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   onUndo,
   onRedo
 }) => {
+  const effectiveSelectedIds = useMemo(() => {
+    if (selectedIds && selectedIds.length > 0) return selectedIds;
+    return selectedId ? [selectedId] : [];
+  }, [selectedIds, selectedId]);
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvas = useRef<fabric.Canvas | null>(null);
@@ -151,9 +159,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
       // Copy: Ctrl + C
       if (isCmdOrCtrl && e.key.toLowerCase() === 'c') {
-        if (selectedId) {
+        if (effectiveSelectedIds.length > 0) {
           e.preventDefault();
-          onCopy?.(selectedId);
+          onCopy?.(effectiveSelectedIds);
         }
         return;
       }
@@ -167,18 +175,18 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
       // Duplicate: Ctrl + D
       if (isCmdOrCtrl && e.key.toLowerCase() === 'd') {
-        if (selectedId) {
+        if (effectiveSelectedIds.length > 0) {
           e.preventDefault();
-          onDuplicateElement?.(selectedId);
+          onDuplicateElement?.(effectiveSelectedIds);
         }
         return;
       }
 
       // Delete: Delete or Backspace
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (selectedId) {
+        if (effectiveSelectedIds.length > 0) {
           e.preventDefault();
-          onDeleteElement?.(selectedId);
+          onDeleteElement?.(effectiveSelectedIds);
         }
         return;
       }
@@ -197,9 +205,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         return;
       }
 
-      // Arrow keys: Nudge selected object by 1px (or 10px with Shift)
+      // Arrow keys: Nudge selected object(s) by 1px (or 10px with Shift)
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-        if (!selectedId || !activeFabricObject) return;
+        if (effectiveSelectedIds.length === 0 || !activeFabricObject) return;
         e.preventDefault();
         const step = e.shiftKey ? 10 : 1;
         let dx = 0;
@@ -209,25 +217,31 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         if (e.key === 'ArrowLeft') dx = -step;
         if (e.key === 'ArrowRight') dx = step;
 
-        activeFabricObject.set({
-          left: (activeFabricObject.left || 0) + dx,
-          top: (activeFabricObject.top || 0) + dy
+        const activeObjects = fabricCanvas.current?.getActiveObjects() || [];
+        activeObjects.forEach(obj => {
+          obj.set({
+            left: (obj.left || 0) + dx,
+            top: (obj.top || 0) + dy
+          });
+          obj.setCoords();
+          const target = obj;
+          const label = fabricCanvas.current?.getObjects().find(o => o.data?.isSlotLabel && o.data.parentId === target.data?.id);
+          if (label) {
+            const center = target.getCenterPoint();
+            label.set({ left: center.x, top: center.y });
+            label.setCoords();
+          }
         });
-        activeFabricObject.setCoords();
         fabricCanvas.current?.renderAll();
 
-        const isSlot = slots.some(s => s.id === selectedId);
-        if (isSlot) {
-          onSlotsChange(slots.map(s => s.id === selectedId ? { ...s, x: s.x + dx, y: s.y + dy } : s));
-        } else {
-          onElementsChange(elements.map(el => el.id === selectedId ? { ...el, x: el.x + dx, y: el.y + dy } : el));
-        }
+        onSlotsChange(slots.map(s => effectiveSelectedIds.includes(s.id) ? { ...s, x: s.x + dx, y: s.y + dy } : s));
+        onElementsChange(elements.map(el => effectiveSelectedIds.includes(el.id) ? { ...el, x: el.x + dx, y: el.y + dy } : el));
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedId, onCopy, onPaste, onDuplicateElement, onDeleteElement, onUndo, onRedo, slots, elements, onSlotsChange, onElementsChange]);
+  }, [effectiveSelectedIds, onCopy, onPaste, onDuplicateElement, onDeleteElement, onUndo, onRedo, slots, elements, onSlotsChange, onElementsChange]);
 
   // 1. Initialize Canvas
   useEffect(() => {
@@ -429,6 +443,13 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       pointerDownRef.current = null;
       if (!downPointer) return;
 
+      // Don't interfere with Shift+Click multi-selection or rubber-band selection
+      if (options.e.shiftKey) return;
+
+      // Don't interfere if an ActiveSelection (multi-select group) is active
+      const currentActive = canvas.getActiveObject();
+      if (currentActive && currentActive.type === 'activeSelection') return;
+
       const pointer = canvas.getPointer(options.e);
       const deltaX = pointer.x - downPointer.x;
       const deltaY = pointer.y - downPointer.y;
@@ -451,31 +472,32 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       hitCycleRef.current = { signature, index: nextIndex, time: now };
 
       if (nextObject && nextObject.data?.id && nextObject.data?.type && nextObject !== activeObject) {
-        canvas.setActiveObject(nextObject);
         onSelectElement(nextObject.data.id, nextObject.data.type);
         canvas.requestRenderAll();
       }
     });
 
     // Listen to selection events
-    canvas.on('selection:created', (e) => {
+    const syncFabricSelection = () => {
       if (isUpdatingFromProps.current) return;
-      const activeObj = e.selected?.[0];
-      if (activeObj && activeObj.data) {
-        onSelectElement(activeObj.data.id, activeObj.data.type);
+      const activeObjs = canvas.getActiveObjects() || [];
+      const selectableObjs = activeObjs.filter(o => o.data?.id && !o.data?.isGridLine && !o.data?.isSlotLabel);
+      if (selectableObjs.length === 0) {
+        onSelectElements?.([], null);
+        onSelectElement(null, null);
+        return;
       }
-    });
+      const ids = selectableObjs.map(o => o.data.id);
+      const primaryType = selectableObjs[0]?.data?.type || null;
+      onSelectElements?.(ids, primaryType);
+      onSelectElement(ids[0], primaryType);
+    };
 
-    canvas.on('selection:updated', (e) => {
-      if (isUpdatingFromProps.current) return;
-      const activeObj = e.selected?.[0];
-      if (activeObj && activeObj.data) {
-        onSelectElement(activeObj.data.id, activeObj.data.type);
-      }
-    });
-
+    canvas.on('selection:created', syncFabricSelection);
+    canvas.on('selection:updated', syncFabricSelection);
     canvas.on('selection:cleared', () => {
       if (isUpdatingFromProps.current) return;
+      onSelectElements?.([], null);
       onSelectElement(null, null);
     });
 
@@ -527,10 +549,18 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         if (obj.data.isGridLine || obj.data.isSlotLabel) return;
         const id = obj.data.id;
 
-        const x = obj.left || 0;
-        const y = obj.top || 0;
         const w = (obj.width || 0) * (obj.scaleX || 1);
         const h = (obj.height || 0) * (obj.scaleY || 1);
+
+        // If object is inside an ActiveSelection group, calculate its absolute canvas position
+        let x = obj.left || 0;
+        let y = obj.top || 0;
+        if ((obj as any).group) {
+          const center = obj.getCenterPoint();
+          x = center.x - w / 2;
+          y = center.y - h / 2;
+        }
+
         const rotation = obj.angle || 0;
         const isVisible = obj.visible !== false;
         const isLocked = obj.lockMovementX === true;
@@ -1034,13 +1064,26 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     bringSlotLabelsToFront();
 
     // 4. Update selection border visualization
-    if (selectedId) {
-      const activeObject = canvas.getObjects().find(o => o.data?.id === selectedId);
+    if (effectiveSelectedIds.length > 1) {
+      const matchingObjects = canvas.getObjects().filter(o => o.data?.id && effectiveSelectedIds.includes(o.data.id));
+      if (matchingObjects.length > 1) {
+        const currentActive = canvas.getActiveObjects() || [];
+        const currentIds = currentActive.map(o => o.data?.id).filter(Boolean);
+        const isSame = currentIds.length === matchingObjects.length && currentIds.every(id => effectiveSelectedIds.includes(id));
+        if (!isSame) {
+          const selection = new fabric.ActiveSelection(matchingObjects, { canvas: canvas });
+          canvas.setActiveObject(selection);
+        }
+      }
+    } else if (effectiveSelectedIds.length === 1) {
+      const activeObject = canvas.getObjects().find(o => o.data?.id === effectiveSelectedIds[0]);
       if (activeObject && canvas.getActiveObject() !== activeObject) {
         canvas.setActiveObject(activeObject);
       }
     } else {
-      canvas.discardActiveObject();
+      if (canvas.getActiveObject()) {
+        canvas.discardActiveObject();
+      }
     }
 
     // Enforce initial Z-index for synchronously added elements
@@ -1064,7 +1107,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         }
       });
     }
-  }, [slots, elements, selectedId]);
+  }, [slots, elements, effectiveSelectedIds]);
 
   const hasImages = !!backgroundImageUrl || elements.some(el => el.type === 'image' && el.visible !== false && el.content);
   const zoomPercent = Math.round(zoom * 100);

@@ -78,10 +78,14 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     }
   };
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const selectedId = selectedIds[0] || null;
+  const setSelectedId = (id: string | null) => {
+    setSelectedIds(id ? [id] : []);
+  };
   const [selectedType, setSelectedType] = useState<'slot' | 'text' | 'icon' | 'image' | 'qr' | null>(null);
   const [activeSidebarTab, setActiveSidebarTab] = useState<'workflow' | 'canvas' | 'stickers' | 'layers'>('workflow');
-  const { showConfirm } = useUI();
+  const { showConfirm, showToast } = useUI();
 
   const getNextPhotoOrder = () => {
     if (slots.length === 0) return 1;
@@ -105,88 +109,6 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     setSelectedId(newSlot.id);
     setSelectedType('slot');
     setActiveSidebarTab('layers');
-  };
-
-  const handleAddPresetSlots = (type: 'strip-4' | 'strip-dual-right' | 'grid-4') => {
-    let newSlots: FrameSlot[] = [];
-
-    if (type === 'strip-4') {
-      const marginY = Math.round(height * 0.05);
-      const availableH = height - marginY * 2;
-      const spacing = Math.round(height * 0.02);
-      const slotH = Math.round((availableH - spacing * 3) / 4);
-      const slotW = Math.round(width * 0.82);
-      const slotX = Math.round((width - slotW) / 2);
-
-      for (let i = 0; i < 4; i++) {
-        newSlots.push({
-          id: `slot_preset_${Date.now()}_${i + 1}`,
-          x: slotX,
-          y: marginY + (slotH + spacing) * i,
-          width: slotW,
-          height: slotH,
-          rotation: 0,
-          order: i + 1,
-          visible: true,
-          locked: false
-        });
-      }
-    } else if (type === 'strip-dual-right') {
-      // Photobooth strip dải đôi: cột trái là ảnh mẫu/idol, cột phải là 4 ô ảnh chụp
-      const marginY = Math.round(height * 0.04);
-      const availableH = height - marginY * 2;
-      const spacing = Math.round(height * 0.015);
-      const slotH = Math.round((availableH - spacing * 3) / 4);
-      const slotW = Math.round(width * 0.44);
-      const slotX = Math.round(width * 0.52);
-
-      for (let i = 0; i < 4; i++) {
-        newSlots.push({
-          id: `slot_preset_${Date.now()}_${i + 1}`,
-          x: slotX,
-          y: marginY + (slotH + spacing) * i,
-          width: slotW,
-          height: slotH,
-          rotation: 0,
-          order: i + 1,
-          visible: true,
-          locked: false
-        });
-      }
-    } else if (type === 'grid-4') {
-      // 2x2 grid
-      const marginX = Math.round(width * 0.06);
-      const marginY = Math.round(height * 0.06);
-      const spacing = Math.round(width * 0.03);
-      const slotW = Math.round((width - marginX * 2 - spacing) / 2);
-      const slotH = Math.round((height - marginY * 2 - spacing) / 2);
-
-      const positions = [
-        { col: 0, row: 0 },
-        { col: 1, row: 0 },
-        { col: 0, row: 1 },
-        { col: 1, row: 1 }
-      ];
-
-      newSlots = positions.map((pos, idx) => ({
-        id: `slot_preset_${Date.now()}_${idx + 1}`,
-        x: marginX + pos.col * (slotW + spacing),
-        y: marginY + pos.row * (slotH + spacing),
-        width: slotW,
-        height: slotH,
-        rotation: 0,
-        order: idx + 1,
-        visible: true,
-        locked: false
-      }));
-    }
-
-    if (newSlots.length > 0) {
-      setSlots(newSlots);
-      setSelectedId(newSlots[0].id);
-      setSelectedType('slot');
-      setActiveSidebarTab('layers');
-    }
   };
 
 
@@ -357,168 +279,130 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     reader.readAsDataURL(file);
   };
 
-  // Delete, duplicate, z-index reorder, alignment
-  const handleDeleteElement = (id: string) => {
-    const deletedSlot = slots.find(s => s.id === id);
-    if (deletedSlot) {
-      setSlots(
-        slots
-          .filter(s => s.id !== id)
-          .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
-          .map((slot, index) => ({ ...slot, order: index + 1 }))
-      );
-    } else {
-      setSlots(slots.filter(s => s.id !== id));
-    }
-    setElements(elements.filter(e => e.id !== id));
-    if (selectedId === id) {
-      setSelectedId(null);
+  // In-memory clipboard for Canva-style batch copy/paste
+  const clipboardRef = useRef<{
+    slots: FrameSlot[];
+    elements: FrameElement[];
+  } | null>(null);
+
+  // Delete element(s)
+  const handleDeleteElement = (ids?: string[] | string) => {
+    let targetIds: string[] = [];
+    if (Array.isArray(ids)) targetIds = ids;
+    else if (typeof ids === 'string') targetIds = [ids];
+    else targetIds = selectedIds;
+
+    if (targetIds.length === 0) return;
+
+    setSlots(prev =>
+      prev
+        .filter(s => !targetIds.includes(s.id))
+        .map((slot, index) => ({ ...slot, order: index + 1 }))
+    );
+    setElements(prev => prev.filter(e => !targetIds.includes(e.id)));
+    setSelectedIds(prev => prev.filter(id => !targetIds.includes(id)));
+    if (targetIds.includes(selectedId || '')) {
       setSelectedType(null);
     }
   };
 
-  // In-memory clipboard for Canva-style copy/paste
-  const clipboardRef = useRef<{ type: 'slot' | 'element'; data: any } | null>(null);
+  // Copy element(s) to clipboard
+  const handleCopy = (ids?: string[] | string) => {
+    let targetIds: string[] = [];
+    if (Array.isArray(ids)) targetIds = ids;
+    else if (typeof ids === 'string') targetIds = [ids];
+    else targetIds = selectedIds;
 
-  const handleDuplicateElement = (id: string) => {
-    const slot = slots.find(s => s.id === id);
-    if (slot) {
-      // Smart stack: if there is room below, stack neatly aligned with spacing, else slight diagonal offset
-      const spacing = 16;
-      const canStackBelow = slot.y + slot.height * 2 + spacing <= height;
-      const nextY = canStackBelow ? slot.y + slot.height + spacing : Math.min(slot.y + 25, height - 50);
-      const nextX = canStackBelow ? slot.x : Math.min(slot.x + 25, width - 50);
+    if (targetIds.length === 0) return false;
 
-      const duplicatedSlot: FrameSlot = {
-        ...slot,
-        id: `slot_${Date.now()}`,
-        x: nextX,
-        y: nextY,
-        order: slots.length + 1
-      };
-      setSlots([...slots, duplicatedSlot]);
-      setSelectedId(duplicatedSlot.id);
-      setSelectedType('slot');
-      setActiveSidebarTab('layers');
-      return;
-    }
-    const elem = elements.find(e => e.id === id);
-    if (elem) {
-      const duplicatedElem: FrameElement = {
-        ...elem,
-        id: `${elem.type}_${Date.now()}`,
-        x: Math.min(elem.x + 25, width - 50),
-        y: Math.min(elem.y + 25, height - 50),
-        style: {
-          ...elem.style,
-          order: elements.length
-        }
-      };
-      setElements([...elements, duplicatedElem]);
-      setSelectedId(duplicatedElem.id);
-      setSelectedType(elem.type);
-      setActiveSidebarTab('layers');
-    }
+    const matchedSlots = slots.filter(s => targetIds.includes(s.id));
+    const matchedElements = elements.filter(el => targetIds.includes(el.id));
+
+    if (matchedSlots.length === 0 && matchedElements.length === 0) return false;
+
+    clipboardRef.current = {
+      slots: matchedSlots.map(s => ({ ...s })),
+      elements: matchedElements.map(el => ({ ...el, style: { ...el.style } }))
+    };
+
+    const count = matchedSlots.length + matchedElements.length;
+    showToast(`Đã sao chép ${count} thành phần`, 'info');
+    return true;
   };
 
-  // Batch duplicate: Creates multiple slots aligned vertically below the selected slot
-  const handleBatchDuplicateSlot = (id: string, count: number = 3, customSpacing?: number) => {
-    const slot = slots.find(s => s.id === id);
-    if (!slot) return;
-
-    const spacing = customSpacing !== undefined ? customSpacing : 16;
-    const newSlots: FrameSlot[] = [];
-
-    for (let i = 1; i <= count; i++) {
-      const nextY = slot.y + (slot.height + spacing) * i;
-      if (nextY + slot.height > height + 20) break; // Canvas boundary check
-
-      newSlots.push({
-        ...slot,
-        id: `slot_${Date.now()}_${i}`,
-        x: slot.x,
-        y: nextY,
-        order: slots.length + i,
-        visible: true,
-        locked: false
-      });
-    }
-
-    if (newSlots.length > 0) {
-      const allSlots = [...slots, ...newSlots];
-      setSlots(allSlots);
-      setSelectedId(newSlots[newSlots.length - 1].id);
-      setSelectedType('slot');
-      setActiveSidebarTab('layers');
-    }
-  };
-
-  // Canva-style copy
-  const handleCopy = (id?: string) => {
-    const targetId = id || selectedId;
-    if (!targetId) return false;
-
-    const slot = slots.find(s => s.id === targetId);
-    if (slot) {
-      clipboardRef.current = { type: 'slot', data: { ...slot } };
-      return true;
-    }
-    const elem = elements.find(e => e.id === targetId);
-    if (elem) {
-      clipboardRef.current = { type: 'element', data: { ...elem } };
-      return true;
-    }
-    return false;
-  };
-
-  // Canva-style paste
+  // Paste element(s) from clipboard
   const handlePaste = () => {
     if (!clipboardRef.current) return false;
-    const { type, data } = clipboardRef.current;
+    const { slots: clipSlots, elements: clipElements } = clipboardRef.current;
+    if (clipSlots.length === 0 && clipElements.length === 0) return false;
 
-    if (type === 'slot') {
-      const spacing = 16;
-      const canStackBelow = data.y + data.height * 2 + spacing <= height;
-      const nextY = canStackBelow ? data.y + data.height + spacing : Math.min(data.y + 25, height - 50);
-      const nextX = canStackBelow ? data.x : Math.min(data.x + 25, width - 50);
+    const offset = 25;
+    const newSlotIds: string[] = [];
+    const newElementIds: string[] = [];
 
-      const newSlot: FrameSlot = {
-        ...data,
-        id: `slot_${Date.now()}`,
+    const newSlots: FrameSlot[] = clipSlots.map((s, idx) => {
+      const newId = `slot_${Date.now()}_${idx}`;
+      newSlotIds.push(newId);
+      const nextX = Math.min(width - s.width, Math.max(0, s.x + offset));
+      const nextY = Math.min(height - s.height, Math.max(0, s.y + offset));
+      return {
+        ...s,
+        id: newId,
         x: nextX,
         y: nextY,
-        order: slots.length + 1
+        order: s.order // preserve original order number
       };
-      setSlots((prev) => [...prev, newSlot]);
-      setSelectedId(newSlot.id);
-      setSelectedType('slot');
-      // Update clipboard anchor for sequential pastes
-      clipboardRef.current = { type: 'slot', data: newSlot };
-      return true;
-    }
+    });
 
-    if (type === 'element') {
-      const nextX = Math.min(data.x + 25, width - 50);
-      const nextY = Math.min(data.y + 25, height - 50);
-
-      const newElem: FrameElement = {
-        ...data,
-        id: `${data.type}_${Date.now()}`,
+    const newElements: FrameElement[] = clipElements.map((el, idx) => {
+      const newId = `${el.type}_${Date.now()}_${idx}`;
+      newElementIds.push(newId);
+      const nextX = Math.min(width - el.width, Math.max(0, el.x + offset));
+      const nextY = Math.min(height - el.height, Math.max(0, el.y + offset));
+      return {
+        ...el,
+        id: newId,
         x: nextX,
         y: nextY,
         style: {
-          ...data.style,
-          order: elements.length
+          ...el.style,
+          order: elements.length + idx
         }
       };
-      setElements((prev) => [...prev, newElem]);
-      setSelectedId(newElem.id);
-      setSelectedType(newElem.type);
-      clipboardRef.current = { type: 'element', data: newElem };
-      return true;
+    });
+
+    if (newSlots.length > 0) {
+      setSlots(prev => [...prev, ...newSlots]);
+    }
+    if (newElements.length > 0) {
+      setElements(prev => [...prev, ...newElements]);
     }
 
-    return false;
+    const allNewIds = [...newSlotIds, ...newElementIds];
+    setSelectedIds(allNewIds);
+    if (newSlots.length > 0) setSelectedType('slot');
+    else if (newElements.length > 0) setSelectedType(newElements[0].type);
+
+    // Update clipboard for cascading subsequent pastes
+    clipboardRef.current = {
+      slots: newSlots,
+      elements: newElements
+    };
+
+    showToast(`Đã dán ${allNewIds.length} thành phần`, 'success');
+    return true;
+  };
+
+  // Duplicate element(s): Copies and pastes immediately
+  const handleDuplicateElement = (ids?: string[] | string) => {
+    let targetIds: string[] = [];
+    if (Array.isArray(ids)) targetIds = ids;
+    else if (typeof ids === 'string') targetIds = [ids];
+    else targetIds = selectedIds;
+
+    if (targetIds.length === 0) return;
+    handleCopy(targetIds);
+    handlePaste();
   };
 
 
@@ -650,13 +534,13 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     slots, setSlots,
     elements, setElements,
     selectedId, setSelectedId,
+    selectedIds, setSelectedIds,
     selectedType, setSelectedType,
     activeSidebarTab, setActiveSidebarTab,
     activeElement,
 
     // Handlers
     handleAddSlot,
-    handleAddPresetSlots,
     handleAddText,
 
     handleAddQr,
@@ -665,7 +549,6 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     handleAddBackgroundFrame,
     handleDeleteElement,
     handleDuplicateElement,
-    handleBatchDuplicateSlot,
     handleCopy,
     handlePaste,
     handleMoveLayerOrder,
