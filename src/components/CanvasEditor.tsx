@@ -757,6 +757,11 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
     isUpdatingFromProps.current = true;
 
+    // Discard any active selection BEFORE updating objects from props.
+    // When objects are in an ActiveSelection group, their left/top are group-relative.
+    // Setting absolute positions on group-relative objects causes them to jump.
+    canvas.discardActiveObject();
+
     // Gather existing canvas objects (excluding grid lines and visual-only slot numbers)
     const objects = canvas.getObjects().filter(o => !o.data?.isGridLine && !o.data?.isSlotLabel);
 
