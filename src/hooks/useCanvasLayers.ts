@@ -444,52 +444,69 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
   const handleAlignElement = (idOrIds: string | string[], alignType: 'left' | 'center-h' | 'right' | 'top' | 'center-v' | 'bottom') => {
     const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
 
-    // Collect all selected items as { id, x, y, w, h }
-    const items: { id: string; x: number; y: number; w: number; h: number; isSlot: boolean }[] = [];
-    slots.filter(s => ids.includes(s.id)).forEach(s => items.push({ id: s.id, x: s.x, y: s.y, w: s.width, h: s.height, isSlot: true }));
-    elements.filter(e => ids.includes(e.id)).forEach(e => items.push({ id: e.id, x: e.x, y: e.y, w: e.width, h: e.height, isSlot: false }));
-
-    if (items.length === 0) return;
-
-    // Single selection: align to canvas edges
-    // Multi selection: align to group bounding box
-    const isSingle = items.length === 1;
-
-    const groupLeft = isSingle ? 0 : Math.min(...items.map(i => i.x));
-    const groupTop = isSingle ? 0 : Math.min(...items.map(i => i.y));
-    const groupRight = isSingle ? width : Math.max(...items.map(i => i.x + i.w));
-    const groupBottom = isSingle ? height : Math.max(...items.map(i => i.y + i.h));
-    const groupCenterX = (groupLeft + groupRight) / 2;
-    const groupCenterY = (groupTop + groupBottom) / 2;
-
-    const computeNewPos = (x: number, y: number, w: number, h: number) => {
-      let newX = x;
-      let newY = y;
-      if (alignType === 'left') newX = groupLeft;
-      else if (alignType === 'right') newX = groupRight - w;
-      else if (alignType === 'center-h') newX = groupCenterX - w / 2;
-      else if (alignType === 'top') newY = groupTop;
-      else if (alignType === 'bottom') newY = groupBottom - h;
-      else if (alignType === 'center-v') newY = groupCenterY - h / 2;
-      return { x: newX, y: newY };
-    };
-
-    const hasSlots = items.some(i => i.isSlot);
-    const hasElements = items.some(i => !i.isSlot);
-
-    if (hasSlots) {
-      setSlots(slots.map(s => {
-        if (!ids.includes(s.id)) return s;
-        const pos = computeNewPos(s.x, s.y, s.width, s.height);
-        return { ...s, x: pos.x, y: pos.y };
-      }));
+    // Single item: align individually to canvas edge
+    if (ids.length === 1) {
+      const id = ids[0];
+      const isSlot = slots.some(s => s.id === id);
+      if (isSlot) {
+        setSlots(slots.map(s => {
+          if (s.id !== id) return s;
+          let newX = s.x, newY = s.y;
+          if (alignType === 'left') newX = 0;
+          else if (alignType === 'right') newX = width - s.width;
+          else if (alignType === 'center-h') newX = (width - s.width) / 2;
+          else if (alignType === 'top') newY = 0;
+          else if (alignType === 'bottom') newY = height - s.height;
+          else if (alignType === 'center-v') newY = (height - s.height) / 2;
+          return { ...s, x: newX, y: newY };
+        }));
+      } else {
+        setElements(elements.map(e => {
+          if (e.id !== id) return e;
+          let newX = e.x, newY = e.y;
+          if (alignType === 'left') newX = 0;
+          else if (alignType === 'right') newX = width - e.width;
+          else if (alignType === 'center-h') newX = (width - e.width) / 2;
+          else if (alignType === 'top') newY = 0;
+          else if (alignType === 'bottom') newY = height - e.height;
+          else if (alignType === 'center-v') newY = (height - e.height) / 2;
+          return { ...e, x: newX, y: newY };
+        }));
+      }
+      return;
     }
-    if (hasElements) {
-      setElements(elements.map(e => {
-        if (!ids.includes(e.id)) return e;
-        const pos = computeNewPos(e.x, e.y, e.width, e.height);
-        return { ...e, x: pos.x, y: pos.y };
-      }));
+
+    // Multi-select: group align — move entire group as a block, preserving relative positions
+    const matchedSlots = slots.filter(s => ids.includes(s.id));
+    const matchedElements = elements.filter(e => ids.includes(e.id));
+    const allItems = [
+      ...matchedSlots.map(s => ({ x: s.x, y: s.y, w: s.width, h: s.height })),
+      ...matchedElements.map(e => ({ x: e.x, y: e.y, w: e.width, h: e.height }))
+    ];
+    if (allItems.length === 0) return;
+
+    // Compute group bounding box
+    const groupLeft = Math.min(...allItems.map(i => i.x));
+    const groupTop = Math.min(...allItems.map(i => i.y));
+    const groupRight = Math.max(...allItems.map(i => i.x + i.w));
+    const groupBottom = Math.max(...allItems.map(i => i.y + i.h));
+    const groupW = groupRight - groupLeft;
+    const groupH = groupBottom - groupTop;
+
+    // Calculate offset to shift entire group
+    let dx = 0, dy = 0;
+    if (alignType === 'left') dx = 0 - groupLeft;
+    else if (alignType === 'right') dx = (width - groupW) - groupLeft;
+    else if (alignType === 'center-h') dx = ((width - groupW) / 2) - groupLeft;
+    else if (alignType === 'top') dy = 0 - groupTop;
+    else if (alignType === 'bottom') dy = (height - groupH) - groupTop;
+    else if (alignType === 'center-v') dy = ((height - groupH) / 2) - groupTop;
+
+    if (matchedSlots.length > 0) {
+      setSlots(slots.map(s => ids.includes(s.id) ? { ...s, x: s.x + dx, y: s.y + dy } : s));
+    }
+    if (matchedElements.length > 0) {
+      setElements(elements.map(e => ids.includes(e.id) ? { ...e, x: e.x + dx, y: e.y + dy } : e));
     }
   };
 
