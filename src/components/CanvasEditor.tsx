@@ -1063,29 +1063,6 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
     bringSlotLabelsToFront();
 
-    // 4. Update selection border visualization
-    if (effectiveSelectedIds.length > 1) {
-      const matchingObjects = canvas.getObjects().filter(o => o.data?.id && effectiveSelectedIds.includes(o.data.id));
-      if (matchingObjects.length > 1) {
-        const currentActive = canvas.getActiveObjects() || [];
-        const currentIds = currentActive.map(o => o.data?.id).filter(Boolean);
-        const isSame = currentIds.length === matchingObjects.length && currentIds.every(id => effectiveSelectedIds.includes(id));
-        if (!isSame) {
-          const selection = new fabric.ActiveSelection(matchingObjects, { canvas: canvas });
-          canvas.setActiveObject(selection);
-        }
-      }
-    } else if (effectiveSelectedIds.length === 1) {
-      const activeObject = canvas.getObjects().find(o => o.data?.id === effectiveSelectedIds[0]);
-      if (activeObject && canvas.getActiveObject() !== activeObject) {
-        canvas.setActiveObject(activeObject);
-      }
-    } else {
-      if (canvas.getActiveObject()) {
-        canvas.discardActiveObject();
-      }
-    }
-
     // Enforce initial Z-index for synchronously added elements
     enforceZIndex();
     canvas.renderAll();
@@ -1107,7 +1084,42 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         }
       });
     }
-  }, [slots, elements, effectiveSelectedIds]);
+  }, [slots, elements]);
+
+  // 5. Sync Fabric selection state from React selectedIds (separate from rendering to avoid position jumps)
+  useEffect(() => {
+    const canvas = fabricCanvas.current;
+    if (!canvas) return;
+
+    // Don't re-set selection while we're updating from props in the render useEffect
+    if (isUpdatingFromProps.current) return;
+
+    if (effectiveSelectedIds.length > 1) {
+      const matchingObjects = canvas.getObjects().filter(o => o.data?.id && effectiveSelectedIds.includes(o.data.id));
+      if (matchingObjects.length > 1) {
+        const currentActive = canvas.getActiveObjects() || [];
+        const currentIds = currentActive.map(o => o.data?.id).filter(Boolean);
+        const isSame = currentIds.length === matchingObjects.length && currentIds.every(id => effectiveSelectedIds.includes(id));
+        if (!isSame) {
+          canvas.discardActiveObject();
+          const selection = new fabric.ActiveSelection(matchingObjects, { canvas: canvas });
+          canvas.setActiveObject(selection);
+          canvas.requestRenderAll();
+        }
+      }
+    } else if (effectiveSelectedIds.length === 1) {
+      const activeObject = canvas.getObjects().find(o => o.data?.id === effectiveSelectedIds[0]);
+      if (activeObject && canvas.getActiveObject() !== activeObject) {
+        canvas.setActiveObject(activeObject);
+        canvas.requestRenderAll();
+      }
+    } else {
+      if (canvas.getActiveObject()) {
+        canvas.discardActiveObject();
+        canvas.requestRenderAll();
+      }
+    }
+  }, [effectiveSelectedIds]);
 
   const hasImages = !!backgroundImageUrl || elements.some(el => el.type === 'image' && el.visible !== false && el.content);
   const zoomPercent = Math.round(zoom * 100);
