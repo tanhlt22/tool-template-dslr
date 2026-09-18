@@ -18,6 +18,7 @@ interface SaveFrameModalProps {
   defaultCategory?: string;
   isSaving: boolean;
   existingNames?: string[];
+  isForExport?: boolean;
   onClose: () => void;
   onSave: (name: string, category: string) => void;
 }
@@ -28,6 +29,7 @@ export const SaveFrameModal: React.FC<SaveFrameModalProps> = ({
   defaultCategory = 'wedding',
   isSaving,
   existingNames = [],
+  isForExport = false,
   onClose,
   onSave
 }) => {
@@ -83,7 +85,9 @@ export const SaveFrameModal: React.FC<SaveFrameModalProps> = ({
             </div>
             <div>
               <h2 className="text-base font-black text-slate-900">Lưu mẫu khung hình</h2>
-              <p className="text-xs font-medium text-slate-500">Lưu thiết kế vào thư viện mẫu của hệ thống.</p>
+              <p className="text-xs font-medium text-slate-500">
+                {isForExport ? 'Lưu khung hình vào hệ thống để tiếp tục xuất file.' : 'Lưu thiết kế vào thư viện mẫu của hệ thống.'}
+              </p>
             </div>
           </div>
           <button
@@ -98,6 +102,12 @@ export const SaveFrameModal: React.FC<SaveFrameModalProps> = ({
         </div>
 
         <div className="p-5 flex flex-col gap-4">
+          {isForExport && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50/90 p-3 text-xs font-semibold text-amber-800 flex items-start gap-2">
+              <span className="text-base leading-none">⚠️</span>
+              <span>Bạn cần lưu thiết kế khung hình vào hệ thống trước khi tiến hành xuất file ảnh hoặc gói DSLRBooth.</span>
+            </div>
+          )}
           {/* Tên mẫu */}
           <div>
             <label htmlFor="save-frame-name" className="mb-1.5 block text-xs font-bold text-slate-700">
@@ -188,7 +198,7 @@ export const SaveFrameModal: React.FC<SaveFrameModalProps> = ({
             className="inline-flex items-center gap-2 rounded-lg bg-rose-700 px-5 py-2 text-xs font-bold text-white shadow-md shadow-rose-900/10 hover:bg-rose-800 disabled:opacity-50 transition-all"
           >
             <Save className="h-4 w-4" aria-hidden="true" />
-            {isSaving ? 'Đang lưu lên hệ thống...' : 'Lưu mẫu ngay'}
+            {isSaving ? 'Đang lưu lên hệ thống...' : isForExport ? 'Lưu & Xuất file ngay' : 'Lưu mẫu ngay'}
           </button>
         </div>
       </form>

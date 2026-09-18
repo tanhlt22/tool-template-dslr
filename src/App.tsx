@@ -38,6 +38,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
   const [isTransparentSlotPickerOpen, setIsTransparentSlotPickerOpen] = useState(false);
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
   const [isUsingSystemTemplate, setIsUsingSystemTemplate] = useState(false);
+  const [pendingExportAfterSave, setPendingExportAfterSave] = useState(false);
   const [personalization, setPersonalization] = useState(DEFAULT_PERSONALIZATION);
   const canvasSnapshotRef = useRef<(() => string | null) | null>(null);
   const handleCanvasSnapshotReady = useCallback((capture: (() => string | null) | null) => {
@@ -222,19 +223,71 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
       return;
     }
 
+    let ok = false;
     if (tpl.editingTemplateId) {
-      const ok = await tpl.handleUpdateTemplateInDb(trimmedName, category);
+      ok = await tpl.handleUpdateTemplateInDb(trimmedName, category);
       if (ok) {
         cs.setFrameName(trimmedName);
         setIsSaveFrameOpen(false);
       }
     } else {
-      const ok = await tpl.handleSaveNewTemplateToDb(trimmedName, category);
+      ok = await tpl.handleSaveNewTemplateToDb(trimmedName, category);
       if (ok) {
         cs.setFrameName(trimmedName);
         setIsSaveFrameOpen(false);
       }
     }
+
+    if (ok && pendingExportAfterSave) {
+      setPendingExportAfterSave(false);
+      setView('preview');
+    }
+  };
+
+  const handleOpenPreview = () => {
+    const hasContent = layers.slots.length > 0 || layers.elements.length > 0 || Boolean(cs.bgImageUrl);
+    if (!hasContent) {
+      showToast('Vui lòng thêm ô ảnh hoặc tải ảnh nền lên khung hình trước khi xuất file!', 'info');
+      return;
+    }
+
+    // Nếu là khung mẫu có sẵn trong hệ thống -> cho phép xuất file ngay
+    if (isUsingSystemTemplate) {
+      setView('preview');
+      return;
+    }
+
+    // Bắt buộc phải lưu khung ảnh trước khi xuất file
+    if (!tpl.editingTemplateId) {
+      showToast('Vui lòng lưu khung hình vào hệ thống trước khi xuất file!', 'info');
+      setPendingExportAfterSave(true);
+      setIsSaveFrameOpen(true);
+      return;
+    }
+
+    setView('preview');
+  };
+
+  const handleExportPNGWithGuard = () => {
+    if (!isUsingSystemTemplate && !tpl.editingTemplateId) {
+      showToast('Vui lòng lưu khung hình vào hệ thống trước khi xuất file!', 'info');
+      setView('editor');
+      setPendingExportAfterSave(true);
+      setIsSaveFrameOpen(true);
+      return;
+    }
+    exp.handleExportPNG();
+  };
+
+  const handleExportZipWithGuard = () => {
+    if (!isUsingSystemTemplate && !tpl.editingTemplateId) {
+      showToast('Vui lòng lưu khung hình vào hệ thống trước khi xuất file!', 'info');
+      setView('editor');
+      setPendingExportAfterSave(true);
+      setIsSaveFrameOpen(true);
+      return;
+    }
+    exp.handleExportDslrboothZip();
   };
 
   const handleRenameFrame = async (frameId: string, newName: string, password?: string) => {
@@ -373,12 +426,12 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
         isSavingTemplate={tpl.isSavingTemplate}
         onUpdateTemplateInDb={handleRequestSave}
         isExporting={exp.isExporting}
-        onExportPNG={exp.handleExportPNG}
+        onExportPNG={handleExportPNGWithGuard}
         isExportingZip={exp.isExportingZip}
         zipExportSuccess={exp.zipExportSuccess}
-        onExportDslrboothZip={exp.handleExportDslrboothZip}
+        onExportDslrboothZip={handleExportZipWithGuard}
         onNewFrame={handleNewFrame}
-        onOpenPreview={() => setView('preview')}
+        onOpenPreview={handleOpenPreview}
         frameName={cs.frameName}
         onEditFrameName={() => {
           if (isUsingSystemTemplate) {
@@ -546,8 +599,8 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
           isExporting={exp.isExporting}
           isExportingZip={exp.isExportingZip}
           onBack={() => setView('editor')}
-          onExportPNG={exp.handleExportPNG}
-          onExportZip={exp.handleExportDslrboothZip}
+          onExportPNG={handleExportPNGWithGuard}
+          onExportZip={handleExportZipWithGuard}
         />
       )}
 
@@ -561,8 +614,12 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
         defaultName={cs.frameName}
         defaultCategory={tpl.editingCategory}
         isSaving={tpl.isSavingTemplate}
-        existingNames={tpl.savedFrames.map((f) => f.name || '')}
-        onClose={() => setIsSaveFrameOpen(false)}
+        existingNames={tpl.savedFrames.filter(f => f.id !== tpl.editingTemplateId).map((f) => f.name || '')}
+        isForExport={pendingExportAfterSave}
+        onClose={() => {
+          setIsSaveFrameOpen(false);
+          setPendingExportAfterSave(false);
+        }}
         onSave={handleSaveFrameName}
       />
       <SelectRegionModal
