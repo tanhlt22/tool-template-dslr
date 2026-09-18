@@ -489,8 +489,14 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       }
       const ids = selectableObjs.map(o => o.data.id);
       const primaryType = selectableObjs[0]?.data?.type || null;
-      onSelectElements?.(ids, primaryType);
-      onSelectElement(ids[0], primaryType);
+      if (ids.length > 1) {
+        // Multi-select: ONLY call onSelectElements to avoid overwriting with single ID
+        onSelectElements?.(ids, primaryType);
+      } else {
+        // Single select: update both
+        onSelectElements?.(ids, primaryType);
+        onSelectElement(ids[0], primaryType);
+      }
     };
 
     canvas.on('selection:created', syncFabricSelection);
