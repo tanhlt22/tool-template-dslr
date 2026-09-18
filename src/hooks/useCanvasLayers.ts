@@ -336,34 +336,43 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     const { slots: clipSlots, elements: clipElements } = clipboardRef.current;
     if (clipSlots.length === 0 && clipElements.length === 0) return false;
 
-    const offset = 25;
+    const desiredOffset = 25;
+
+    // Compute group bounding box to calculate a uniform offset
+    const allClipItems = [
+      ...clipSlots.map(s => ({ x: s.x, y: s.y, w: s.width, h: s.height })),
+      ...clipElements.map(e => ({ x: e.x, y: e.y, w: e.width, h: e.height }))
+    ];
+    const groupRight = Math.max(...allClipItems.map(i => i.x + i.w));
+    const groupBottom = Math.max(...allClipItems.map(i => i.y + i.h));
+
+    // Clamp offset so the entire group stays within canvas bounds
+    const dx = Math.min(desiredOffset, Math.max(0, width - groupRight));
+    const dy = Math.min(desiredOffset, Math.max(0, height - groupBottom));
+
     const newSlotIds: string[] = [];
     const newElementIds: string[] = [];
 
     const newSlots: FrameSlot[] = clipSlots.map((s, idx) => {
       const newId = `slot_${Date.now()}_${idx}`;
       newSlotIds.push(newId);
-      const nextX = Math.min(width - s.width, Math.max(0, s.x + offset));
-      const nextY = Math.min(height - s.height, Math.max(0, s.y + offset));
       return {
         ...s,
         id: newId,
-        x: nextX,
-        y: nextY,
-        order: s.order // preserve original order number
+        x: s.x + dx,
+        y: s.y + dy,
+        order: s.order
       };
     });
 
     const newElements: FrameElement[] = clipElements.map((el, idx) => {
       const newId = `${el.type}_${Date.now()}_${idx}`;
       newElementIds.push(newId);
-      const nextX = Math.min(width - el.width, Math.max(0, el.x + offset));
-      const nextY = Math.min(height - el.height, Math.max(0, el.y + offset));
       return {
         ...el,
         id: newId,
-        x: nextX,
-        y: nextY,
+        x: el.x + dx,
+        y: el.y + dy,
         style: {
           ...el.style,
           order: elements.length + idx

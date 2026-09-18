@@ -59,9 +59,8 @@ interface EditorToolbarProps {
   onAddImage: (file: File) => void;
   onAddQr: () => void;
   onAddBackgroundFrame: (file: File) => void;
-  onDeleteElement: (id: string) => void;
-  onDuplicateElement?: (id: string) => void;
-  onAddPresetSlots?: (type: 'strip-4' | 'strip-dual-right' | 'grid-4') => void;
+  onDeleteElement: (ids?: string[] | string) => void;
+  onDuplicateElement?: (ids?: string[] | string) => void;
   onClearCanvas: () => void;
 
   onUndo: () => void;
@@ -196,7 +195,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   onAddBackgroundFrame,
   onDeleteElement,
   onDuplicateElement,
-  onAddPresetSlots,
   onClearCanvas,
 
   onUndo,
@@ -319,44 +317,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                     <span className="block text-[10.5px] font-medium text-rose-700/80">Quét & click chọn vùng trong suốt</span>
                   </div>
                 </button>
-
-                {onAddPresetSlots && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowSlotMenu(false);
-                        onAddPresetSlots('strip-dual-right');
-                      }}
-                      className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/60 p-2 text-left hover:bg-amber-100/60 transition-colors"
-                    >
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-amber-600 text-white">
-                        <LayoutTemplate className="h-4 w-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="block text-xs font-bold text-amber-900">4 ô cột phải (Khung dải đôi)</span>
-                        <span className="block text-[10.5px] font-medium text-amber-700/80">Chuẩn cho khung idol/mẫu 1 bên</span>
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowSlotMenu(false);
-                        onAddPresetSlots('strip-4');
-                      }}
-                      className="flex items-start gap-2.5 rounded-lg border border-indigo-200 bg-indigo-50/60 p-2 text-left hover:bg-indigo-100/60 transition-colors"
-                    >
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-white">
-                        <Camera className="h-4 w-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="block text-xs font-bold text-indigo-900">4 ô dải dọc (Khung strip)</span>
-                        <span className="block text-[10.5px] font-medium text-indigo-700/80">Xếp thẳng hàng ở giữa khung</span>
-                      </div>
-                    </button>
-                  </>
-                )}
 
                 <button
                   type="button"

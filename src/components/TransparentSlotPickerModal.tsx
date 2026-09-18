@@ -8,6 +8,7 @@ interface TransparentSlotPickerModalProps {
   imageUrl: string | null;
   canvasWidth: number;
   canvasHeight: number;
+  targetBounds?: { x: number; y: number; width: number; height: number };
   onApply: (slots: FrameSlot[]) => void;
   onClose: () => void;
 }
@@ -32,6 +33,7 @@ export const TransparentSlotPickerModal: React.FC<TransparentSlotPickerModalProp
   imageUrl,
   canvasWidth,
   canvasHeight,
+  targetBounds,
   onApply,
   onClose
 }) => {
@@ -211,17 +213,19 @@ export const TransparentSlotPickerModal: React.FC<TransparentSlotPickerModalProp
     const sizes = previewSizeRef.current;
     if (!sizes.width || !sizes.height) return;
 
-    const scaleX = canvasWidth / sizes.width;
-    const scaleY = canvasHeight / sizes.height;
+    const bounds = targetBounds || { x: 0, y: 0, width: canvasWidth, height: canvasHeight };
+
+    const scaleX = bounds.width / sizes.width;
+    const scaleY = bounds.height / sizes.height;
 
     // Expand outward 4px to completely clear the inner border edges
     const pad = 4;
 
     const slots: FrameSlot[] = selectedRegions.map(({ region }, index) => {
-      const origX = Math.round(region.x * scaleX);
-      const origY = Math.round(region.y * scaleY);
-      const origR = Math.round((region.x + region.width) * scaleX);
-      const origB = Math.round((region.y + region.height) * scaleY);
+      const origX = bounds.x + Math.round(region.x * scaleX);
+      const origY = bounds.y + Math.round(region.y * scaleY);
+      const origR = bounds.x + Math.round((region.x + region.width) * scaleX);
+      const origB = bounds.y + Math.round((region.y + region.height) * scaleY);
 
       const x = Math.max(0, origX - pad);
       const y = Math.max(0, origY - pad);

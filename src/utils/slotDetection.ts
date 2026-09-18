@@ -163,8 +163,7 @@ function refineAndExpand(
   }
   if (realMaxX < realMinX) return null;
 
-  const isVerticalStrip = targetH > targetW * 1.25;
-  const maxAllowedWidth = isVerticalStrip ? Math.round(targetW * 0.52) : Math.round(targetW * 0.95);
+  const maxAllowedWidth = Math.round(targetW * 0.96);
 
   // Expand UP - requires at least 40% transparent pixels in the candidate row
   for (let ry = realMinY - 1; ry >= 0; ry--) {
@@ -322,40 +321,9 @@ function projectionDetect(
       }
     }
 
-    // For vertical photobooth strips, if a single span is wider than 58% of canvas,
-    // split it down the middle or inspect for a central valley separating columns
     for (const span of bandSpans) {
-      const spanW = span.end - span.start + 1;
-      const isVerticalStrip = targetH > targetW * 1.25;
-
-      if (isVerticalStrip && spanW > targetW * 0.58) {
-        // Find minimum valley in the middle 30% of the span
-        const searchMinX = Math.round(span.start + spanW * 0.35);
-        const searchMaxX = Math.round(span.start + spanW * 0.65);
-        let minVal = Number.POSITIVE_INFINITY;
-        let valleyX = Math.round(span.start + spanW * 0.5);
-
-        for (let vx = searchMinX; vx <= searchMaxX; vx++) {
-          if (colCounts[vx] < minVal) {
-            minVal = colCounts[vx];
-            valleyX = vx;
-          }
-        }
-
-        // Split into left and right sub-spans
-        const leftSpan = { start: span.start, end: Math.max(span.start + 10, valleyX - 4) };
-        const rightSpan = { start: Math.min(span.end - 10, valleyX + 4), end: span.end };
-
-        [leftSpan, rightSpan].forEach((sub) => {
-          if (sub.end - sub.start >= MIN_SPAN_W) {
-            const slot = refineAndExpand(mask, targetW, targetH, origW, origH, band.start, band.end, sub.start, sub.end, scaleX, scaleY, PAD);
-            if (slot) detected.push(slot);
-          }
-        });
-      } else {
-        const slot = refineAndExpand(mask, targetW, targetH, origW, origH, band.start, band.end, span.start, span.end, scaleX, scaleY, PAD);
-        if (slot) detected.push(slot);
-      }
+      const slot = refineAndExpand(mask, targetW, targetH, origW, origH, band.start, band.end, span.start, span.end, scaleX, scaleY, PAD);
+      if (slot) detected.push(slot);
     }
   }
 
@@ -417,8 +385,35 @@ export async function detectSlots(
 
   sCtx.drawImage(compositeCanvas, 0, 0, targetW, targetH);
   const imgData = sCtx.getImageData(0, 0, targetW, targetH);
-  const data = imgData.data;
 
+  // If scanning transparency, use accurate 2D flood fill connected components
+  if (detectType === 'transparency') {
+    const transparentRegions = findAllTransparentRegions(imgData);
+    if (transparentRegions.length > 0) {
+      const scaleX = origW / targetW;
+      const scaleY = origH / targetH;
+      const pad = 4;
+      return transparentRegions.map((reg, index) => {
+        const sx = Math.max(0, Math.round(reg.x * scaleX) - pad);
+        const sy = Math.max(0, Math.round(reg.y * scaleY) - pad);
+        const sw = Math.min(origW - sx, Math.round(reg.width * scaleX) + pad * 2);
+        const sh = Math.min(origH - sy, Math.round(reg.height * scaleY) + pad * 2);
+        return {
+          id: `slot_auto_${index + 1}_${Date.now()}`,
+          x: sx,
+          y: sy,
+          width: sw,
+          height: sh,
+          rotation: 0,
+          order: index + 1,
+          visible: true,
+          locked: false
+        };
+      });
+    }
+  }
+
+  const data = imgData.data;
   const coverage = buildCoverageMask(imageElements, targetW, targetH, canvasWidth, canvasHeight);
   const { mask, maskCount } = buildBinaryMask(data, coverage, targetW * targetH, detectType);
   const totalPixels = targetW * targetH;
@@ -427,38 +422,9 @@ export async function detectSlots(
   const detected = projectionDetect(mask, targetW, targetH, origW, origH);
   if (detected.length === 0) return [];
 
-  // Post-processing: Ensure no slot spans across columns on vertical strips
-  const isVertical = origH > origW * 1.25;
-  const normalizedDetected: DetectedRect[] = [];
-
-  for (const s of detected) {
-    if (isVertical && s.w > origW * 0.58) {
-      // Slot accidentally spanned both columns, split into right and left column slots
-      const halfW = Math.round(s.w * 0.48);
-      const leftX = s.x;
-      const rightX = Math.round(s.x + s.w - halfW);
-      
-      normalizedDetected.push({
-        x: leftX,
-        y: s.y,
-        w: halfW,
-        h: s.h
-      });
-      normalizedDetected.push({
-        x: rightX,
-        y: s.y,
-        w: halfW,
-        h: s.h
-      });
-    } else {
-      normalizedDetected.push(s);
-    }
-  }
-
-  const sorted = sortDetected(normalizedDetected);
+  const sorted = sortDetected(detected);
 
   return sorted.map((s, index) => {
-    // Mở rộng ô ảnh ra ngoài 4px theo mọi hướng để trùm qua mép viền trong
     const pad = 4;
     const newX = Math.max(0, s.x - pad);
     const newY = Math.max(0, s.y - pad);
@@ -472,7 +438,9 @@ export async function detectSlots(
       width: newW,
       height: newH,
       rotation: 0,
-      order: index + 1
+      order: index + 1,
+      visible: true,
+      locked: false
     };
   });
 }

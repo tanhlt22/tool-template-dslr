@@ -332,8 +332,23 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
     }
   };
 
-  const getSelectRegionTargetElement = () =>
-    layers.elements.find((el) => el.id === layers.selectedId && el.type === 'image') || null;
+  const getSelectRegionTargetElement = () => {
+    const selected = layers.elements.find((el) => el.id === layers.selectedId && el.type === 'image');
+    if (selected) return selected;
+    const bgFrame = layers.elements.find((el) => el.id.startsWith('background_frame') && el.type === 'image');
+    if (bgFrame) return bgFrame;
+    const anyImage = layers.elements.find((el) => el.type === 'image' && el.content);
+    if (anyImage) return anyImage;
+    return null;
+  };
+
+  const getSelectRegionTargetBounds = () => {
+    const el = getSelectRegionTargetElement();
+    if (el) {
+      return { x: el.x, y: el.y, width: el.width, height: el.height };
+    }
+    return { x: 0, y: 0, width: cs.width, height: cs.height };
+  };
 
   const getSelectRegionTargetImage = (): string | null => {
     const selectedElement = getSelectRegionTargetElement();
@@ -422,7 +437,6 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
         onAddBackgroundFrame={(file) => layers.handleAddBackgroundFrame(file, cs.setBgImageUrl, cs.setBackgroundType)}
         onDeleteElement={layers.handleDeleteElement}
         onDuplicateElement={layers.handleDuplicateElement}
-        onAddPresetSlots={layers.handleAddPresetSlots}
         onClearCanvas={async () => {
 
           if (await layers.handleClearCanvas()) {
@@ -529,8 +543,13 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
               onSlotsChange={layers.setSlots}
               onElementsChange={layers.setElements}
               selectedId={layers.selectedId}
+              selectedIds={layers.selectedIds}
               onSelectElement={(id, type) => {
                 layers.setSelectedId(id);
+                layers.setSelectedType(type);
+              }}
+              onSelectElements={(ids, type) => {
+                layers.setSelectedIds(ids);
                 layers.setSelectedType(type);
               }}
               showGrid={cs.showGrid}
@@ -559,12 +578,12 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
 
         <Inspector
           selectedId={layers.selectedId}
+          selectedIds={layers.selectedIds}
           selectedType={layers.selectedType}
           activeElement={layers.activeElement}
           onUpdateProp={layers.handleUpdateSelectedProp}
           onDeleteElement={layers.handleDeleteElement}
           onDuplicateElement={layers.handleDuplicateElement}
-          onBatchDuplicateSlot={layers.handleBatchDuplicateSlot}
           onCopy={layers.handleCopy}
           onPaste={layers.handlePaste}
           onMoveLayerOrder={layers.handleMoveLayerOrder}
@@ -684,6 +703,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
       <TransparentSlotPickerModal
         isOpen={isTransparentSlotPickerOpen}
         imageUrl={getSelectRegionTargetImage()}
+        targetBounds={getSelectRegionTargetBounds()}
         canvasWidth={cs.width}
         canvasHeight={cs.height}
         onClose={() => setIsTransparentSlotPickerOpen(false)}
