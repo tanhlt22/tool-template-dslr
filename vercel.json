@@ -5,6 +5,7 @@
   "buildCommand": "BASE_PATH=/ PORT=3000 pnpm run build",
   "outputDirectory": "dist/public",
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://frame-storage-proxy.toashop2002.workers.dev/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
