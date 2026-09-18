@@ -441,34 +441,41 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     }
   };
 
-  const handleAlignElement = (id: string, alignType: 'left' | 'center-h' | 'right' | 'top' | 'center-v' | 'bottom') => {
-    const isSlot = slots.some(s => s.id === id);
-    if (isSlot) {
-      setSlots(slots.map(s => {
-        if (s.id !== id) return s;
-        let newX = s.x;
-        let newY = s.y;
-        if (alignType === 'left') newX = 0;
-        else if (alignType === 'right') newX = width - s.width;
-        else if (alignType === 'center-h') newX = (width - s.width) / 2;
-        else if (alignType === 'top') newY = 0;
-        else if (alignType === 'bottom') newY = height - s.height;
-        else if (alignType === 'center-v') newY = (height - s.height) / 2;
-        return { ...s, x: newX, y: newY };
-      }));
-    } else {
-      setElements(elements.map(e => {
-        if (e.id !== id) return e;
-        let newX = e.x;
-        let newY = e.y;
-        if (alignType === 'left') newX = 0;
-        else if (alignType === 'right') newX = width - e.width;
-        else if (alignType === 'center-h') newX = (width - e.width) / 2;
-        else if (alignType === 'top') newY = 0;
-        else if (alignType === 'bottom') newY = height - e.height;
-        else if (alignType === 'center-v') newY = (height - e.height) / 2;
-        return { ...e, x: newX, y: newY };
-      }));
+  const handleAlignElement = (idOrIds: string | string[], alignType: 'left' | 'center-h' | 'right' | 'top' | 'center-v' | 'bottom') => {
+    const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
+
+    const alignSlot = (s: FrameSlot): FrameSlot => {
+      let newX = s.x;
+      let newY = s.y;
+      if (alignType === 'left') newX = 0;
+      else if (alignType === 'right') newX = width - s.width;
+      else if (alignType === 'center-h') newX = (width - s.width) / 2;
+      else if (alignType === 'top') newY = 0;
+      else if (alignType === 'bottom') newY = height - s.height;
+      else if (alignType === 'center-v') newY = (height - s.height) / 2;
+      return { ...s, x: newX, y: newY };
+    };
+
+    const alignElement = (e: FrameElement): FrameElement => {
+      let newX = e.x;
+      let newY = e.y;
+      if (alignType === 'left') newX = 0;
+      else if (alignType === 'right') newX = width - e.width;
+      else if (alignType === 'center-h') newX = (width - e.width) / 2;
+      else if (alignType === 'top') newY = 0;
+      else if (alignType === 'bottom') newY = height - e.height;
+      else if (alignType === 'center-v') newY = (height - e.height) / 2;
+      return { ...e, x: newX, y: newY };
+    };
+
+    const hasSlots = slots.some(s => ids.includes(s.id));
+    const hasElements = elements.some(e => ids.includes(e.id));
+
+    if (hasSlots) {
+      setSlots(slots.map(s => ids.includes(s.id) ? alignSlot(s) : s));
+    }
+    if (hasElements) {
+      setElements(elements.map(e => ids.includes(e.id) ? alignElement(e) : e));
     }
   };
 

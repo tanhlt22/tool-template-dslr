@@ -21,16 +21,16 @@ import { GOOGLE_FONTS } from '../constants/templates';
 
 interface InspectorProps {
   selectedId: string | null;
+  selectedIds?: string[];
   selectedType: 'slot' | 'text' | 'icon' | 'image' | 'qr' | null;
   activeElement: any;
   onUpdateProp: (key: string, val: any) => void;
-  onDeleteElement: (id: string) => void;
-  onDuplicateElement: (id: string) => void;
-  onBatchDuplicateSlot?: (id: string, count: number, spacing?: number) => void;
-  onCopy?: (id?: string) => boolean;
+  onDeleteElement: (ids?: string[] | string) => void;
+  onDuplicateElement: (ids?: string[] | string) => void;
+  onCopy?: (ids?: string[] | string) => boolean;
   onPaste?: () => boolean;
   onMoveLayerOrder: (id: string, dir: 'up' | 'down') => void;
-  onAlignElement: (id: string, alignType: 'left' | 'center-h' | 'right' | 'top' | 'center-v' | 'bottom') => void;
+  onAlignElement: (id: string | string[], alignType: 'left' | 'center-h' | 'right' | 'top' | 'center-v' | 'bottom') => void;
   isExporting: boolean;
   onExportPNG: () => void;
   isExportingZip?: boolean;
@@ -72,12 +72,12 @@ const NumberField: React.FC<{
 
 export const Inspector: React.FC<InspectorProps> = ({
   selectedId,
+  selectedIds,
   selectedType,
   activeElement,
   onUpdateProp,
   onDeleteElement,
   onDuplicateElement,
-  onBatchDuplicateSlot,
   onCopy,
   onPaste,
   onMoveLayerOrder,
@@ -88,6 +88,92 @@ export const Inspector: React.FC<InspectorProps> = ({
   canvasHeight = 1800,
   onClose
 }) => {
+
+  if (selectedIds && selectedIds.length > 1) {
+    return (
+      <aside className="w-80 shrink-0 border-l border-slate-200 bg-white flex flex-col overflow-hidden h-full">
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+          <div>
+            <h2 className="text-sm font-black text-slate-950">Nhiều đối tượng</h2>
+            <p className="text-[11px] font-semibold text-rose-700">Đang chọn {selectedIds.length} thành phần</p>
+          </div>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Đóng bảng thuộc tính"
+              className="rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          )}
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2.5">
+            <span className="text-xs font-bold text-slate-700 block">Thao tác hàng loạt:</span>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => onCopy?.(selectedIds)}
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white py-2 px-2 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors shadow-sm"
+              >
+                <Copy className="h-3.5 w-3.5 text-slate-500" />
+                <span>Sao chép (Ctrl+C)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onDuplicateElement(selectedIds)}
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-rose-300 bg-rose-50 py-2 px-2 text-xs font-bold text-rose-800 hover:bg-rose-100 transition-colors shadow-sm"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-rose-600" />
+                <span>Nhân bản (Ctrl+D)</span>
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => onDeleteElement(selectedIds)}
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-red-50 py-2 text-xs font-bold text-red-700 hover:bg-red-100 transition-colors"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span>Xóa tất cả {selectedIds.length} mục đã chọn</span>
+            </button>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2.5">
+            <span className="text-xs font-bold text-slate-700 block">Căn lề nhanh:</span>
+            <div className="grid grid-cols-6 gap-1">
+              {[
+                ['left', AlignLeft, 'Trái'],
+                ['center-h', AlignCenter, 'Giữa ngang'],
+                ['right', AlignRight, 'Phải'],
+                ['top', AlignLeft, 'Trên'],
+                ['center-v', AlignCenter, 'Giữa dọc'],
+                ['bottom', AlignRight, 'Dưới']
+              ].map(([type, Icon, label]) => (
+                <button
+                  key={String(type)}
+                  type="button"
+                  title={String(label)}
+                  onClick={() => onAlignElement(selectedIds, type as any)}
+                  className="flex h-8 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-600 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+                >
+                  {React.createElement(Icon as any, { className: `h-4 w-4 ${['top', 'center-v', 'bottom'].includes(String(type)) ? 'rotate-90' : ''}`, 'aria-hidden': true })}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-200 p-3 bg-white text-xs text-slate-500 space-y-1.5 leading-relaxed">
+            <p className="font-bold text-slate-700">Mẹo thao tác Canva:</p>
+            <p>• Dùng <strong>phím mũi tên</strong> để di chuyển cả nhóm</p>
+            <p>• Giữ <strong>Shift + Mũi tên</strong> để di chuyển nhanh 10px</p>
+            <p>• Nhấn <strong>Delete / Backspace</strong> để xóa nhanh</p>
+          </div>
+        </div>
+      </aside>
+    );
+  }
 
   const header = (() => {
     if (!activeElement) return { icon: MousePointer, title: 'Chọn đối tượng', subtitle: 'Nhấp vào lớp hoặc khung vẽ' };
@@ -261,50 +347,6 @@ export const Inspector: React.FC<InspectorProps> = ({
                       ))}
                     </select>
                   </label>
-                </section>
-
-                <section className="rounded-xl border border-rose-200 bg-rose-50/50 p-3 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-rose-900 flex items-center gap-1.5">
-                      <Sparkles className="h-3.5 w-3.5 text-rose-600" />
-                      Nhân bản hàng loạt
-                    </span>
-                    <span className="rounded bg-rose-200/70 px-1.5 py-0.5 text-[9px] font-bold text-rose-800">
-                      Canva
-                    </span>
-                  </div>
-                  <p className="text-[11px] font-medium text-slate-600 leading-tight">
-                    Tạo nhanh dải các ô ảnh thẳng hàng phía dưới ô hiện tại:
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => onBatchDuplicateSlot?.(selectedId!, 3)}
-                      className="flex items-center justify-center gap-1.5 rounded-lg border border-rose-300 bg-white py-2 px-2 text-xs font-bold text-rose-800 hover:bg-rose-100 transition-colors shadow-sm"
-                    >
-                      <span>+ 3 ô (Dải 4 ảnh)</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onBatchDuplicateSlot?.(selectedId!, 2)}
-                      className="flex items-center justify-center gap-1.5 rounded-lg border border-rose-300 bg-white py-2 px-2 text-xs font-bold text-rose-800 hover:bg-rose-100 transition-colors shadow-sm"
-                    >
-                      <span>+ 2 ô (Dải 3 ảnh)</span>
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-2 pt-1 border-t border-rose-200/60">
-                    <button
-                      type="button"
-                      onClick={() => onDuplicateElement(selectedId!)}
-                      className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors shadow-sm"
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                      <span>Nhân bản 1 ô (Ctrl+D)</span>
-                    </button>
-                  </div>
-                  <p className="text-[10px] text-slate-500 italic">
-                    Phím tắt: <strong>Ctrl+C</strong> (sao chép), <strong>Ctrl+V</strong> (dán), <strong>Ctrl+D</strong> (nhân bản), <strong>mũi tên</strong> (di chuyển).
-                  </p>
                 </section>
               </>
             )}
