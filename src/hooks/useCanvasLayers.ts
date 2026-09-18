@@ -444,38 +444,52 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
   const handleAlignElement = (idOrIds: string | string[], alignType: 'left' | 'center-h' | 'right' | 'top' | 'center-v' | 'bottom') => {
     const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
 
-    const alignSlot = (s: FrameSlot): FrameSlot => {
-      let newX = s.x;
-      let newY = s.y;
-      if (alignType === 'left') newX = 0;
-      else if (alignType === 'right') newX = width - s.width;
-      else if (alignType === 'center-h') newX = (width - s.width) / 2;
-      else if (alignType === 'top') newY = 0;
-      else if (alignType === 'bottom') newY = height - s.height;
-      else if (alignType === 'center-v') newY = (height - s.height) / 2;
-      return { ...s, x: newX, y: newY };
+    // Collect all selected items as { id, x, y, w, h }
+    const items: { id: string; x: number; y: number; w: number; h: number; isSlot: boolean }[] = [];
+    slots.filter(s => ids.includes(s.id)).forEach(s => items.push({ id: s.id, x: s.x, y: s.y, w: s.width, h: s.height, isSlot: true }));
+    elements.filter(e => ids.includes(e.id)).forEach(e => items.push({ id: e.id, x: e.x, y: e.y, w: e.width, h: e.height, isSlot: false }));
+
+    if (items.length === 0) return;
+
+    // Single selection: align to canvas edges
+    // Multi selection: align to group bounding box
+    const isSingle = items.length === 1;
+
+    const groupLeft = isSingle ? 0 : Math.min(...items.map(i => i.x));
+    const groupTop = isSingle ? 0 : Math.min(...items.map(i => i.y));
+    const groupRight = isSingle ? width : Math.max(...items.map(i => i.x + i.w));
+    const groupBottom = isSingle ? height : Math.max(...items.map(i => i.y + i.h));
+    const groupCenterX = (groupLeft + groupRight) / 2;
+    const groupCenterY = (groupTop + groupBottom) / 2;
+
+    const computeNewPos = (x: number, y: number, w: number, h: number) => {
+      let newX = x;
+      let newY = y;
+      if (alignType === 'left') newX = groupLeft;
+      else if (alignType === 'right') newX = groupRight - w;
+      else if (alignType === 'center-h') newX = groupCenterX - w / 2;
+      else if (alignType === 'top') newY = groupTop;
+      else if (alignType === 'bottom') newY = groupBottom - h;
+      else if (alignType === 'center-v') newY = groupCenterY - h / 2;
+      return { x: newX, y: newY };
     };
 
-    const alignElement = (e: FrameElement): FrameElement => {
-      let newX = e.x;
-      let newY = e.y;
-      if (alignType === 'left') newX = 0;
-      else if (alignType === 'right') newX = width - e.width;
-      else if (alignType === 'center-h') newX = (width - e.width) / 2;
-      else if (alignType === 'top') newY = 0;
-      else if (alignType === 'bottom') newY = height - e.height;
-      else if (alignType === 'center-v') newY = (height - e.height) / 2;
-      return { ...e, x: newX, y: newY };
-    };
-
-    const hasSlots = slots.some(s => ids.includes(s.id));
-    const hasElements = elements.some(e => ids.includes(e.id));
+    const hasSlots = items.some(i => i.isSlot);
+    const hasElements = items.some(i => !i.isSlot);
 
     if (hasSlots) {
-      setSlots(slots.map(s => ids.includes(s.id) ? alignSlot(s) : s));
+      setSlots(slots.map(s => {
+        if (!ids.includes(s.id)) return s;
+        const pos = computeNewPos(s.x, s.y, s.width, s.height);
+        return { ...s, x: pos.x, y: pos.y };
+      }));
     }
     if (hasElements) {
-      setElements(elements.map(e => ids.includes(e.id) ? alignElement(e) : e));
+      setElements(elements.map(e => {
+        if (!ids.includes(e.id)) return e;
+        const pos = computeNewPos(e.x, e.y, e.width, e.height);
+        return { ...e, x: pos.x, y: pos.y };
+      }));
     }
   };
 
