@@ -1,0 +1,15 @@
+name = "frame-storage-proxy"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+DRIVE_CLIENT_ID = "251105969406-ffhuetcuk4poknhsijf663g6vtdof0h9.apps.googleusercontent.com"
+DRIVE_CLIENT_SECRET = "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"
+DRIVE_REFRESH_TOKEN = "1//04HODypjPbZTeCgYIARAAGAQSNwF-L9IrWwvPfQV9pPlRFW42pw_nEa2Wet73v2SdbJ4XxaHIEangCW9yhDwbBSovdVy0pufPlIg"
+DRIVE_ROOT_FOLDER_ID = "1lTpzdKmPOWyBixawbFFtFFXR8IGoSRMC"
+JWT_SECRET = "photobooth_dslr_secret_key_jwt_2024"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "photobooth_db"
+database_id = "5a780026-d24d-4cc6-88ea-67730e924635"

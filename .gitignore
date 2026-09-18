@@ -1,5 +1,12 @@
 # See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
+# env files
+.env
+.env.*
+.env.local
+.env.*.local
+!.env.example
+
 # compiled output
 dist
 tmp
@@ -109,6 +116,9 @@ Thumbs.db
 scratch/
 scratch_workspace.html
 debug*.json
+.playwright-cli/
+.wrangler/
+cloudflare-worker/.wrangler/
 
 # Old Next.js build cache
 .next/
