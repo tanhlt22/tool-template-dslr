@@ -1,0 +1,4938 @@
+[
+  {
+    "id": "pbne_1",
+    "name": "Khung 1 ảnh #1",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung1.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung1.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 8,
+        "y": 12,
+        "width": 412,
+        "height": 304,
+        "rotation": 0,
+        "path": "M 8 12 L 420 12 L 420 316 L 8 316 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_2",
+    "name": "Khung 1 ảnh #2",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung2.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung2.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 136,
+        "y": 80,
+        "width": 156,
+        "height": 192,
+        "rotation": 0,
+        "path": "M 136 80 L 292 80 L 292 272 L 136 272 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_3",
+    "name": "Khung 1 ảnh #3",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung3.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung3.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 132,
+        "y": 104,
+        "width": 180,
+        "height": 180,
+        "rotation": 0,
+        "path": "M 132 104 L 312 104 L 312 284 L 132 284 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_4",
+    "name": "Khung 1 ảnh #4",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung_4.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung_4.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 44,
+        "y": 0,
+        "width": 348,
+        "height": 304,
+        "rotation": 0,
+        "path": "M 44 0 L 392 0 L 392 304 L 44 304 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_5",
+    "name": "Khung 1 ảnh #5",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung_5.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung_5.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 96,
+        "y": 52,
+        "width": 240,
+        "height": 244,
+        "rotation": 0,
+        "path": "M 96 52 L 336 52 L 336 296 L 96 296 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_6",
+    "name": "Khung 1 ảnh #6",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung6.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung6.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 136,
+        "y": 120,
+        "width": 156,
+        "height": 140,
+        "rotation": 0,
+        "path": "M 136 120 L 292 120 L 292 260 L 136 260 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_7",
+    "name": "Khung 1 ảnh #7",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung7.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung7.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 152,
+        "y": 108,
+        "width": 124,
+        "height": 132,
+        "rotation": 0,
+        "path": "M 152 108 L 276 108 L 276 240 L 152 240 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_8",
+    "name": "Khung 1 ảnh #8",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung8.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung8.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 148,
+        "y": 76,
+        "width": 96,
+        "height": 96,
+        "rotation": 0,
+        "path": "M 148 76 L 244 76 L 244 172 L 148 172 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_9",
+    "name": "Khung 1 ảnh #9",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung9.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung9.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 0,
+        "y": 0,
+        "width": 428,
+        "height": 328,
+        "rotation": 0,
+        "path": "M 0 0 L 428 0 L 428 328 L 0 328 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_10",
+    "name": "Khung 1 ảnh #10",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung10.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung10.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 156,
+        "y": 156,
+        "width": 140,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 156 156 L 296 156 L 296 292 L 156 292 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_11",
+    "name": "Khung 1 ảnh #11",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung11.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung11.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 152,
+        "y": 148,
+        "width": 136,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 152 148 L 288 148 L 288 284 L 152 284 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_12",
+    "name": "Khung 1 ảnh #12",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung_12.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung_12.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 136,
+        "y": 68,
+        "width": 160,
+        "height": 164,
+        "rotation": 0,
+        "path": "M 136 68 L 296 68 L 296 232 L 136 232 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_13",
+    "name": "Khung 1 ảnh #13",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung_13.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung_13.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 8,
+        "y": 12,
+        "width": 412,
+        "height": 304,
+        "rotation": 0,
+        "path": "M 8 12 L 420 12 L 420 316 L 8 316 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 268,
+        "y": 232,
+        "width": 96,
+        "height": 56,
+        "rotation": 0,
+        "path": "M 268 232 L 364 232 L 364 288 L 268 288 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 96,
+        "y": 292,
+        "width": 192,
+        "height": 24,
+        "rotation": 0,
+        "path": "M 96 292 L 288 292 L 288 316 L 96 316 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_14",
+    "name": "Khung 1 ảnh #14",
+    "category": "basic",
+    "layout": "polaroid",
+    "fileName": "img_khung_1_ảnh_khung_14.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_1_ảnh_khung_14.png",
+    "width": 428,
+    "height": 328,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 8,
+        "y": 12,
+        "width": 412,
+        "height": 304,
+        "rotation": 0,
+        "path": "M 8 12 L 420 12 L 420 316 L 8 316 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 340,
+        "y": 232,
+        "width": 40,
+        "height": 40,
+        "rotation": 0,
+        "path": "M 340 232 L 380 232 L 380 272 L 340 272 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_15",
+    "name": "Khung 2 ảnh #1",
+    "category": "basic",
+    "layout": "2x1",
+    "fileName": "img_khung_2_ảnh_khung1.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_2_ảnh_khung1.png",
+    "width": 428,
+    "height": 636,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 12,
+        "width": 348,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 40 12 L 388 12 L 388 272 L 40 272 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 324,
+        "width": 348,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 40 324 L 388 324 L 388 584 L 40 584 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_16",
+    "name": "Khung 2 ảnh #2",
+    "category": "basic",
+    "layout": "2x1",
+    "fileName": "img_khung_2_ảnh_khung2.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_2_ảnh_khung2.png",
+    "width": 428,
+    "height": 636,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 72,
+        "y": 56,
+        "width": 292,
+        "height": 248,
+        "rotation": 0,
+        "path": "M 72 56 L 364 56 L 364 304 L 72 304 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_17",
+    "name": "Khung 2 ảnh #3",
+    "category": "basic",
+    "layout": "2x1",
+    "fileName": "img_khung_2_ảnh_khung3.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_2_ảnh_khung3.png",
+    "width": 428,
+    "height": 636,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 68,
+        "y": 4,
+        "width": 348,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 68 4 L 416 4 L 416 272 L 68 272 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 12,
+        "y": 352,
+        "width": 352,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 12 352 L 364 352 L 364 632 L 12 632 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_18",
+    "name": "Khung 2 ảnh #4",
+    "category": "basic",
+    "layout": "2x1",
+    "fileName": "img_khung_2_ảnh_khung_4.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_2_ảnh_khung_4.png",
+    "width": 428,
+    "height": 636,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 108,
+        "width": 148,
+        "height": 204,
+        "rotation": 0,
+        "path": "M 24 108 L 172 108 L 172 312 L 24 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 264,
+        "y": 100,
+        "width": 140,
+        "height": 212,
+        "rotation": 0,
+        "path": "M 264 100 L 404 100 L 404 312 L 264 312 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 128,
+        "y": 132,
+        "width": 184,
+        "height": 140,
+        "rotation": 0,
+        "path": "M 128 132 L 312 132 L 312 272 L 128 272 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 324,
+        "width": 380,
+        "height": 236,
+        "rotation": 0,
+        "path": "M 24 324 L 404 324 L 404 560 L 24 560 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_19",
+    "name": "Khung 2 ảnh #5",
+    "category": "basic",
+    "layout": "2x1",
+    "fileName": "img_khung_2_ảnh_khung_5.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_2_ảnh_khung_5.png",
+    "width": 428,
+    "height": 636,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 56,
+        "y": 80,
+        "width": 316,
+        "height": 208,
+        "rotation": 0,
+        "path": "M 56 80 L 372 80 L 372 288 L 56 288 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 60,
+        "y": 320,
+        "width": 308,
+        "height": 204,
+        "rotation": 0,
+        "path": "M 60 320 L 368 320 L 368 524 L 60 524 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_20",
+    "name": "Khung 2 ảnh #6",
+    "category": "basic",
+    "layout": "2x1",
+    "fileName": "img_khung_2_ảnh_khung_6.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_2_ảnh_khung_6.png",
+    "width": 428,
+    "height": 636,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 12,
+        "y": 16,
+        "width": 404,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 12 16 L 416 16 L 416 312 L 12 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 12,
+        "y": 324,
+        "width": 404,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 12 324 L 416 324 L 416 624 L 12 624 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_21",
+    "name": "Khung 2 ảnh #7",
+    "category": "basic",
+    "layout": "2x1",
+    "fileName": "img_khung_2_ảnh_khung_7.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_2_ảnh_khung_7.png",
+    "width": 428,
+    "height": 636,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 12,
+        "y": 16,
+        "width": 404,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 12 16 L 416 16 L 416 312 L 12 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 12,
+        "y": 324,
+        "width": 404,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 12 324 L 416 324 L 416 624 L 12 624 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 284,
+        "y": 532,
+        "width": 92,
+        "height": 56,
+        "rotation": 0,
+        "path": "M 284 532 L 376 532 L 376 588 L 284 588 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_22",
+    "name": "Khung 2 ảnh #8",
+    "category": "basic",
+    "layout": "2x1",
+    "fileName": "img_khung_2_ảnh_khung_8.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_2_ảnh_khung_8.png",
+    "width": 428,
+    "height": 636,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 12,
+        "y": 16,
+        "width": 404,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 12 16 L 416 16 L 416 312 L 12 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 12,
+        "y": 324,
+        "width": 404,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 12 324 L 416 324 L 416 624 L 12 624 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 284,
+        "y": 520,
+        "width": 56,
+        "height": 64,
+        "rotation": 0,
+        "path": "M 284 520 L 340 520 L 340 584 L 284 584 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_23",
+    "name": "Khung 6 ảnh #1",
+    "category": "basic",
+    "layout": "2x3",
+    "fileName": "img_khung_6_ảnh_khung1.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_6_ảnh_khung1.png",
+    "width": 856,
+    "height": 964,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 92,
+        "y": 20,
+        "width": 328,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 92 20 L 420 20 L 420 320 L 92 320 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 436,
+        "y": 20,
+        "width": 332,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 436 20 L 768 20 L 768 320 L 436 320 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 92,
+        "y": 336,
+        "width": 328,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 92 336 L 420 336 L 420 632 L 92 632 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 436,
+        "y": 332,
+        "width": 328,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 436 332 L 764 332 L 764 632 L 436 632 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 92,
+        "y": 644,
+        "width": 328,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 92 644 L 420 644 L 420 944 L 92 944 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 436,
+        "y": 648,
+        "width": 328,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 436 648 L 764 648 L 764 944 L 436 944 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_24",
+    "name": "Khung 6 ảnh #2",
+    "category": "basic",
+    "layout": "2x3",
+    "fileName": "img_khung_6_ảnh_khung2.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_6_ảnh_khung2.png",
+    "width": 856,
+    "height": 964,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 28,
+        "y": 28,
+        "width": 364,
+        "height": 284,
+        "rotation": 0,
+        "path": "M 28 28 L 392 28 L 392 312 L 28 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 480,
+        "y": 28,
+        "width": 352,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 480 28 L 832 28 L 832 308 L 480 308 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 88,
+        "y": 380,
+        "width": 256,
+        "height": 232,
+        "rotation": 0,
+        "path": "M 88 380 L 344 380 L 344 612 L 88 612 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 516,
+        "y": 380,
+        "width": 244,
+        "height": 228,
+        "rotation": 0,
+        "path": "M 516 380 L 760 380 L 760 608 L 516 608 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 88,
+        "y": 708,
+        "width": 196,
+        "height": 220,
+        "rotation": 0,
+        "path": "M 88 708 L 284 708 L 284 928 L 88 928 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 476,
+        "y": 688,
+        "width": 344,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 476 688 L 820 688 L 820 956 L 476 956 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_25",
+    "name": "Khung 6 ảnh #3",
+    "category": "basic",
+    "layout": "2x3",
+    "fileName": "img_khung_6_ảnh_khung3.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_6_ảnh_khung3.png",
+    "width": 856,
+    "height": 964,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 28,
+        "y": 12,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 28 12 L 420 12 L 420 320 L 28 320 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 440,
+        "y": 52,
+        "width": 368,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 440 52 L 808 52 L 808 320 L 440 320 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 28,
+        "y": 332,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 28 332 L 420 332 L 420 640 L 28 640 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 440,
+        "y": 332,
+        "width": 380,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 440 332 L 820 332 L 820 640 L 440 640 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 28,
+        "y": 576,
+        "width": 20,
+        "height": 52,
+        "rotation": 0,
+        "path": "M 28 576 L 48 576 L 48 628 L 28 628 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 44,
+        "y": 648,
+        "width": 376,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 44 648 L 420 648 L 420 956 L 44 956 Z"
+      },
+      {
+        "order": 7,
+        "id": "slot_7",
+        "x": 440,
+        "y": 648,
+        "width": 372,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 440 648 L 812 648 L 812 956 L 440 956 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_26",
+    "name": "Khung 6 ảnh #4",
+    "category": "basic",
+    "layout": "2x3",
+    "fileName": "img_khung_6_ảnh_khung_4.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_6_ảnh_khung_4.png",
+    "width": 856,
+    "height": 964,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 56,
+        "y": 36,
+        "width": 332,
+        "height": 248,
+        "rotation": 0,
+        "path": "M 56 36 L 388 36 L 388 284 L 56 284 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 472,
+        "y": 36,
+        "width": 328,
+        "height": 252,
+        "rotation": 0,
+        "path": "M 472 36 L 800 36 L 800 288 L 472 288 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 56,
+        "y": 352,
+        "width": 332,
+        "height": 248,
+        "rotation": 0,
+        "path": "M 56 352 L 388 352 L 388 600 L 56 600 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 472,
+        "y": 352,
+        "width": 328,
+        "height": 248,
+        "rotation": 0,
+        "path": "M 472 352 L 800 352 L 800 600 L 472 600 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_27",
+    "name": "Khung 6 ảnh #5",
+    "category": "basic",
+    "layout": "2x3",
+    "fileName": "img_khung_6_ảnh_khung_5.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_6_ảnh_khung_5.png",
+    "width": 856,
+    "height": 964,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 28,
+        "y": 76,
+        "width": 148,
+        "height": 56,
+        "rotation": 0,
+        "path": "M 28 76 L 176 76 L 176 132 L 28 132 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 28,
+        "y": 76,
+        "width": 392,
+        "height": 244,
+        "rotation": 0,
+        "path": "M 28 76 L 420 76 L 420 320 L 28 320 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 440,
+        "y": 76,
+        "width": 392,
+        "height": 244,
+        "rotation": 0,
+        "path": "M 440 76 L 832 76 L 832 320 L 440 320 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 28,
+        "y": 136,
+        "width": 240,
+        "height": 40,
+        "rotation": 0,
+        "path": "M 28 136 L 268 136 L 268 176 L 28 176 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 768,
+        "y": 244,
+        "width": 64,
+        "height": 28,
+        "rotation": 0,
+        "path": "M 768 244 L 832 244 L 832 272 L 768 272 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 28,
+        "y": 332,
+        "width": 104,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 28 332 L 132 332 L 132 640 L 28 640 Z"
+      },
+      {
+        "order": 7,
+        "id": "slot_7",
+        "x": 220,
+        "y": 332,
+        "width": 200,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 220 332 L 420 332 L 420 640 L 220 640 Z"
+      },
+      {
+        "order": 8,
+        "id": "slot_8",
+        "x": 440,
+        "y": 332,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 440 332 L 832 332 L 832 640 L 440 640 Z"
+      },
+      {
+        "order": 9,
+        "id": "slot_9",
+        "x": 160,
+        "y": 392,
+        "width": 36,
+        "height": 248,
+        "rotation": 0,
+        "path": "M 160 392 L 196 392 L 196 640 L 160 640 Z"
+      },
+      {
+        "order": 10,
+        "id": "slot_10",
+        "x": 780,
+        "y": 516,
+        "width": 52,
+        "height": 56,
+        "rotation": 0,
+        "path": "M 780 516 L 832 516 L 832 572 L 780 572 Z"
+      },
+      {
+        "order": 11,
+        "id": "slot_11",
+        "x": 28,
+        "y": 648,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 28 648 L 420 648 L 420 956 L 28 956 Z"
+      },
+      {
+        "order": 12,
+        "id": "slot_12",
+        "x": 440,
+        "y": 648,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 440 648 L 832 648 L 832 956 L 440 956 Z"
+      },
+      {
+        "order": 13,
+        "id": "slot_13",
+        "x": 696,
+        "y": 876,
+        "width": 136,
+        "height": 28,
+        "rotation": 0,
+        "path": "M 696 876 L 832 876 L 832 904 L 696 904 Z"
+      },
+      {
+        "order": 14,
+        "id": "slot_14",
+        "x": 712,
+        "y": 936,
+        "width": 116,
+        "height": 20,
+        "rotation": 0,
+        "path": "M 712 936 L 828 936 L 828 956 L 712 956 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_28",
+    "name": "Khung 6 ảnh #6",
+    "category": "basic",
+    "layout": "2x3",
+    "fileName": "img_khung_6_ảnh_khung6.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_6_ảnh_khung6.png",
+    "width": 856,
+    "height": 964,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 28,
+        "y": 12,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 28 12 L 420 12 L 420 320 L 28 320 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 440,
+        "y": 12,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 440 12 L 832 12 L 832 320 L 440 320 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 28,
+        "y": 332,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 28 332 L 420 332 L 420 640 L 28 640 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 440,
+        "y": 332,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 440 332 L 832 332 L 832 640 L 440 640 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_29",
+    "name": "Khung 6 ảnh #7",
+    "category": "basic",
+    "layout": "2x3",
+    "fileName": "img_khung_6_ảnh_khung7.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_6_ảnh_khung7.png",
+    "width": 856,
+    "height": 964,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 28,
+        "y": 12,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 28 12 L 420 12 L 420 320 L 28 320 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 440,
+        "y": 12,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 440 12 L 832 12 L 832 320 L 440 320 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 28,
+        "y": 332,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 28 332 L 420 332 L 420 640 L 28 640 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 440,
+        "y": 332,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 440 332 L 832 332 L 832 640 L 440 640 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_30",
+    "name": "Khung 6 ảnh #8",
+    "category": "basic",
+    "layout": "2x3",
+    "fileName": "img_khung_6_ảnh_khung_8.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_6_ảnh_khung_8.png",
+    "width": 856,
+    "height": 964,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 28,
+        "y": 12,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 28 12 L 420 12 L 420 320 L 28 320 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 440,
+        "y": 12,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 440 12 L 832 12 L 832 320 L 440 320 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 28,
+        "y": 332,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 28 332 L 420 332 L 420 640 L 28 640 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 440,
+        "y": 332,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 440 332 L 832 332 L 832 640 L 440 640 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 336,
+        "y": 544,
+        "width": 48,
+        "height": 32,
+        "rotation": 0,
+        "path": "M 336 544 L 384 544 L 384 576 L 336 576 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 168,
+        "y": 576,
+        "width": 116,
+        "height": 64,
+        "rotation": 0,
+        "path": "M 168 576 L 284 576 L 284 640 L 168 640 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_31",
+    "name": "Khung 4 Strips #19",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_19.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_19.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 44,
+        "y": 76,
+        "width": 348,
+        "height": 232,
+        "rotation": 0,
+        "path": "M 44 76 L 392 76 L 392 308 L 44 308 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 44,
+        "y": 360,
+        "width": 344,
+        "height": 228,
+        "rotation": 0,
+        "path": "M 44 360 L 388 360 L 388 588 L 44 588 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 648,
+        "width": 348,
+        "height": 248,
+        "rotation": 0,
+        "path": "M 40 648 L 388 648 L 388 896 L 40 896 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_32",
+    "name": "Khung 4 Strips #20",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_20.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_20.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 68,
+        "y": 84,
+        "width": 304,
+        "height": 212,
+        "rotation": 0,
+        "path": "M 68 84 L 372 84 L 372 296 L 68 296 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 68,
+        "y": 340,
+        "width": 304,
+        "height": 244,
+        "rotation": 0,
+        "path": "M 68 340 L 372 340 L 372 584 L 68 584 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 64,
+        "y": 628,
+        "width": 308,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 64 628 L 372 628 L 372 896 L 64 896 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 68,
+        "y": 940,
+        "width": 304,
+        "height": 176,
+        "rotation": 0,
+        "path": "M 68 940 L 372 940 L 372 1116 L 68 1116 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_33",
+    "name": "Khung 4 Strips #21",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_21.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_21.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 60,
+        "width": 356,
+        "height": 252,
+        "rotation": 0,
+        "path": "M 40 60 L 396 60 L 396 312 L 40 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 324,
+        "width": 356,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 40 324 L 396 324 L 396 620 L 40 620 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 628,
+        "width": 356,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 40 628 L 396 628 L 396 928 L 40 928 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 936,
+        "width": 356,
+        "height": 160,
+        "rotation": 0,
+        "path": "M 40 936 L 396 936 L 396 1096 L 40 1096 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_34",
+    "name": "Khung 4 Strips #22",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_22.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_22.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 32,
+        "y": 44,
+        "width": 360,
+        "height": 252,
+        "rotation": 0,
+        "path": "M 32 44 L 392 44 L 392 296 L 32 296 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 32,
+        "y": 340,
+        "width": 356,
+        "height": 256,
+        "rotation": 0,
+        "path": "M 32 340 L 388 340 L 388 596 L 32 596 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 28,
+        "y": 628,
+        "width": 368,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 28 628 L 396 628 L 396 908 L 28 908 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 32,
+        "y": 944,
+        "width": 360,
+        "height": 256,
+        "rotation": 0,
+        "path": "M 32 944 L 392 944 L 392 1200 L 32 1200 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_35",
+    "name": "Khung 4 Strips #23",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_23.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_23.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 32,
+        "y": 76,
+        "width": 352,
+        "height": 232,
+        "rotation": 0,
+        "path": "M 32 76 L 384 76 L 384 308 L 32 308 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 32,
+        "y": 340,
+        "width": 352,
+        "height": 228,
+        "rotation": 0,
+        "path": "M 32 340 L 384 340 L 384 568 L 32 568 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 32,
+        "y": 648,
+        "width": 352,
+        "height": 152,
+        "rotation": 0,
+        "path": "M 32 648 L 384 648 L 384 800 L 32 800 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 60,
+        "y": 936,
+        "width": 300,
+        "height": 160,
+        "rotation": 0,
+        "path": "M 60 936 L 360 936 L 360 1096 L 60 1096 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_36",
+    "name": "Khung 4 Strips #24",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_24.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_24.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 44,
+        "y": 136,
+        "width": 352,
+        "height": 152,
+        "rotation": 0,
+        "path": "M 44 136 L 396 136 L 396 288 L 44 288 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 44,
+        "y": 352,
+        "width": 356,
+        "height": 232,
+        "rotation": 0,
+        "path": "M 44 352 L 400 352 L 400 584 L 44 584 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 48,
+        "y": 616,
+        "width": 348,
+        "height": 224,
+        "rotation": 0,
+        "path": "M 48 616 L 396 616 L 396 840 L 48 840 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 44,
+        "y": 880,
+        "width": 352,
+        "height": 212,
+        "rotation": 0,
+        "path": "M 44 880 L 396 880 L 396 1092 L 44 1092 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_37",
+    "name": "Khung 4 Strips #25",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_25.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_25.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 24,
+        "width": 380,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 24 24 L 404 24 L 404 304 L 24 304 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 328,
+        "width": 380,
+        "height": 288,
+        "rotation": 0,
+        "path": "M 24 328 L 404 328 L 404 616 L 24 616 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 640,
+        "width": 380,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 24 640 L 404 640 L 404 920 L 24 920 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 944,
+        "width": 380,
+        "height": 188,
+        "rotation": 0,
+        "path": "M 24 944 L 404 944 L 404 1132 L 24 1132 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_38",
+    "name": "Khung 4 Strips #26",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_26.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_26.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 76,
+        "y": 96,
+        "width": 280,
+        "height": 212,
+        "rotation": 0,
+        "path": "M 76 96 L 356 96 L 356 308 L 76 308 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 72,
+        "y": 324,
+        "width": 320,
+        "height": 292,
+        "rotation": 0,
+        "path": "M 72 324 L 392 324 L 392 616 L 72 616 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 72,
+        "y": 632,
+        "width": 288,
+        "height": 288,
+        "rotation": 0,
+        "path": "M 72 632 L 360 632 L 360 920 L 72 920 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 76,
+        "y": 940,
+        "width": 280,
+        "height": 140,
+        "rotation": 0,
+        "path": "M 76 940 L 356 940 L 356 1080 L 76 1080 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_39",
+    "name": "Khung 4 Strips #27",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_27.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_27.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 44,
+        "y": 56,
+        "width": 352,
+        "height": 256,
+        "rotation": 0,
+        "path": "M 44 56 L 396 56 L 396 312 L 44 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 44,
+        "y": 340,
+        "width": 356,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 44 340 L 400 340 L 400 604 L 44 604 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 48,
+        "y": 632,
+        "width": 352,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 48 632 L 400 632 L 400 892 L 48 892 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_40",
+    "name": "Khung 4 Strips #28",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_28.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_28.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 36,
+        "y": 28,
+        "width": 348,
+        "height": 284,
+        "rotation": 0,
+        "path": "M 36 28 L 384 28 L 384 312 L 36 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 36,
+        "y": 332,
+        "width": 348,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 36 332 L 384 332 L 384 612 L 36 612 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 36,
+        "y": 632,
+        "width": 348,
+        "height": 284,
+        "rotation": 0,
+        "path": "M 36 632 L 384 632 L 384 916 L 36 916 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 36,
+        "y": 936,
+        "width": 348,
+        "height": 284,
+        "rotation": 0,
+        "path": "M 36 936 L 384 936 L 384 1220 L 36 1220 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_41",
+    "name": "Khung 4 Strips #29",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_29.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_29.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 32,
+        "y": 32,
+        "width": 364,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 32 32 L 396 32 L 396 312 L 32 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 32,
+        "y": 324,
+        "width": 364,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 32 324 L 396 324 L 396 620 L 32 620 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 32,
+        "y": 628,
+        "width": 364,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 32 628 L 396 628 L 396 928 L 32 928 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 32,
+        "y": 936,
+        "width": 364,
+        "height": 232,
+        "rotation": 0,
+        "path": "M 32 936 L 396 936 L 396 1168 L 32 1168 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_42",
+    "name": "Khung 4 Strips #30",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_30.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_30.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 32,
+        "y": 48,
+        "width": 364,
+        "height": 248,
+        "rotation": 0,
+        "path": "M 32 48 L 396 48 L 396 296 L 32 296 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 20,
+        "y": 312,
+        "width": 380,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 20 312 L 400 312 L 400 620 L 20 620 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 28,
+        "y": 640,
+        "width": 372,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 28 640 L 400 640 L 400 920 L 28 920 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 32,
+        "y": 936,
+        "width": 368,
+        "height": 152,
+        "rotation": 0,
+        "path": "M 32 936 L 400 936 L 400 1088 L 32 1088 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_43",
+    "name": "Khung 4 Strips #31",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_31.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_31.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 16,
+        "y": 16,
+        "width": 396,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 16 16 L 412 16 L 412 312 L 16 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 16,
+        "y": 320,
+        "width": 396,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 16 320 L 412 320 L 412 620 L 16 620 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 16,
+        "y": 628,
+        "width": 392,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 16 628 L 408 628 L 408 936 L 16 936 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 16,
+        "y": 936,
+        "width": 396,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 16 936 L 412 936 L 412 1236 L 16 1236 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_44",
+    "name": "Khung 4 Strips #32",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_32.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_32.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 32,
+        "width": 380,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 24 32 L 404 32 L 404 296 L 24 296 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 324,
+        "width": 376,
+        "height": 284,
+        "rotation": 0,
+        "path": "M 24 324 L 400 324 L 400 608 L 24 608 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 632,
+        "width": 380,
+        "height": 288,
+        "rotation": 0,
+        "path": "M 24 632 L 404 632 L 404 920 L 24 920 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 948,
+        "width": 368,
+        "height": 216,
+        "rotation": 0,
+        "path": "M 24 948 L 392 948 L 392 1164 L 24 1164 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_45",
+    "name": "Khung 4 Strips #33",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_33.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_33.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 28,
+        "y": 44,
+        "width": 368,
+        "height": 256,
+        "rotation": 0,
+        "path": "M 28 44 L 396 44 L 396 300 L 28 300 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 28,
+        "y": 340,
+        "width": 368,
+        "height": 256,
+        "rotation": 0,
+        "path": "M 28 340 L 396 340 L 396 596 L 28 596 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 28,
+        "y": 636,
+        "width": 368,
+        "height": 256,
+        "rotation": 0,
+        "path": "M 28 636 L 396 636 L 396 892 L 28 892 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 28,
+        "y": 932,
+        "width": 368,
+        "height": 256,
+        "rotation": 0,
+        "path": "M 28 932 L 396 932 L 396 1188 L 28 1188 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_46",
+    "name": "Khung 4 Strips #34",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_34.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_34.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 36,
+        "width": 372,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 24 36 L 396 36 L 396 304 L 24 304 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 336,
+        "width": 372,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 24 336 L 396 336 L 396 604 L 24 604 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 636,
+        "width": 376,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 24 636 L 400 636 L 400 904 L 24 904 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 936,
+        "width": 372,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 24 936 L 396 936 L 396 1204 L 24 1204 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_47",
+    "name": "Khung 4 Strips #35",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_35.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_35.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 60,
+        "y": 40,
+        "width": 324,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 60 40 L 384 40 L 384 304 L 60 304 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 60,
+        "y": 340,
+        "width": 324,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 60 340 L 384 340 L 384 608 L 60 608 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 60,
+        "y": 644,
+        "width": 324,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 60 644 L 384 644 L 384 912 L 60 912 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 64,
+        "y": 944,
+        "width": 320,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 64 944 L 384 944 L 384 1216 L 64 1216 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_48",
+    "name": "Khung 4 Strips #36",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_36.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_36.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 52,
+        "y": 48,
+        "width": 316,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 52 48 L 368 48 L 368 312 L 52 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 48,
+        "y": 348,
+        "width": 320,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 48 348 L 368 348 L 368 616 L 48 616 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 52,
+        "y": 652,
+        "width": 316,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 52 652 L 368 652 L 368 920 L 52 920 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 48,
+        "y": 944,
+        "width": 320,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 48 944 L 368 944 L 368 1212 L 48 1212 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_49",
+    "name": "Khung 4 Strips #37",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_37.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_37.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 56,
+        "y": 16,
+        "width": 336,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 56 16 L 392 16 L 392 284 L 56 284 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 60,
+        "y": 324,
+        "width": 332,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 60 324 L 392 324 L 392 604 L 60 604 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 56,
+        "y": 632,
+        "width": 332,
+        "height": 292,
+        "rotation": 0,
+        "path": "M 56 632 L 388 632 L 388 924 L 56 924 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 56,
+        "y": 956,
+        "width": 336,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 56 956 L 392 956 L 392 1236 L 56 1236 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_50",
+    "name": "Khung 4 Strips #38",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_38.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_38.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 12,
+        "width": 344,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 40 12 L 384 12 L 384 312 L 40 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 320,
+        "width": 344,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 40 320 L 384 320 L 384 620 L 40 620 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 628,
+        "width": 344,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 40 628 L 384 628 L 384 928 L 40 928 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 68,
+        "y": 936,
+        "width": 316,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 68 936 L 384 936 L 384 1236 L 68 1236 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_51",
+    "name": "Khung 4 Strips #39",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_39.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_39.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 12,
+        "width": 352,
+        "height": 288,
+        "rotation": 0,
+        "path": "M 40 12 L 392 12 L 392 300 L 40 300 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 336,
+        "width": 352,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 40 336 L 392 336 L 392 604 L 40 604 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 636,
+        "width": 352,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 40 636 L 392 636 L 392 904 L 40 904 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 44,
+        "y": 940,
+        "width": 344,
+        "height": 236,
+        "rotation": 0,
+        "path": "M 44 940 L 388 940 L 388 1176 L 44 1176 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_52",
+    "name": "Khung 4 Strips #40",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_40.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_40.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 8,
+        "width": 352,
+        "height": 308,
+        "rotation": 0,
+        "path": "M 40 8 L 392 8 L 392 316 L 40 316 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 48,
+        "y": 316,
+        "width": 340,
+        "height": 304,
+        "rotation": 0,
+        "path": "M 48 316 L 388 316 L 388 620 L 48 620 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 48,
+        "y": 628,
+        "width": 344,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 48 628 L 392 628 L 392 928 L 48 928 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 48,
+        "y": 936,
+        "width": 344,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 48 936 L 392 936 L 392 1232 L 48 1232 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 56,
+        "y": 1192,
+        "width": 96,
+        "height": 40,
+        "rotation": 0,
+        "path": "M 56 1192 L 152 1192 L 152 1232 L 56 1232 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_53",
+    "name": "Khung 4 Strips #41",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_41.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_41.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 8,
+        "y": 16,
+        "width": 356,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 8 16 L 364 16 L 364 316 L 8 316 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 32,
+        "y": 324,
+        "width": 344,
+        "height": 304,
+        "rotation": 0,
+        "path": "M 32 324 L 376 324 L 376 628 L 32 628 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 48,
+        "y": 636,
+        "width": 328,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 48 636 L 376 636 L 376 936 L 48 936 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 32,
+        "y": 920,
+        "width": 312,
+        "height": 328,
+        "rotation": 0,
+        "path": "M 32 920 L 344 920 L 344 1248 L 32 1248 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_54",
+    "name": "Khung 4 Strips #42",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_42.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_42.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 36,
+        "y": 12,
+        "width": 368,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 36 12 L 404 12 L 404 308 L 36 308 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 36,
+        "y": 320,
+        "width": 368,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 36 320 L 404 320 L 404 616 L 36 616 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 36,
+        "y": 628,
+        "width": 368,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 36 628 L 404 628 L 404 924 L 36 924 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 60,
+        "y": 940,
+        "width": 320,
+        "height": 288,
+        "rotation": 0,
+        "path": "M 60 940 L 380 940 L 380 1228 L 60 1228 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_55",
+    "name": "Khung 4 Strips #43",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_43.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_43.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 28,
+        "y": 12,
+        "width": 368,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 28 12 L 396 12 L 396 308 L 28 308 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 28,
+        "y": 320,
+        "width": 368,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 28 320 L 396 320 L 396 616 L 28 616 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 28,
+        "y": 624,
+        "width": 368,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 28 624 L 396 624 L 396 924 L 28 924 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 64,
+        "y": 936,
+        "width": 292,
+        "height": 292,
+        "rotation": 0,
+        "path": "M 64 936 L 356 936 L 356 1228 L 64 1228 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_56",
+    "name": "Khung 4 Strips #44",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_44.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_44.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 28,
+        "y": 20,
+        "width": 364,
+        "height": 288,
+        "rotation": 0,
+        "path": "M 28 20 L 392 20 L 392 308 L 28 308 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 28,
+        "y": 320,
+        "width": 364,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 28 320 L 392 320 L 392 616 L 28 616 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 28,
+        "y": 628,
+        "width": 364,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 28 628 L 392 628 L 392 924 L 28 924 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 44,
+        "y": 936,
+        "width": 332,
+        "height": 292,
+        "rotation": 0,
+        "path": "M 44 936 L 376 936 L 376 1228 L 44 1228 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_57",
+    "name": "Khung 4 Strips #45",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_45.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_45.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 424,
+        "y": 0,
+        "width": 4,
+        "height": 1252,
+        "rotation": 0,
+        "path": "M 424 0 L 428 0 L 428 1252 L 424 1252 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 48,
+        "y": 80,
+        "width": 336,
+        "height": 220,
+        "rotation": 0,
+        "path": "M 48 80 L 384 80 L 384 300 L 48 300 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 48,
+        "y": 320,
+        "width": 336,
+        "height": 304,
+        "rotation": 0,
+        "path": "M 48 320 L 384 320 L 384 624 L 48 624 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 0,
+        "y": 380,
+        "width": 8,
+        "height": 872,
+        "rotation": 0,
+        "path": "M 0 380 L 8 380 L 8 1252 L 0 1252 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 52,
+        "y": 592,
+        "width": 336,
+        "height": 352,
+        "rotation": 0,
+        "path": "M 52 592 L 388 592 L 388 944 L 52 944 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 52,
+        "y": 976,
+        "width": 336,
+        "height": 228,
+        "rotation": 0,
+        "path": "M 52 976 L 388 976 L 388 1204 L 52 1204 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_58",
+    "name": "Khung 4 Strips #46",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_46.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_46.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 40,
+        "width": 352,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 24 40 L 376 40 L 376 312 L 24 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 44,
+        "y": 340,
+        "width": 336,
+        "height": 288,
+        "rotation": 0,
+        "path": "M 44 340 L 380 340 L 380 628 L 44 628 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 48,
+        "y": 636,
+        "width": 336,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 48 636 L 384 636 L 384 912 L 48 912 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 48,
+        "y": 936,
+        "width": 332,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 48 936 L 380 936 L 380 1204 L 48 1204 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_59",
+    "name": "Khung 4 Strips #47",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_47.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_47.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 64,
+        "y": 52,
+        "width": 328,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 64 52 L 392 52 L 392 312 L 64 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 64,
+        "y": 352,
+        "width": 324,
+        "height": 252,
+        "rotation": 0,
+        "path": "M 64 352 L 388 352 L 388 604 L 64 604 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 60,
+        "y": 644,
+        "width": 308,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 60 644 L 368 644 L 368 908 L 60 908 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 44,
+        "y": 948,
+        "width": 336,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 44 948 L 380 948 L 380 1212 L 44 1212 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_60",
+    "name": "Khung 4 Strips #48",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_48.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_48.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 68,
+        "y": 56,
+        "width": 316,
+        "height": 240,
+        "rotation": 0,
+        "path": "M 68 56 L 384 56 L 384 296 L 68 296 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 16,
+        "y": 336,
+        "width": 152,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 16 336 L 168 336 L 168 612 L 16 612 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 44,
+        "y": 356,
+        "width": 280,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 44 356 L 324 356 L 324 616 L 44 616 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 216,
+        "y": 372,
+        "width": 176,
+        "height": 248,
+        "rotation": 0,
+        "path": "M 216 372 L 392 372 L 392 620 L 216 620 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 44,
+        "y": 648,
+        "width": 324,
+        "height": 244,
+        "rotation": 0,
+        "path": "M 44 648 L 368 648 L 368 892 L 44 892 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 36,
+        "y": 956,
+        "width": 332,
+        "height": 248,
+        "rotation": 0,
+        "path": "M 36 956 L 368 956 L 368 1204 L 36 1204 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_61",
+    "name": "Khung 4 Strips #49",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_49.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_49.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 44,
+        "width": 356,
+        "height": 256,
+        "rotation": 0,
+        "path": "M 24 44 L 380 44 L 380 300 L 24 300 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 28,
+        "y": 336,
+        "width": 352,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 28 336 L 380 336 L 380 612 L 28 612 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 32,
+        "y": 648,
+        "width": 352,
+        "height": 252,
+        "rotation": 0,
+        "path": "M 32 648 L 384 648 L 384 900 L 32 900 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 36,
+        "y": 936,
+        "width": 348,
+        "height": 256,
+        "rotation": 0,
+        "path": "M 36 936 L 384 936 L 384 1192 L 36 1192 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_62",
+    "name": "Khung 4 Strips #50",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_50.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_50.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 52,
+        "y": 76,
+        "width": 336,
+        "height": 236,
+        "rotation": 0,
+        "path": "M 52 76 L 388 76 L 388 312 L 52 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 80,
+        "y": 356,
+        "width": 276,
+        "height": 220,
+        "rotation": 0,
+        "path": "M 80 356 L 356 356 L 356 576 L 80 576 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 52,
+        "y": 628,
+        "width": 336,
+        "height": 232,
+        "rotation": 0,
+        "path": "M 52 628 L 388 628 L 388 860 L 52 860 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 84,
+        "y": 940,
+        "width": 276,
+        "height": 144,
+        "rotation": 0,
+        "path": "M 84 940 L 360 940 L 360 1084 L 84 1084 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_63",
+    "name": "Khung 4 Strips #51",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_51.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_51.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 40,
+        "width": 340,
+        "height": 248,
+        "rotation": 0,
+        "path": "M 40 40 L 380 40 L 380 288 L 40 288 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 48,
+        "y": 332,
+        "width": 336,
+        "height": 216,
+        "rotation": 0,
+        "path": "M 48 332 L 384 332 L 384 548 L 48 548 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 56,
+        "y": 620,
+        "width": 324,
+        "height": 232,
+        "rotation": 0,
+        "path": "M 56 620 L 380 620 L 380 852 L 56 852 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 52,
+        "y": 940,
+        "width": 336,
+        "height": 184,
+        "rotation": 0,
+        "path": "M 52 940 L 388 940 L 388 1124 L 52 1124 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_64",
+    "name": "Khung 4 Strips #52",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_52.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_52.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 48,
+        "width": 388,
+        "height": 252,
+        "rotation": 0,
+        "path": "M 24 48 L 412 48 L 412 300 L 24 300 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 364,
+        "width": 388,
+        "height": 248,
+        "rotation": 0,
+        "path": "M 24 364 L 412 364 L 412 612 L 24 612 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 676,
+        "width": 388,
+        "height": 252,
+        "rotation": 0,
+        "path": "M 24 676 L 412 676 L 412 928 L 24 928 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 1000,
+        "width": 388,
+        "height": 228,
+        "rotation": 0,
+        "path": "M 24 1000 L 412 1000 L 412 1228 L 24 1228 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_65",
+    "name": "Khung 4 Strips #53",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_53.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_53.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 56,
+        "y": 0,
+        "width": 336,
+        "height": 316,
+        "rotation": 0,
+        "path": "M 56 0 L 392 0 L 392 316 L 56 316 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 32,
+        "y": 416,
+        "width": 380,
+        "height": 208,
+        "rotation": 0,
+        "path": "M 32 416 L 412 416 L 412 624 L 32 624 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 32,
+        "y": 704,
+        "width": 380,
+        "height": 208,
+        "rotation": 0,
+        "path": "M 32 704 L 412 704 L 412 912 L 32 912 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 32,
+        "y": 992,
+        "width": 380,
+        "height": 208,
+        "rotation": 0,
+        "path": "M 32 992 L 412 992 L 412 1200 L 32 1200 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_66",
+    "name": "Khung 4 Strips #54",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_54.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_54.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 8,
+        "width": 380,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 24 8 L 404 8 L 404 268 L 24 268 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 328,
+        "width": 380,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 24 328 L 404 328 L 404 588 L 24 588 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 648,
+        "width": 380,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 24 648 L 404 648 L 404 908 L 24 908 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 968,
+        "width": 380,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 24 968 L 404 968 L 404 1228 L 24 1228 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_67",
+    "name": "Khung 4 Strips #55",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_55.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_55.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 16,
+        "y": 16,
+        "width": 396,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 16 16 L 412 16 L 412 280 L 16 280 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 16,
+        "y": 336,
+        "width": 396,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 16 336 L 412 336 L 412 604 L 16 604 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 12,
+        "y": 660,
+        "width": 396,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 12 660 L 408 660 L 408 924 L 12 924 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 16,
+        "y": 984,
+        "width": 392,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 16 984 L 408 984 L 408 1252 L 16 1252 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_68",
+    "name": "Khung 4 Strips #56",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_56.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_56.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 52,
+        "y": 24,
+        "width": 320,
+        "height": 228,
+        "rotation": 0,
+        "path": "M 52 24 L 372 24 L 372 252 L 52 252 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 60,
+        "y": 348,
+        "width": 312,
+        "height": 224,
+        "rotation": 0,
+        "path": "M 60 348 L 372 348 L 372 572 L 60 572 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 60,
+        "y": 668,
+        "width": 308,
+        "height": 224,
+        "rotation": 0,
+        "path": "M 60 668 L 368 668 L 368 892 L 60 892 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 64,
+        "y": 996,
+        "width": 300,
+        "height": 216,
+        "rotation": 0,
+        "path": "M 64 996 L 364 996 L 364 1212 L 64 1212 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_69",
+    "name": "Khung 4 Strips #57",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_57.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_57.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 28,
+        "y": 24,
+        "width": 352,
+        "height": 200,
+        "rotation": 0,
+        "path": "M 28 24 L 380 24 L 380 224 L 28 224 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 28,
+        "y": 316,
+        "width": 352,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 28 316 L 380 316 L 380 580 L 28 580 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 36,
+        "y": 668,
+        "width": 344,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 36 668 L 380 668 L 380 932 L 36 932 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_70",
+    "name": "Khung 4 Strips #58",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_58.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_58.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 48,
+        "y": 24,
+        "width": 336,
+        "height": 288,
+        "rotation": 0,
+        "path": "M 48 24 L 384 24 L 384 312 L 48 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 48,
+        "y": 332,
+        "width": 332,
+        "height": 284,
+        "rotation": 0,
+        "path": "M 48 332 L 380 332 L 380 616 L 48 616 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 52,
+        "y": 632,
+        "width": 332,
+        "height": 288,
+        "rotation": 0,
+        "path": "M 52 632 L 384 632 L 384 920 L 52 920 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_71",
+    "name": "Khung 4 Strips #59",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_59.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_59.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 12,
+        "y": 16,
+        "width": 404,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 12 16 L 416 16 L 416 312 L 12 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 12,
+        "y": 324,
+        "width": 404,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 12 324 L 416 324 L 416 592 L 12 592 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 12,
+        "y": 560,
+        "width": 404,
+        "height": 60,
+        "rotation": 0,
+        "path": "M 12 560 L 416 560 L 416 620 L 12 620 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 12,
+        "y": 628,
+        "width": 400,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 12 628 L 412 628 L 412 888 L 12 888 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 12,
+        "y": 880,
+        "width": 144,
+        "height": 48,
+        "rotation": 0,
+        "path": "M 12 880 L 156 880 L 156 928 L 12 928 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 228,
+        "y": 872,
+        "width": 188,
+        "height": 56,
+        "rotation": 0,
+        "path": "M 228 872 L 416 872 L 416 928 L 228 928 Z"
+      },
+      {
+        "order": 7,
+        "id": "slot_7",
+        "x": 12,
+        "y": 936,
+        "width": 404,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 12 936 L 416 936 L 416 1200 L 12 1200 Z"
+      },
+      {
+        "order": 8,
+        "id": "slot_8",
+        "x": 12,
+        "y": 1184,
+        "width": 404,
+        "height": 52,
+        "rotation": 0,
+        "path": "M 12 1184 L 416 1184 L 416 1236 L 12 1236 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_72",
+    "name": "Khung 4 Strips #60",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_60.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_60.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 0,
+        "y": 52,
+        "width": 416,
+        "height": 292,
+        "rotation": 0,
+        "path": "M 0 52 L 416 52 L 416 344 L 0 344 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 8,
+        "y": 340,
+        "width": 408,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 8 340 L 416 340 L 416 620 L 8 620 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 20,
+        "y": 640,
+        "width": 400,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 20 640 L 420 640 L 420 916 L 20 916 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 940,
+        "width": 396,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 24 940 L 420 940 L 420 1212 L 24 1212 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_73",
+    "name": "Khung 4 Strips #61",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_61.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_61.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 28,
+        "width": 392,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 24 28 L 416 28 L 416 300 L 24 300 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 20,
+        "y": 336,
+        "width": 392,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 20 336 L 412 336 L 412 608 L 20 608 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 16,
+        "y": 644,
+        "width": 392,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 16 644 L 408 644 L 408 916 L 16 916 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 16,
+        "y": 952,
+        "width": 392,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 16 952 L 408 952 L 408 1224 L 16 1224 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_74",
+    "name": "Khung 4 Strips #62",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_62.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_62.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 12,
+        "y": 40,
+        "width": 396,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 12 40 L 408 40 L 408 312 L 12 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 12,
+        "y": 348,
+        "width": 392,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 12 348 L 404 348 L 404 624 L 12 624 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 8,
+        "y": 656,
+        "width": 392,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 8 656 L 400 656 L 400 932 L 8 932 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 4,
+        "y": 964,
+        "width": 396,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 4 964 L 400 964 L 400 1240 L 4 1240 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_75",
+    "name": "Khung 4 Strips #63",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_63.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_63.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 16,
+        "y": 44,
+        "width": 392,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 16 44 L 408 44 L 408 312 L 16 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 16,
+        "y": 352,
+        "width": 392,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 16 352 L 408 352 L 408 616 L 16 616 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 20,
+        "y": 648,
+        "width": 384,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 20 648 L 404 648 L 404 920 L 20 920 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 964,
+        "width": 372,
+        "height": 244,
+        "rotation": 0,
+        "path": "M 24 964 L 396 964 L 396 1208 L 24 1208 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_76",
+    "name": "Khung 4 Strips #64",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_64.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_64.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 20,
+        "y": 24,
+        "width": 380,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 20 24 L 400 24 L 400 292 L 20 292 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 28,
+        "y": 336,
+        "width": 368,
+        "height": 248,
+        "rotation": 0,
+        "path": "M 28 336 L 396 336 L 396 584 L 28 584 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 632,
+        "width": 380,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 24 632 L 404 632 L 404 900 L 24 900 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 28,
+        "y": 948,
+        "width": 372,
+        "height": 240,
+        "rotation": 0,
+        "path": "M 28 948 L 400 948 L 400 1188 L 28 1188 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_77",
+    "name": "Khung 4 Strips #65",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_65.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_65.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 16,
+        "y": 12,
+        "width": 380,
+        "height": 284,
+        "rotation": 0,
+        "path": "M 16 12 L 396 12 L 396 296 L 16 296 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 28,
+        "y": 324,
+        "width": 368,
+        "height": 288,
+        "rotation": 0,
+        "path": "M 28 324 L 396 324 L 396 612 L 28 612 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 36,
+        "y": 632,
+        "width": 368,
+        "height": 288,
+        "rotation": 0,
+        "path": "M 36 632 L 404 632 L 404 920 L 36 920 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 36,
+        "y": 952,
+        "width": 372,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 36 952 L 408 952 L 408 1232 L 36 1232 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_78",
+    "name": "Khung 4 Strips #66",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_66.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_66.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 12,
+        "y": 32,
+        "width": 376,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 12 32 L 388 32 L 388 308 L 12 308 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 16,
+        "y": 336,
+        "width": 380,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 16 336 L 396 336 L 396 616 L 16 616 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 28,
+        "y": 648,
+        "width": 368,
+        "height": 284,
+        "rotation": 0,
+        "path": "M 28 648 L 396 648 L 396 932 L 28 932 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 36,
+        "y": 956,
+        "width": 368,
+        "height": 284,
+        "rotation": 0,
+        "path": "M 36 956 L 404 956 L 404 1240 L 36 1240 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_79",
+    "name": "Khung 4 Strips #67",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_67.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_67.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 4,
+        "width": 388,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 24 4 L 412 4 L 412 268 L 24 268 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 328,
+        "width": 388,
+        "height": 292,
+        "rotation": 0,
+        "path": "M 24 328 L 412 328 L 412 620 L 24 620 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 16,
+        "y": 640,
+        "width": 400,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 16 640 L 416 640 L 416 916 L 16 916 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 16,
+        "y": 940,
+        "width": 400,
+        "height": 288,
+        "rotation": 0,
+        "path": "M 16 940 L 416 940 L 416 1228 L 16 1228 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_80",
+    "name": "Khung 4 Strips #68",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_68.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_68.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 16,
+        "y": 16,
+        "width": 396,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 16 16 L 412 16 L 412 292 L 16 292 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 16,
+        "y": 316,
+        "width": 396,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 16 316 L 412 316 L 412 588 L 16 588 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 628,
+        "width": 384,
+        "height": 292,
+        "rotation": 0,
+        "path": "M 24 628 L 408 628 L 408 920 L 24 920 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 20,
+        "y": 952,
+        "width": 388,
+        "height": 292,
+        "rotation": 0,
+        "path": "M 20 952 L 408 952 L 408 1244 L 20 1244 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_81",
+    "name": "Khung 4 Strips #69",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_69.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_69.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 12,
+        "y": 16,
+        "width": 404,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 12 16 L 416 16 L 416 312 L 12 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 12,
+        "y": 324,
+        "width": 404,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 12 324 L 416 324 L 416 620 L 12 620 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 12,
+        "y": 628,
+        "width": 404,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 12 628 L 416 628 L 416 928 L 12 928 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 12,
+        "y": 936,
+        "width": 404,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 12 936 L 416 936 L 416 1236 L 12 1236 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_82",
+    "name": "Khung 4 Strips #70",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_70.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_70.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 12,
+        "y": 16,
+        "width": 404,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 12 16 L 416 16 L 416 312 L 12 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 12,
+        "y": 324,
+        "width": 404,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 12 324 L 416 324 L 416 620 L 12 620 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 12,
+        "y": 628,
+        "width": 404,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 12 628 L 416 628 L 416 928 L 12 928 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 12,
+        "y": 936,
+        "width": 404,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 12 936 L 416 936 L 416 1236 L 12 1236 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 276,
+        "y": 1140,
+        "width": 96,
+        "height": 56,
+        "rotation": 0,
+        "path": "M 276 1140 L 372 1140 L 372 1196 L 276 1196 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_83",
+    "name": "Khung 4 Strips #71",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_71.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_71.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 12,
+        "y": 16,
+        "width": 404,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 12 16 L 416 16 L 416 312 L 12 312 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 12,
+        "y": 324,
+        "width": 404,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 12 324 L 416 324 L 416 620 L 12 620 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 12,
+        "y": 628,
+        "width": 404,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 12 628 L 416 628 L 416 928 L 12 928 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 12,
+        "y": 936,
+        "width": 404,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 12 936 L 416 936 L 416 1236 L 12 1236 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 364,
+        "y": 1140,
+        "width": 44,
+        "height": 56,
+        "rotation": 0,
+        "path": "M 364 1140 L 408 1140 L 408 1196 L 364 1196 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_84",
+    "name": "Khung 4 Strips V#1",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung1.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung1.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 364,
+        "y": 8,
+        "width": 32,
+        "height": 72,
+        "rotation": 0,
+        "path": "M 364 8 L 396 8 L 396 80 L 364 80 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 20,
+        "y": 36,
+        "width": 376,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 20 36 L 396 36 L 396 312 L 20 312 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 328,
+        "y": 296,
+        "width": 68,
+        "height": 16,
+        "rotation": 0,
+        "path": "M 328 296 L 396 296 L 396 312 L 328 312 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 20,
+        "y": 328,
+        "width": 380,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 20 328 L 400 328 L 400 608 L 20 608 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 20,
+        "y": 624,
+        "width": 376,
+        "height": 292,
+        "rotation": 0,
+        "path": "M 20 624 L 396 624 L 396 916 L 20 916 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 20,
+        "y": 944,
+        "width": 376,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 20 944 L 396 944 L 396 1204 L 20 1204 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_85",
+    "name": "Khung 4 Strips V#2",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung1_copy.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung1_copy.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 32,
+        "y": 16,
+        "width": 364,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 32 16 L 396 16 L 396 296 L 32 296 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 68,
+        "y": 336,
+        "width": 292,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 68 336 L 360 336 L 360 600 L 68 600 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 52,
+        "y": 636,
+        "width": 324,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 52 636 L 376 636 L 376 908 L 52 908 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 948,
+        "width": 388,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 24 948 L 412 948 L 412 1208 L 24 1208 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_86",
+    "name": "Khung 4 Strips V#3",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung1_copy_2.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung1_copy_2.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 60,
+        "y": 52,
+        "width": 320,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 60 52 L 380 52 L 380 316 L 60 316 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 60,
+        "y": 340,
+        "width": 320,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 60 340 L 380 340 L 380 604 L 60 604 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 60,
+        "y": 628,
+        "width": 320,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 60 628 L 380 628 L 380 892 L 60 892 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_87",
+    "name": "Khung 4 Strips V#4",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung2.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung2.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 0,
+        "y": 0,
+        "width": 4,
+        "height": 1252,
+        "rotation": 0,
+        "path": "M 0 0 L 4 0 L 4 1252 L 0 1252 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 32,
+        "y": 40,
+        "width": 368,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 32 40 L 400 40 L 400 316 L 32 316 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 32,
+        "y": 332,
+        "width": 364,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 32 332 L 396 332 L 396 612 L 32 612 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 32,
+        "y": 628,
+        "width": 364,
+        "height": 292,
+        "rotation": 0,
+        "path": "M 32 628 L 396 628 L 396 920 L 32 920 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 32,
+        "y": 936,
+        "width": 364,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 32 936 L 396 936 L 396 1204 L 32 1204 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_88",
+    "name": "Khung 4 Strips V#5",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung2_copy.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung2_copy.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 32,
+        "y": 44,
+        "width": 368,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 32 44 L 400 44 L 400 304 L 32 304 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 36,
+        "y": 344,
+        "width": 364,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 36 344 L 400 344 L 400 624 L 36 624 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 32,
+        "y": 636,
+        "width": 372,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 32 636 L 404 636 L 404 896 L 32 896 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 36,
+        "y": 912,
+        "width": 372,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 36 912 L 408 912 L 408 1184 L 36 1184 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_89",
+    "name": "Khung 4 Strips V#6",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung2_copy_2.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung2_copy_2.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 28,
+        "width": 360,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 24 28 L 384 28 L 384 308 L 24 308 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 60,
+        "y": 348,
+        "width": 288,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 60 348 L 348 348 L 348 616 L 60 616 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 44,
+        "y": 648,
+        "width": 320,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 44 648 L 364 648 L 364 924 L 44 924 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 16,
+        "y": 964,
+        "width": 368,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 16 964 L 384 964 L 384 1240 L 16 1240 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_90",
+    "name": "Khung 4 Strips V#7",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung3.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung3.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 424,
+        "y": 0,
+        "width": 4,
+        "height": 1252,
+        "rotation": 0,
+        "path": "M 424 0 L 428 0 L 428 1252 L 424 1252 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 48,
+        "y": 36,
+        "width": 344,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 48 36 L 392 36 L 392 316 L 48 316 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 32,
+        "y": 332,
+        "width": 364,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 32 332 L 396 332 L 396 612 L 32 612 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 32,
+        "y": 624,
+        "width": 360,
+        "height": 296,
+        "rotation": 0,
+        "path": "M 32 624 L 392 624 L 392 920 L 32 920 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 32,
+        "y": 936,
+        "width": 360,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 32 936 L 392 936 L 392 1204 L 32 1204 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_91",
+    "name": "Khung 4 Strips V#8",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung3_copy.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung3_copy.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 44,
+        "width": 384,
+        "height": 284,
+        "rotation": 0,
+        "path": "M 40 44 L 424 44 L 424 328 L 40 328 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 312,
+        "width": 364,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 40 312 L 404 312 L 404 612 L 40 612 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 632,
+        "width": 364,
+        "height": 284,
+        "rotation": 0,
+        "path": "M 40 632 L 404 632 L 404 916 L 40 916 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 900,
+        "width": 364,
+        "height": 300,
+        "rotation": 0,
+        "path": "M 40 900 L 404 900 L 404 1200 L 40 1200 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_92",
+    "name": "Khung 4 Strips V#9",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung3_copy_2.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung3_copy_2.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 416,
+        "y": 0,
+        "width": 12,
+        "height": 1208,
+        "rotation": 0,
+        "path": "M 416 0 L 428 0 L 428 1208 L 416 1208 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 16,
+        "y": 40,
+        "width": 372,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 16 40 L 388 40 L 388 312 L 16 312 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 16,
+        "y": 328,
+        "width": 376,
+        "height": 256,
+        "rotation": 0,
+        "path": "M 16 328 L 392 328 L 392 584 L 16 584 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 616,
+        "width": 360,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 24 616 L 384 616 L 384 892 L 24 892 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 24,
+        "y": 916,
+        "width": 364,
+        "height": 272,
+        "rotation": 0,
+        "path": "M 24 916 L 388 916 L 388 1188 L 24 1188 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_93",
+    "name": "Khung 4 Strips V#10",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_4.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_4.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 96,
+        "y": 0,
+        "width": 116,
+        "height": 12,
+        "rotation": 0,
+        "path": "M 96 0 L 212 0 L 212 12 L 96 12 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 28,
+        "y": 52,
+        "width": 356,
+        "height": 252,
+        "rotation": 0,
+        "path": "M 28 52 L 384 52 L 384 304 L 28 304 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 316,
+        "y": 160,
+        "width": 60,
+        "height": 60,
+        "rotation": 0,
+        "path": "M 316 160 L 376 160 L 376 220 L 316 220 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 28,
+        "y": 344,
+        "width": 352,
+        "height": 244,
+        "rotation": 0,
+        "path": "M 28 344 L 380 344 L 380 588 L 28 588 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 316,
+        "y": 484,
+        "width": 60,
+        "height": 80,
+        "rotation": 0,
+        "path": "M 316 484 L 376 484 L 376 564 L 316 564 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 28,
+        "y": 628,
+        "width": 352,
+        "height": 252,
+        "rotation": 0,
+        "path": "M 28 628 L 380 628 L 380 880 L 28 880 Z"
+      },
+      {
+        "order": 7,
+        "id": "slot_7",
+        "x": 20,
+        "y": 1032,
+        "width": 352,
+        "height": 220,
+        "rotation": 0,
+        "path": "M 20 1032 L 372 1032 L 372 1252 L 20 1252 Z"
+      },
+      {
+        "order": 8,
+        "id": "slot_8",
+        "x": 308,
+        "y": 1136,
+        "width": 60,
+        "height": 60,
+        "rotation": 0,
+        "path": "M 308 1136 L 368 1136 L 368 1196 L 308 1196 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_94",
+    "name": "Khung 4 Strips V#11",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_4_copy.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_4_copy.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 52,
+        "y": 348,
+        "width": 332,
+        "height": 268,
+        "rotation": 0,
+        "path": "M 52 348 L 384 348 L 384 616 L 52 616 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 56,
+        "y": 648,
+        "width": 328,
+        "height": 264,
+        "rotation": 0,
+        "path": "M 56 648 L 384 648 L 384 912 L 56 912 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 60,
+        "y": 944,
+        "width": 324,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 60 944 L 384 944 L 384 1204 L 60 1204 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_95",
+    "name": "Khung 4 Strips V#12",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_4_copy_2.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_4_copy_2.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 20,
+        "y": 16,
+        "width": 380,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 20 16 L 400 16 L 400 296 L 20 296 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 28,
+        "y": 336,
+        "width": 376,
+        "height": 280,
+        "rotation": 0,
+        "path": "M 28 336 L 404 336 L 404 616 L 28 616 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 20,
+        "y": 644,
+        "width": 384,
+        "height": 284,
+        "rotation": 0,
+        "path": "M 20 644 L 404 644 L 404 928 L 20 928 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_96",
+    "name": "Khung 4 Strips V#13",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_5.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_5.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 0,
+        "y": 0,
+        "width": 36,
+        "height": 76,
+        "rotation": 0,
+        "path": "M 0 0 L 36 0 L 36 76 L 0 76 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 0,
+        "y": 0,
+        "width": 392,
+        "height": 316,
+        "rotation": 0,
+        "path": "M 0 0 L 392 0 L 392 316 L 0 316 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 92,
+        "y": 0,
+        "width": 32,
+        "height": 36,
+        "rotation": 0,
+        "path": "M 92 0 L 124 0 L 124 36 L 92 36 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 152,
+        "y": 0,
+        "width": 28,
+        "height": 36,
+        "rotation": 0,
+        "path": "M 152 0 L 180 0 L 180 36 L 152 36 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 208,
+        "y": 0,
+        "width": 32,
+        "height": 36,
+        "rotation": 0,
+        "path": "M 208 0 L 240 0 L 240 36 L 208 36 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 264,
+        "y": 0,
+        "width": 32,
+        "height": 36,
+        "rotation": 0,
+        "path": "M 264 0 L 296 0 L 296 36 L 264 36 Z"
+      },
+      {
+        "order": 7,
+        "id": "slot_7",
+        "x": 324,
+        "y": 0,
+        "width": 28,
+        "height": 36,
+        "rotation": 0,
+        "path": "M 324 0 L 352 0 L 352 36 L 324 36 Z"
+      },
+      {
+        "order": 8,
+        "id": "slot_8",
+        "x": 380,
+        "y": 0,
+        "width": 32,
+        "height": 36,
+        "rotation": 0,
+        "path": "M 380 0 L 412 0 L 412 36 L 380 36 Z"
+      },
+      {
+        "order": 9,
+        "id": "slot_9",
+        "x": 0,
+        "y": 352,
+        "width": 392,
+        "height": 256,
+        "rotation": 0,
+        "path": "M 0 352 L 392 352 L 392 608 L 0 608 Z"
+      },
+      {
+        "order": 10,
+        "id": "slot_10",
+        "x": 20,
+        "y": 652,
+        "width": 372,
+        "height": 252,
+        "rotation": 0,
+        "path": "M 20 652 L 392 652 L 392 904 L 20 904 Z"
+      },
+      {
+        "order": 11,
+        "id": "slot_11",
+        "x": 24,
+        "y": 948,
+        "width": 372,
+        "height": 260,
+        "rotation": 0,
+        "path": "M 24 948 L 396 948 L 396 1208 L 24 1208 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_97",
+    "name": "Khung 4 Strips V#14",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_5_copy.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_5_copy.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 0,
+        "width": 376,
+        "height": 636,
+        "rotation": 0,
+        "path": "M 24 0 L 400 0 L 400 636 L 24 636 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 20,
+        "y": 644,
+        "width": 384,
+        "height": 312,
+        "rotation": 0,
+        "path": "M 20 644 L 404 644 L 404 956 L 20 956 Z"
+      }
+    ]
+  },
+  {
+    "id": "pbne_98",
+    "name": "Khung 4 Strips V#15",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "img_khung_4_strips_khung_5_copy_2.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\photobothne_frames\\img_khung_4_strips_khung_5_copy_2.png",
+    "width": 428,
+    "height": 1252,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 16,
+        "width": 336,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 40 16 L 376 16 L 376 292 L 40 292 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 332,
+        "width": 336,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 40 332 L 376 332 L 376 608 L 40 608 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 644,
+        "width": 336,
+        "height": 276,
+        "rotation": 0,
+        "path": "M 40 644 L 376 644 L 376 920 L 40 920 Z"
+      }
+    ]
+  }
+]
