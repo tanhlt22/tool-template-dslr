@@ -1,0 +1,1639 @@
+[
+  {
+    "id": "gh_frame_1",
+    "name": "Snappie Cute Pastel",
+    "category": "cartoon",
+    "layout": "1x4",
+    "fileName": "gh_frameFree1.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frameFree1.png",
+    "width": 297,
+    "height": 841,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 56,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 56 L 272 56 L 272 192 L 24 192 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 212,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 212 L 272 212 L 272 348 L 24 348 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 368,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 368 L 272 368 L 272 504 L 24 504 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 524,
+        "width": 248,
+        "height": 132,
+        "rotation": 0,
+        "path": "M 24 524 L 272 524 L 272 656 L 24 656 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_2",
+    "name": "Snappie Vintage Minimal",
+    "category": "basic",
+    "layout": "1x4",
+    "fileName": "gh_frameFree2.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frameFree2.png",
+    "width": 297,
+    "height": 841,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 56,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 56 L 272 56 L 272 192 L 24 192 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 212,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 212 L 272 212 L 272 348 L 24 348 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 368,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 368 L 272 368 L 272 504 L 24 504 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 524,
+        "width": 248,
+        "height": 132,
+        "rotation": 0,
+        "path": "M 24 524 L 272 524 L 272 656 L 24 656 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_3",
+    "name": "Snappie Soft Pink",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "gh_frameFree3.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frameFree3.png",
+    "width": 297,
+    "height": 841,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 56,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 56 L 272 56 L 272 192 L 24 192 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 212,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 212 L 272 212 L 272 348 L 24 348 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 368,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 368 L 272 368 L 272 504 L 24 504 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 524,
+        "width": 248,
+        "height": 132,
+        "rotation": 0,
+        "path": "M 24 524 L 272 524 L 272 656 L 24 656 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_4",
+    "name": "Snappie Retro Film",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "gh_frameFree4.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frameFree4.png",
+    "width": 297,
+    "height": 841,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 56,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 56 L 272 56 L 272 192 L 24 192 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 212,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 212 L 272 212 L 272 348 L 24 348 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 368,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 368 L 272 368 L 272 504 L 24 504 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 524,
+        "width": 248,
+        "height": 132,
+        "rotation": 0,
+        "path": "M 24 524 L 272 524 L 272 656 L 24 656 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_5",
+    "name": "Snappie Cloud Dream",
+    "category": "cartoon",
+    "layout": "1x4",
+    "fileName": "gh_frameFree5.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frameFree5.png",
+    "width": 297,
+    "height": 841,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 56,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 56 L 272 56 L 272 192 L 24 192 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 212,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 212 L 272 212 L 272 348 L 24 348 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 368,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 368 L 272 368 L 272 504 L 24 504 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 524,
+        "width": 248,
+        "height": 132,
+        "rotation": 0,
+        "path": "M 24 524 L 272 524 L 272 656 L 24 656 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_6",
+    "name": "Snappie Starry Night",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "gh_frameFree6.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frameFree6.png",
+    "width": 297,
+    "height": 841,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 56,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 56 L 272 56 L 272 192 L 24 192 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 212,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 212 L 272 212 L 272 348 L 24 348 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 360,
+        "width": 248,
+        "height": 144,
+        "rotation": 0,
+        "path": "M 24 360 L 272 360 L 272 504 L 24 504 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 524,
+        "width": 248,
+        "height": 132,
+        "rotation": 0,
+        "path": "M 24 524 L 272 524 L 272 656 L 24 656 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_7",
+    "name": "Snappie Premium Y2K",
+    "category": "y2k",
+    "layout": "1x4",
+    "fileName": "gh_framePaid1.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_framePaid1.png",
+    "width": 297,
+    "height": 841,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 56,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 56 L 272 56 L 272 192 L 24 192 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 212,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 212 L 272 212 L 272 348 L 24 348 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 368,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 368 L 272 368 L 272 504 L 24 504 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 524,
+        "width": 248,
+        "height": 132,
+        "rotation": 0,
+        "path": "M 24 524 L 272 524 L 272 656 L 24 656 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_8",
+    "name": "Snappie Premium Sparkle",
+    "category": "y2k",
+    "layout": "1x4",
+    "fileName": "gh_framePaid2.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_framePaid2.png",
+    "width": 297,
+    "height": 841,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 24,
+        "y": 56,
+        "width": 248,
+        "height": 132,
+        "rotation": 0,
+        "path": "M 24 56 L 272 56 L 272 188 L 24 188 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 24,
+        "y": 212,
+        "width": 248,
+        "height": 136,
+        "rotation": 0,
+        "path": "M 24 212 L 272 212 L 272 348 L 24 348 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 24,
+        "y": 368,
+        "width": 248,
+        "height": 132,
+        "rotation": 0,
+        "path": "M 24 368 L 272 368 L 272 500 L 24 500 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 24,
+        "y": 524,
+        "width": 248,
+        "height": 132,
+        "rotation": 0,
+        "path": "M 24 524 L 272 524 L 272 656 L 24 656 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_9",
+    "name": "Snapshoot Blok Biru",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "gh_frame-blok-biru.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-blok-biru.png",
+    "width": 600,
+    "height": 1800,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 40,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 40 L 560 40 L 560 424 L 40 424 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 440,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 440 L 560 440 L 560 820 L 40 820 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 840,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 840 L 560 840 L 560 1220 L 40 1220 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 1236,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 1236 L 560 1236 L 560 1620 L 40 1620 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_10",
+    "name": "Snapshoot Blok Hijau",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "gh_frame-blok-hijau.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-blok-hijau.png",
+    "width": 600,
+    "height": 1800,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 40,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 40 L 560 40 L 560 424 L 40 424 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 440,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 440 L 560 440 L 560 820 L 40 820 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 840,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 840 L 560 840 L 560 1220 L 40 1220 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 1236,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 1236 L 560 1236 L 560 1620 L 40 1620 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_11",
+    "name": "Snapshoot Checkerboard",
+    "category": "y2k",
+    "layout": "1x4",
+    "fileName": "gh_frame-checker.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-checker.png",
+    "width": 600,
+    "height": 1800,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 40,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 40 L 560 40 L 560 424 L 40 424 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 440,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 440 L 560 440 L 560 820 L 40 820 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 840,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 840 L 560 840 L 560 1220 L 40 1220 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 1236,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 1236 L 560 1236 L 560 1620 L 40 1620 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_12",
+    "name": "Snapshoot Funky Circus",
+    "category": "cartoon",
+    "layout": "1x4",
+    "fileName": "gh_frame-sirkus.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-sirkus.png",
+    "width": 600,
+    "height": 1800,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 40,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 40 L 560 40 L 560 424 L 40 424 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 440,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 440 L 560 440 L 560 820 L 40 820 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 840,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 840 L 560 840 L 560 1220 L 40 1220 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 1236,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 1236 L 560 1236 L 560 1620 L 40 1620 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_13",
+    "name": "Snapshoot Stamp Edge",
+    "category": "basic",
+    "layout": "1x4",
+    "fileName": "gh_frame-bergerigi.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-bergerigi.png",
+    "width": 600,
+    "height": 1800,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 0,
+        "y": 0,
+        "width": 600,
+        "height": 16,
+        "rotation": 0,
+        "path": "M 0 0 L 600 0 L 600 16 L 0 16 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 40,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 40 L 560 40 L 560 424 L 40 424 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 440,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 440 L 560 440 L 560 820 L 40 820 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 840,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 840 L 560 840 L 560 1220 L 40 1220 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 40,
+        "y": 1236,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 1236 L 560 1236 L 560 1620 L 40 1620 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 0,
+        "y": 1784,
+        "width": 600,
+        "height": 16,
+        "rotation": 0,
+        "path": "M 0 1784 L 600 1784 L 600 1800 L 0 1800 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_14",
+    "name": "Snapshoot Studio Sage",
+    "category": "basic",
+    "layout": "1x4",
+    "fileName": "gh_frame-studio-sage.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-studio-sage.png",
+    "width": 600,
+    "height": 1800,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 40,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 40 L 560 40 L 560 424 L 40 424 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 440,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 440 L 560 440 L 560 820 L 40 820 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 840,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 840 L 560 840 L 560 1220 L 40 1220 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 1236,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 1236 L 560 1236 L 560 1620 L 40 1620 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_15",
+    "name": "Snapshoot Terracotta Warm",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "gh_frame-terracotta.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-terracotta.png",
+    "width": 600,
+    "height": 1800,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 40,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 40 L 560 40 L 560 424 L 40 424 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 440,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 440 L 560 440 L 560 820 L 40 820 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 840,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 840 L 560 840 L 560 1220 L 40 1220 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 1236,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 1236 L 560 1236 L 560 1620 L 40 1620 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_16",
+    "name": "Snapshoot Star Glow",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "gh_frame-bintang.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-bintang.png",
+    "width": 600,
+    "height": 1800,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 40,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 40 L 560 40 L 560 424 L 40 424 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 440,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 440 L 560 440 L 560 820 L 40 820 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 840,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 840 L 560 840 L 560 1220 L 40 1220 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 1236,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 1236 L 560 1236 L 560 1620 L 40 1620 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_17",
+    "name": "Snapshoot Retro Halftone",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "gh_frame-halftone.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-halftone.png",
+    "width": 600,
+    "height": 1800,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 40,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 40 L 560 40 L 560 424 L 40 424 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 440,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 440 L 560 440 L 560 820 L 40 820 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 840,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 840 L 560 840 L 560 1220 L 40 1220 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 1236,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 1236 L 560 1236 L 560 1620 L 40 1620 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_18",
+    "name": "Snapshoot Postcard Vintage",
+    "category": "basic",
+    "layout": "1x4",
+    "fileName": "gh_frame-kartu-pos.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-kartu-pos.png",
+    "width": 600,
+    "height": 1800,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 40,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 40 L 560 40 L 560 424 L 40 424 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 440,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 440 L 560 440 L 560 820 L 40 820 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 840,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 840 L 560 840 L 560 1220 L 40 1220 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 1236,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 1236 L 560 1236 L 560 1620 L 40 1620 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_19",
+    "name": "Snapshoot 35mm Sprocket Film",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "gh_frame-sprocket.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-sprocket.png",
+    "width": 600,
+    "height": 1800,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 40,
+        "y": 40,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 40 L 560 40 L 560 424 L 40 424 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 440,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 440 L 560 440 L 560 820 L 40 820 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 840,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 840 L 560 840 L 560 1220 L 40 1220 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 1236,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 1236 L 560 1236 L 560 1620 L 40 1620 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_20",
+    "name": "Snapshoot Classic Clean",
+    "category": "basic",
+    "layout": "1x4",
+    "fileName": "gh_frame-polos.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-polos.png",
+    "width": 600,
+    "height": 1800,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 0,
+        "y": 0,
+        "width": 600,
+        "height": 1800,
+        "rotation": 0,
+        "path": "M 0 0 L 600 0 L 600 1800 L 0 1800 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 40,
+        "y": 40,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 40 L 560 40 L 560 424 L 40 424 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 40,
+        "y": 440,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 440 L 560 440 L 560 820 L 40 820 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 40,
+        "y": 840,
+        "width": 520,
+        "height": 380,
+        "rotation": 0,
+        "path": "M 40 840 L 560 840 L 560 1220 L 40 1220 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 40,
+        "y": 1236,
+        "width": 520,
+        "height": 384,
+        "rotation": 0,
+        "path": "M 40 1236 L 560 1236 L 560 1620 L 40 1620 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_21",
+    "name": "Jiggle Heart Romantic",
+    "category": "couple",
+    "layout": "1x4",
+    "fileName": "gh_heart-frame.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_heart-frame.png",
+    "width": 1200,
+    "height": 3000,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 124,
+        "y": 88,
+        "width": 948,
+        "height": 552,
+        "rotation": 0,
+        "path": "M 124 88 L 1072 88 L 1072 640 L 124 640 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 124,
+        "y": 688,
+        "width": 948,
+        "height": 552,
+        "rotation": 0,
+        "path": "M 124 688 L 1072 688 L 1072 1240 L 124 1240 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 128,
+        "y": 1288,
+        "width": 948,
+        "height": 552,
+        "rotation": 0,
+        "path": "M 128 1288 L 1076 1288 L 1076 1840 L 128 1840 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 124,
+        "y": 1892,
+        "width": 952,
+        "height": 556,
+        "rotation": 0,
+        "path": "M 124 1892 L 1076 1892 L 1076 2448 L 124 2448 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_22",
+    "name": "Jiggle Sweet Heart Pink",
+    "category": "couple",
+    "layout": "1x4",
+    "fileName": "gh_heart-frame-2.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_heart-frame-2.png",
+    "width": 1200,
+    "height": 3000,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 116,
+        "y": 80,
+        "width": 964,
+        "height": 572,
+        "rotation": 0,
+        "path": "M 116 80 L 1080 80 L 1080 652 L 116 652 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 116,
+        "y": 680,
+        "width": 964,
+        "height": 568,
+        "rotation": 0,
+        "path": "M 116 680 L 1080 680 L 1080 1248 L 116 1248 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 120,
+        "y": 1280,
+        "width": 964,
+        "height": 572,
+        "rotation": 0,
+        "path": "M 120 1280 L 1084 1280 L 1084 1852 L 120 1852 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 120,
+        "y": 1888,
+        "width": 964,
+        "height": 568,
+        "rotation": 0,
+        "path": "M 120 1888 L 1084 1888 L 1084 2456 L 120 2456 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 124,
+        "y": 1920,
+        "width": 28,
+        "height": 60,
+        "rotation": 0,
+        "path": "M 124 1920 L 152 1920 L 152 1980 L 124 1980 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 804,
+        "y": 2400,
+        "width": 64,
+        "height": 56,
+        "rotation": 0,
+        "path": "M 804 2400 L 868 2400 L 868 2456 L 804 2456 Z"
+      },
+      {
+        "order": 7,
+        "id": "slot_7",
+        "x": 1032,
+        "y": 2392,
+        "width": 32,
+        "height": 64,
+        "rotation": 0,
+        "path": "M 1032 2392 L 1064 2392 L 1064 2456 L 1032 2456 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_23",
+    "name": "Jiggle Cherry Blossom Heart",
+    "category": "couple",
+    "layout": "1x4",
+    "fileName": "gh_heart-frame-3.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_heart-frame-3.png",
+    "width": 1200,
+    "height": 3000,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 124,
+        "y": 88,
+        "width": 948,
+        "height": 552,
+        "rotation": 0,
+        "path": "M 124 88 L 1072 88 L 1072 640 L 124 640 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 160,
+        "y": 684,
+        "width": 888,
+        "height": 592,
+        "rotation": 0,
+        "path": "M 160 684 L 1048 684 L 1048 1276 L 160 1276 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 124,
+        "y": 1308,
+        "width": 952,
+        "height": 556,
+        "rotation": 0,
+        "path": "M 124 1308 L 1076 1308 L 1076 1864 L 124 1864 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 124,
+        "y": 1916,
+        "width": 948,
+        "height": 556,
+        "rotation": 0,
+        "path": "M 124 1916 L 1072 1916 L 1072 2472 L 124 2472 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_24",
+    "name": "Jiggle Violet Dream Heart",
+    "category": "couple",
+    "layout": "1x4",
+    "fileName": "gh_heart-frame-4.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_heart-frame-4.png",
+    "width": 1200,
+    "height": 3000,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 160,
+        "y": 72,
+        "width": 888,
+        "height": 592,
+        "rotation": 0,
+        "path": "M 160 72 L 1048 72 L 1048 664 L 160 664 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 160,
+        "y": 660,
+        "width": 888,
+        "height": 596,
+        "rotation": 0,
+        "path": "M 160 660 L 1048 660 L 1048 1256 L 160 1256 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 152,
+        "y": 1252,
+        "width": 888,
+        "height": 592,
+        "rotation": 0,
+        "path": "M 152 1252 L 1040 1252 L 1040 1844 L 152 1844 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 152,
+        "y": 1852,
+        "width": 892,
+        "height": 592,
+        "rotation": 0,
+        "path": "M 152 1852 L 1044 1852 L 1044 2444 L 152 2444 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_25",
+    "name": "Baddie Bow Aesthetic",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "gh_bowframe.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_bowframe.png",
+    "width": 271,
+    "height": 350,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 0,
+        "y": 0,
+        "width": 268,
+        "height": 348,
+        "rotation": 0,
+        "path": "M 0 0 L 268 0 L 268 348 L 0 348 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 36,
+        "y": 64,
+        "width": 200,
+        "height": 256,
+        "rotation": 0,
+        "path": "M 36 64 L 236 64 L 236 320 L 36 320 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_26",
+    "name": "Baddie Floral Bloom",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "gh_flower.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_flower.png",
+    "width": 1200,
+    "height": 1200,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 0,
+        "y": 0,
+        "width": 1200,
+        "height": 992,
+        "rotation": 0,
+        "path": "M 0 0 L 1200 0 L 1200 992 L 0 992 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 948,
+        "y": 160,
+        "width": 48,
+        "height": 52,
+        "rotation": 0,
+        "path": "M 948 160 L 996 160 L 996 212 L 948 212 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 0,
+        "y": 208,
+        "width": 1200,
+        "height": 992,
+        "rotation": 0,
+        "path": "M 0 208 L 1200 208 L 1200 1200 L 0 1200 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 168,
+        "y": 196,
+        "width": 24,
+        "height": 44,
+        "rotation": 0,
+        "path": "M 168 196 L 192 196 L 192 240 L 168 240 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 220,
+        "y": 260,
+        "width": 756,
+        "height": 692,
+        "rotation": 0,
+        "path": "M 220 260 L 976 260 L 976 952 L 220 952 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 1012,
+        "y": 916,
+        "width": 28,
+        "height": 48,
+        "rotation": 0,
+        "path": "M 1012 916 L 1040 916 L 1040 964 L 1012 964 Z"
+      },
+      {
+        "order": 7,
+        "id": "slot_7",
+        "x": 980,
+        "y": 956,
+        "width": 60,
+        "height": 60,
+        "rotation": 0,
+        "path": "M 980 956 L 1040 956 L 1040 1016 L 980 1016 Z"
+      },
+      {
+        "order": 8,
+        "id": "slot_8",
+        "x": 1016,
+        "y": 940,
+        "width": 60,
+        "height": 88,
+        "rotation": 0,
+        "path": "M 1016 940 L 1076 940 L 1076 1028 L 1016 1028 Z"
+      },
+      {
+        "order": 9,
+        "id": "slot_9",
+        "x": 96,
+        "y": 996,
+        "width": 36,
+        "height": 20,
+        "rotation": 0,
+        "path": "M 96 996 L 132 996 L 132 1016 L 96 1016 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_27",
+    "name": "Baddie Hot Pink Y2K",
+    "category": "y2k",
+    "layout": "1x4",
+    "fileName": "gh_pink.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_pink.png",
+    "width": 900,
+    "height": 1129,
+    "slots": []
+  },
+  {
+    "id": "gh_frame_28",
+    "name": "Prismo Clay Pink",
+    "category": "cartoon",
+    "layout": "1x4",
+    "fileName": "gh_frame-prism-pink.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-prism-pink.png",
+    "width": 2500,
+    "height": 7500,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 208,
+        "y": 208,
+        "width": 2084,
+        "height": 1560,
+        "rotation": 0,
+        "path": "M 208 208 L 2292 208 L 2292 1768 L 208 1768 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 208,
+        "y": 1980,
+        "width": 2084,
+        "height": 1560,
+        "rotation": 0,
+        "path": "M 208 1980 L 2292 1980 L 2292 3540 L 208 3540 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 208,
+        "y": 3752,
+        "width": 2084,
+        "height": 1560,
+        "rotation": 0,
+        "path": "M 208 3752 L 2292 3752 L 2292 5312 L 208 5312 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 208,
+        "y": 5520,
+        "width": 2084,
+        "height": 1564,
+        "rotation": 0,
+        "path": "M 208 5520 L 2292 5520 L 2292 7084 L 208 7084 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 1572,
+        "y": 6708,
+        "width": 16,
+        "height": 76,
+        "rotation": 0,
+        "path": "M 1572 6708 L 1588 6708 L 1588 6784 L 1572 6784 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 1736,
+        "y": 6708,
+        "width": 12,
+        "height": 60,
+        "rotation": 0,
+        "path": "M 1736 6708 L 1748 6708 L 1748 6768 L 1736 6768 Z"
+      },
+      {
+        "order": 7,
+        "id": "slot_7",
+        "x": 1964,
+        "y": 6828,
+        "width": 16,
+        "height": 60,
+        "rotation": 0,
+        "path": "M 1964 6828 L 1980 6828 L 1980 6888 L 1964 6888 Z"
+      },
+      {
+        "order": 8,
+        "id": "slot_8",
+        "x": 844,
+        "y": 6940,
+        "width": 412,
+        "height": 144,
+        "rotation": 0,
+        "path": "M 844 6940 L 1256 6940 L 1256 7084 L 844 7084 Z"
+      }
+    ]
+  },
+  {
+    "id": "gh_frame_29",
+    "name": "Prismo Clay Ruby",
+    "category": "amazing",
+    "layout": "1x4",
+    "fileName": "gh_frame-prism-red.png",
+    "localPath": "D:\\code_tool\\tool-template-dslr\\scripts\\github_frames\\gh_frame-prism-red.png",
+    "width": 2500,
+    "height": 7500,
+    "slots": [
+      {
+        "order": 1,
+        "id": "slot_1",
+        "x": 208,
+        "y": 208,
+        "width": 2084,
+        "height": 1560,
+        "rotation": 0,
+        "path": "M 208 208 L 2292 208 L 2292 1768 L 208 1768 Z"
+      },
+      {
+        "order": 2,
+        "id": "slot_2",
+        "x": 208,
+        "y": 1980,
+        "width": 2084,
+        "height": 1560,
+        "rotation": 0,
+        "path": "M 208 1980 L 2292 1980 L 2292 3540 L 208 3540 Z"
+      },
+      {
+        "order": 3,
+        "id": "slot_3",
+        "x": 208,
+        "y": 3752,
+        "width": 2084,
+        "height": 1560,
+        "rotation": 0,
+        "path": "M 208 3752 L 2292 3752 L 2292 5312 L 208 5312 Z"
+      },
+      {
+        "order": 4,
+        "id": "slot_4",
+        "x": 208,
+        "y": 5520,
+        "width": 2084,
+        "height": 1564,
+        "rotation": 0,
+        "path": "M 208 5520 L 2292 5520 L 2292 7084 L 208 7084 Z"
+      },
+      {
+        "order": 5,
+        "id": "slot_5",
+        "x": 1572,
+        "y": 6708,
+        "width": 16,
+        "height": 76,
+        "rotation": 0,
+        "path": "M 1572 6708 L 1588 6708 L 1588 6784 L 1572 6784 Z"
+      },
+      {
+        "order": 6,
+        "id": "slot_6",
+        "x": 1736,
+        "y": 6708,
+        "width": 12,
+        "height": 60,
+        "rotation": 0,
+        "path": "M 1736 6708 L 1748 6708 L 1748 6768 L 1736 6768 Z"
+      },
+      {
+        "order": 7,
+        "id": "slot_7",
+        "x": 1964,
+        "y": 6828,
+        "width": 16,
+        "height": 60,
+        "rotation": 0,
+        "path": "M 1964 6828 L 1980 6828 L 1980 6888 L 1964 6888 Z"
+      },
+      {
+        "order": 8,
+        "id": "slot_8",
+        "x": 844,
+        "y": 6940,
+        "width": 412,
+        "height": 144,
+        "rotation": 0,
+        "path": "M 844 6940 L 1256 6940 L 1256 7084 L 844 7084 Z"
+      }
+    ]
+  }
+]
