@@ -34,7 +34,7 @@ const punchSnapshotSlotHoles = (
     ctx.rotate(theta);
     ctx.fillStyle = 'black';
     ctx.beginPath();
-    ctx.roundRect(-slot.width / 2, -slot.height / 2, slot.width, slot.height, 8);
+    ctx.rect(-slot.width / 2, -slot.height / 2, slot.width, slot.height);
     ctx.fill();
     ctx.restore();
   });
@@ -888,13 +888,16 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const slotNumber = String(slot.order || slotIndex + 1);
 
       if (existing) {
-        existing.set({
+        (existing as fabric.Rect).set({
           left: slot.x,
           top: slot.y,
           width: slot.width / (existing.scaleX || 1),
           height: slot.height / (existing.scaleY || 1),
           angle: slot.rotation,
           fill: slot.placeholderColor || 'rgba(226, 232, 240, 0.92)',
+          rx: 0,
+          ry: 0,
+          strokeUniform: true,
           visible: isVisible
         });
         existing.data = { ...existing.data, order: slot.order || slotIndex + 1, placeholderColor: slot.placeholderColor };
@@ -911,8 +914,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           stroke: '#0ea5e9',
           strokeWidth: 2,
           strokeDashArray: [6, 4],
-          rx: 8,
-          ry: 8,
+          rx: 0,
+          ry: 0,
+          strokeUniform: true,
           visible: isVisible,
           data: { id: slot.id, type: 'slot', order: slot.order, placeholderColor: slot.placeholderColor }
         });

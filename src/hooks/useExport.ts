@@ -129,7 +129,7 @@ export function useExport(options: UseExportOptions) {
       }
 
       // Punch holes in background
-      punchSlotHoles(ctx, slots, true);
+      punchSlotHoles(ctx, slots, false);
 
       // Draw elements on top
       ctx.globalCompositeOperation = 'source-over';

@@ -106,7 +106,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
         ctx.setLineDash([8, 6]);
         ctx.fillStyle = 'rgba(239, 68, 68, 0.35)';
         ctx.beginPath();
-        ctx.roundRect(0, 0, slot.width, slot.height, 8);
+        ctx.rect(0, 0, slot.width, slot.height);
         ctx.fill();
         ctx.stroke();
         ctx.restore();
@@ -259,7 +259,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
           ctx.rotate(((slot.rotation || 0) * Math.PI) / 180);
           ctx.fillStyle = 'black';
           ctx.beginPath();
-          ctx.roundRect(-bleed, -bleed, slot.width + bleed * 2, slot.height + bleed * 2, 8);
+          ctx.rect(-bleed, -bleed, slot.width + bleed * 2, slot.height + bleed * 2);
           ctx.fill();
           ctx.restore();
         });

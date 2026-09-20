@@ -214,7 +214,7 @@ export async function generateClientBase64(
   await renderBackground(ctx, width, height, bgOptions, elements);
 
   // Punch holes in the background so slots are transparent
-  punchSlotHoles(ctx, slots, true);
+  punchSlotHoles(ctx, slots, false);
 
   // Draw elements on top of holes so they are never cut
   ctx.globalCompositeOperation = 'source-over';
