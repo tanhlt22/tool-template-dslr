@@ -34,7 +34,6 @@ export function useCanvasState() {
       }
       setWidth(newW);
       setHeight(newH);
-      setBgImageUrl(null);
     }
   };
 
@@ -45,7 +44,6 @@ export function useCanvasState() {
     if ((orient === 'horizontal' && width < height) || (orient === 'vertical' && width > height)) {
       setWidth(prevH);
       setHeight(prevW);
-      setBgImageUrl(null);
     }
   };
 

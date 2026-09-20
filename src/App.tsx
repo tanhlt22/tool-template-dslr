@@ -18,6 +18,7 @@ import { useCanvasLayers } from './hooks/useCanvasLayers';
 import { useExport } from './hooks/useExport';
 import { useTemplateDB } from './hooks/useTemplateDB';
 import { DEFAULT_PERSONALIZATION } from './utils/personalization';
+import { PAPER_SIZES } from './constants/templates';
 import { apiService } from './services/api';
 import { useUI } from './contexts/UIContext';
 
@@ -58,6 +59,90 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
   const cs = useCanvasState();
   const layers = useCanvasLayers({ width: cs.width, height: cs.height });
   const { showToast, showConfirm, showPrompt } = useUI();
+
+  const handleDimensionChange = useCallback((newW: number, newH: number) => {
+    if (!newW || !newH || isNaN(newW) || isNaN(newH)) return;
+    const oldW = cs.width;
+    const oldH = cs.height;
+    if (newW === oldW && newH === oldH) return;
+
+    cs.setWidth(newW);
+    cs.setHeight(newH);
+
+    if (oldW > 0 && oldH > 0) {
+      const scaleX = newW / oldW;
+      const scaleY = newH / oldH;
+
+      layers.setSlots((prev) =>
+        prev.map((s) => ({
+          ...s,
+          x: Math.round(s.x * scaleX),
+          y: Math.round(s.y * scaleY),
+          width: Math.max(20, Math.round(s.width * scaleX)),
+          height: Math.max(20, Math.round(s.height * scaleY))
+        }))
+      );
+
+      layers.setElements((prev) =>
+        prev.map((e) => {
+          if (e.id === 'background_frame' || (e.id && e.id.startsWith('background_frame_'))) {
+            return {
+              ...e,
+              x: 0,
+              y: 0,
+              width: newW,
+              height: newH
+            };
+          }
+          return {
+            ...e,
+            x: Math.round(e.x * scaleX),
+            y: Math.round(e.y * scaleY),
+            width: Math.max(10, Math.round(e.width * scaleX)),
+            height: Math.max(10, Math.round(e.height * scaleY)),
+            style: e.style
+              ? {
+                  ...e.style,
+                  fontSize: e.style.fontSize
+                    ? Math.max(8, Math.round(e.style.fontSize * Math.min(scaleX, scaleY)))
+                    : undefined
+                }
+              : undefined
+          };
+        })
+      );
+    }
+  }, [cs.width, cs.height, cs.setWidth, cs.setHeight, layers.setSlots, layers.setElements]);
+
+  const handlePaperSizeChange = useCallback(
+    (sizeId: string) => {
+      cs.setPaperSize(sizeId);
+      const found = PAPER_SIZES.find((p) => p.id === sizeId);
+      if (found) {
+        let newW = found.width;
+        let newH = found.height;
+        if (cs.orientation === 'horizontal') {
+          newW = found.height;
+          newH = found.width;
+        }
+        handleDimensionChange(newW, newH);
+      }
+    },
+    [cs.orientation, cs.setPaperSize, handleDimensionChange]
+  );
+
+  const handleOrientationChange = useCallback(
+    (orient: 'vertical' | 'horizontal') => {
+      cs.setOrientation(orient);
+      if (
+        (orient === 'horizontal' && cs.width < cs.height) ||
+        (orient === 'vertical' && cs.width > cs.height)
+      ) {
+        handleDimensionChange(cs.height, cs.width);
+      }
+    },
+    [cs.width, cs.height, cs.setOrientation, handleDimensionChange]
+  );
 
   const exp = useExport({
     width: cs.width,
@@ -491,13 +576,13 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
           }}
           onDeleteElement={layers.handleDeleteElement}
           paperSize={cs.paperSize}
-          onPaperSizeChange={cs.handlePaperSizeChange}
+          onPaperSizeChange={handlePaperSizeChange}
           orientation={cs.orientation}
-          onOrientationChange={cs.handleOrientationChange}
+          onOrientationChange={handleOrientationChange}
           width={cs.width}
-          onWidthChange={cs.setWidth}
+          onWidthChange={(w) => handleDimensionChange(w, cs.height)}
           height={cs.height}
-          onHeightChange={cs.setHeight}
+          onHeightChange={(h) => handleDimensionChange(cs.width, h)}
           resolution={cs.resolution}
           onResolutionChange={cs.setResolution}
           backgroundType={cs.backgroundType}

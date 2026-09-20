@@ -56,14 +56,10 @@ export const FrameLibrary: React.FC<FrameLibraryProps> = ({
 
   const categories = [
     { id: 'all', label: 'Tất cả' },
-    { id: 'amazing', label: '⭐️ Amazing' },
-    { id: 'cartoon', label: '🎨 Cartoon' },
-    { id: 'idol', label: '🎤 Idol' },
-    { id: 'basic', label: '✨ Basic' },
-    { id: 'graduation', label: '🎓 Đại Học / Kỷ yếu' },
-    { id: 'event', label: '🎉 Sự kiện' },
     { id: 'wedding', label: '💍 Đám cưới' },
     { id: 'birthday', label: '🎂 Sinh nhật' },
+    { id: 'event', label: '🎉 Sự kiện' },
+    { id: 'graduation', label: '🎓 Kỷ yếu' },
     { id: 'couple', label: '❤️ Cặp đôi' },
     { id: 'y2k', label: '✨ Y2K' },
     { id: 'holiday', label: '🎄 Lễ hội' },

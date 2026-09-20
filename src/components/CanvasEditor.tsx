@@ -110,6 +110,23 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     time: 0
   });
   const [zoom, setZoom] = useState(1);
+  const widthRef = useRef(width);
+  const heightRef = useRef(height);
+  const snapToGridRef = useRef(snapToGrid);
+  const onCanvasSnapshotReadyRef = useRef(onCanvasSnapshotReady);
+
+  useEffect(() => {
+    widthRef.current = width;
+    heightRef.current = height;
+  }, [width, height]);
+
+  useEffect(() => {
+    snapToGridRef.current = snapToGrid;
+  }, [snapToGrid]);
+
+  useEffect(() => {
+    onCanvasSnapshotReadyRef.current = onCanvasSnapshotReady;
+  }, [onCanvasSnapshotReady]);
 
   // Prevent any browser viewport auto-scrolling on double click/focus
   useEffect(() => {
@@ -298,7 +315,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       }
     };
 
-    onCanvasSnapshotReady?.(captureCurrentCanvas);
+    onCanvasSnapshotReadyRef.current?.(captureCurrentCanvas);
 
     // Prevent browser auto-scroll-to-focus on Fabric.js hidden accessibility textarea
     const hiddenTextarea = (canvas as any).hiddenTextarea;
@@ -317,15 +334,27 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       };
     }
 
-    // Custom styling for active object borders & handles
+    // Custom styling for active object borders & handles - snug (sát viền) and clean
     fabric.Object.prototype.transparentCorners = false;
     fabric.Object.prototype.cornerColor = '#ffffff';
     fabric.Object.prototype.cornerStrokeColor = '#e11d48';
     fabric.Object.prototype.borderColor = '#e11d48';
-    fabric.Object.prototype.cornerSize = 16;
+    fabric.Object.prototype.cornerSize = 12;
     fabric.Object.prototype.cornerStyle = 'circle';
-    fabric.Object.prototype.borderScaleFactor = 4;
-    fabric.Object.prototype.padding = 6;
+    fabric.Object.prototype.borderScaleFactor = 2;
+    fabric.Object.prototype.padding = 0;
+    fabric.Object.prototype.strokeUniform = true;
+
+    // Apply same snug styles to multi-selection groups
+    fabric.ActiveSelection.prototype.transparentCorners = false;
+    fabric.ActiveSelection.prototype.cornerColor = '#ffffff';
+    fabric.ActiveSelection.prototype.cornerStrokeColor = '#e11d48';
+    fabric.ActiveSelection.prototype.borderColor = '#e11d48';
+    fabric.ActiveSelection.prototype.cornerSize = 12;
+    fabric.ActiveSelection.prototype.cornerStyle = 'circle';
+    fabric.ActiveSelection.prototype.borderScaleFactor = 2;
+    fabric.ActiveSelection.prototype.padding = 0;
+    fabric.ActiveSelection.prototype.strokeUniform = true;
 
     const updateSlotLabelForObject = (target?: fabric.Object) => {
       if (!target || target.data?.type !== 'slot') return;
@@ -345,7 +374,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     };
 
     if (fabric.Object.prototype.controls && fabric.Object.prototype.controls.mtr) {
-      fabric.Object.prototype.controls.mtr.offsetY = -46;
+      fabric.Object.prototype.controls.mtr.offsetY = -28;
       fabric.Object.prototype.controls.mtr.cursorStyle = 'pointer';
       
       let initialAngle = 0;
@@ -376,25 +405,25 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         
         // Background circle
         ctx.beginPath();
-        ctx.arc(0, 0, 24, 0, 2 * Math.PI); // Bigger circle, radius 24
+        ctx.arc(0, 0, 15, 0, 2 * Math.PI);
         ctx.fillStyle = '#ffffff';
         ctx.fill();
-        ctx.lineWidth = 2.5;
-        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#e11d48';
         ctx.stroke();
         
         // Circular arrow path
         ctx.beginPath();
-        ctx.arc(0, 0, 11, -Math.PI / 2, Math.PI); 
+        ctx.arc(0, 0, 8, -Math.PI / 2, Math.PI); 
         ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
         ctx.stroke();
 
         // Arrow head
         ctx.beginPath();
-        ctx.moveTo(-11, -7);
-        ctx.lineTo(-18, 4);
-        ctx.lineTo(-4, 4);
+        ctx.moveTo(-8, -5);
+        ctx.lineTo(-13, 3);
+        ctx.lineTo(-3, 3);
         ctx.fillStyle = '#0f172a';
         ctx.fill();
         
@@ -510,7 +539,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     // Grid snapping on moving
     canvas.on('object:moving', (options) => {
       if (!options.target) return;
-      if (snapToGrid) {
+      if (snapToGridRef.current) {
         const grid = 20;
         const target = options.target;
         target.set({
@@ -654,8 +683,10 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const availableW = el.clientWidth - paddingX;
       const availableH = el.clientHeight - paddingY;
 
-      const scaleX = availableW / width;
-      const scaleY = availableH / height;
+      const currentW = widthRef.current;
+      const currentH = heightRef.current;
+      const scaleX = availableW / currentW;
+      const scaleY = availableH / currentH;
 
       let baseScale;
       if (isMobile) {
@@ -674,8 +705,8 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       // Update canvas scaler size to allow perfect scroll footprint
       const scalerEl = el.querySelector('.canvas-scaler') as HTMLElement;
       if (scalerEl) {
-        scalerEl.style.width = `${width * scale}px`;
-        scalerEl.style.height = `${height * scale}px`;
+        scalerEl.style.width = `${currentW * scale}px`;
+        scalerEl.style.height = `${currentH * scale}px`;
       }
     };
 
@@ -693,7 +724,24 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       canvas.dispose();
       fabricCanvas.current = null;
     };
-  }, [width, height, snapToGrid, onCanvasSnapshotReady]);
+  }, []); // Initialize canvas once on mount
+
+  // Dynamically update canvas dimensions without disposing the canvas or losing objects
+  useEffect(() => {
+    const canvas = fabricCanvas.current;
+    if (!canvas) return;
+
+    canvas.setDimensions({ width, height });
+    canvas.clipPath = new fabric.Rect({
+      left: 0,
+      top: 0,
+      width: width,
+      height: height,
+      absolutePositioned: true
+    });
+    resizeCanvasContainerRef.current?.();
+    canvas.requestRenderAll();
+  }, [width, height]);
 
   // 2. Sync background color / gradient
   useEffect(() => {
@@ -1095,7 +1143,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         }
       });
     }
-  }, [slots, elements]);
+  }, [slots, elements, width, height]);
 
   // 5. Sync Fabric selection state from React selectedIds (separate from rendering to avoid position jumps)
   useEffect(() => {
@@ -1138,12 +1186,21 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   return (
     <div
       ref={containerRef}
-      className="flex-1 w-full h-full flex items-center justify-center overflow-y-auto bg-slate-900 relative p-4 py-8 custom-scrollbar"
+      onMouseDown={(e) => {
+        const target = e.target as HTMLElement | null;
+        if (target === containerRef.current || (target && target.classList && target.classList.contains('canvas-scaler'))) {
+          fabricCanvas.current?.discardActiveObject();
+          fabricCanvas.current?.requestRenderAll();
+          onSelectElement(null, null);
+          onSelectElements?.([], null);
+        }
+      }}
+      className="flex-1 w-full h-full flex items-center justify-center overflow-y-auto bg-slate-900 relative p-4 py-8 custom-scrollbar select-none"
     >
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:32px_32px] pointer-events-none" />
 
-      <div className="canvas-scaler relative shrink-0">
-        <div className="canvas-container shadow-xl shadow-slate-200/50 absolute top-0 left-0">
+      <div className="canvas-scaler relative shrink-0 overflow-hidden shadow-2xl">
+        <div className="canvas-container absolute top-0 left-0 overflow-hidden">
           <canvas ref={canvasRef} />
         </div>
       </div>
