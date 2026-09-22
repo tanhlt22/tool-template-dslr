@@ -57,11 +57,13 @@ export const AdminPasswordModal: React.FC<AdminPasswordModalProps> = ({
 
         {/* Header */}
         <div className="flex items-center gap-3.5 mb-5">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-rose-100 text-rose-700">
-            <ShieldCheck className="h-6 w-6" />
-          </div>
+          <img
+            src="/logo/Black Minimal Photography Logo (512 x 512 px).png"
+            alt="Pica Design"
+            className="h-12 w-12 shrink-0 rounded-xl object-contain bg-white border border-slate-200 p-1 shadow-sm"
+          />
           <div>
-            <h3 className="text-base font-bold text-slate-900">Xác thực Quản trị viên</h3>
+            <h3 className="text-base font-bold text-slate-900">Pica Design Admin</h3>
             <p className="text-xs font-medium text-slate-500">
               Nhập mật khẩu quản trị để truy cập trang quản lý và sửa/xóa khung hình
             </p>

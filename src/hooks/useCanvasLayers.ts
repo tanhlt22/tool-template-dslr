@@ -143,7 +143,7 @@ export function useCanvasLayers({ width, height }: UseCanvasLayersOptions) {
     const newQr: FrameElement = {
       id: `qr_${Date.now()}`,
       type: 'qr',
-      content: 'https://haivustudio.com',
+      content: 'https://picadesign.vn',
       x: width / 2 - 60,
       y: height / 2 - 60,
       width: 120,

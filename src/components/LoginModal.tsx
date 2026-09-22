@@ -124,11 +124,13 @@ export function LoginModal({ onSuccess }: LoginModalProps) {
         
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center mb-6">
-          <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 mb-3 active:scale-95 transition-transform duration-200">
-            <Camera className="w-7 h-7 text-white" />
-          </div>
+          <img
+            src="/logo/Black Minimal Photography Logo (512 x 512 px).png"
+            alt="Pica Design"
+            className="w-16 h-16 rounded-2xl object-contain bg-white border border-slate-200/80 p-1 shadow-lg shadow-blue-500/10 mb-3 active:scale-95 transition-transform duration-200"
+          />
           <h2 className="text-xl font-extrabold text-slate-800 tracking-tight font-sans">
-            HaiVuStudio Workspace
+            Pica Design Workspace
           </h2>
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5 font-sans">
             Hệ thống quản lý tài khoản thiết kế

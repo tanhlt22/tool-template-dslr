@@ -12,7 +12,7 @@ export const DEFAULT_PERSONALIZATION: PersonalizationData = {
   brideName: 'Thuỳ Trang',
   groomName: 'Quốc Huy',
   weddingDate: '30.12.2026',
-  galleryUrl: 'https://haivustudio.com/gallery',
+  galleryUrl: 'https://picadesign.vn/gallery',
   eventName: 'Happy Wedding Day'
 };
 
@@ -64,7 +64,7 @@ export function applyPersonalizationToElements(
       };
     }
 
-    if (element.type === 'qr' && (!element.content || element.content === 'https://lumibooth.com' || element.content === 'https://haivustudio.com')) {
+    if (element.type === 'qr' && (!element.content || element.content === 'https://lumibooth.com' || element.content === 'https://haivustudio.com' || element.content === 'https://picadesign.vn')) {
       return {
         ...element,
         content: data.galleryUrl

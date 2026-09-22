@@ -568,9 +568,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onOpenEditor }) 
   return (
     <main className="flex min-h-0 flex-1 bg-slate-50">
       <aside className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
-        <div className="border-b border-slate-200 p-4">
-          <p className="text-sm font-black text-slate-950">Admin</p>
-          <p className="text-xs font-semibold text-slate-500">Quản trị vận hành</p>
+        <div className="flex items-center gap-3 border-b border-slate-200 p-4">
+          <img
+            src="/logo/Black Minimal Photography Logo (512 x 512 px).png"
+            alt="Pica Design"
+            className="h-8 w-8 rounded-lg object-contain bg-white border border-slate-200 p-0.5 shadow-sm"
+          />
+          <div>
+            <p className="text-sm font-black text-slate-950">Pica Admin</p>
+            <p className="text-[10px] font-semibold text-slate-500">Quản trị vận hành</p>
+          </div>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-3">
           {navItems.map((item) => {

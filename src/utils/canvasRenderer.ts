@@ -351,7 +351,7 @@ export async function generateDslrboothZip(
 
   // BOM (EF BB BF) bắt buộc cho .NET XML parser của DSLRbooth
   let xmlStr = `\uFEFF<?xml version="1.0" encoding="UTF-8"?>\r\n`;
-  xmlStr += `<Template Name="dslrbooth_${frameName.replace(/\s+/g, '_')}" Width="${exportWidth}" Height="${exportHeight}" Dimensions="0" Resolution="${Math.round(resolution)}" BackgroundColor="${argbBackground}" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-HAIVUSTUDIO">\r\n`;
+  xmlStr += `<Template Name="dslrbooth_${frameName.replace(/\s+/g, '_')}" Width="${exportWidth}" Height="${exportHeight}" Dimensions="0" Resolution="${Math.round(resolution)}" BackgroundColor="${argbBackground}" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-PICADESIGN">\r\n`;
   xmlStr += `  <Elements>\r\n`;
 
   // Ghi XML theo thứ tự ZIndex giảm dần (cao nhất ghi trước)

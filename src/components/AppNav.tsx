@@ -19,11 +19,13 @@ export const AppNav: React.FC<AppNavProps> = ({
   return (
     <header className="flex min-h-14 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 py-2">
       <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-800 text-white shadow-sm">
-          <Camera className="h-5 w-5" />
-        </div>
+        <img
+          src="/logo/Black Minimal Photography Logo (512 x 512 px).png"
+          alt="Pica Design"
+          className="h-9 w-9 rounded-lg object-contain bg-white shadow-sm border border-slate-200 p-0.5"
+        />
         <div className="min-w-0">
-          <p className="truncate text-sm font-black tracking-tight text-slate-900">Photobooth Design</p>
+          <p className="truncate text-sm font-black tracking-tight text-slate-900">Pica Design</p>
           <p className="truncate text-[10px] font-semibold text-slate-500">Thiết kế khung hình photobooth</p>
         </div>
       </div>

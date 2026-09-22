@@ -26,7 +26,7 @@ export function usePWA() {
     const handleAppInstalled = () => {
       setIsInstalled(true);
       setInstallPromptEvent(null);
-      console.log('HaiVuStudio PWA was installed successfully!');
+      console.log('Pica Design PWA was installed successfully!');
     };
 
     window.addEventListener('appinstalled', handleAppInstalled);

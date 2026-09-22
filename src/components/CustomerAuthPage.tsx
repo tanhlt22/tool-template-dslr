@@ -130,9 +130,11 @@ export const CustomerAuthPage: React.FC<CustomerAuthPageProps> = ({
     <main className="flex min-h-0 flex-1 items-center justify-center bg-slate-50 px-4 py-8">
       <section className="w-full max-w-sm rounded-md border border-slate-200 bg-white p-5 shadow-sm">
         <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-800 text-white">
-            <Camera className="h-5 w-5" />
-          </div>
+          <img
+            src="/logo/Black Minimal Photography Logo (512 x 512 px).png"
+            alt="Pica Design"
+            className="h-10 w-10 rounded-lg object-contain bg-white border border-slate-200 p-0.5 shadow-sm"
+          />
           <div>
             <h1 className="text-lg font-black text-slate-950">{isRegisterMode ? 'Tạo tài khoản' : title || 'Đăng nhập'}</h1>
             <p className="text-xs font-semibold text-slate-500">{description || 'Đăng nhập để xem số dư và nạp tiền.'}</p>

@@ -93,7 +93,7 @@ export function useExport(options: UseExportOptions) {
         success: true,
         frame_id: `client_${Date.now().toString().slice(-6)}`,
         image_url: finalImageBase64,
-        name: frameName || 'haivustudio_frame'
+        name: frameName || 'pica_design_frame'
       });
     } catch (e) {
       showToast('Không thể xuất ảnh PNG: ' + String(e), 'error');

@@ -46,12 +46,14 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        <div className="bg-[#0058be] p-1.5 sm:p-2 rounded-xl text-white shadow-md shadow-[#0058be]/15 shrink-0">
-          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
-        </div>
+        <img
+          src="/logo/Black Minimal Photography Logo (512 x 512 px).png"
+          alt="Pica Design"
+          className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl object-contain bg-white border border-[#dee8ff] p-0.5 shadow-sm shrink-0"
+        />
         <div className="leading-tight">
           <h1 className="font-black text-xs sm:text-base text-[#111c2d]">
-            HaiVu<span className="text-[#0058be]">Studio</span>
+            Pica <span className="text-[#0058be]">Design</span>
           </h1>
           <p className="text-[8px] text-slate-400 font-semibold hidden md:block">Studio thiết kế mẫu photobooth</p>
         </div>

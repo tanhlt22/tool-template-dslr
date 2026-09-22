@@ -411,7 +411,7 @@ export const CoupleTab: React.FC = () => {
 
       // BOM (EF BB BF) bắt buộc cho .NET XML parser của DSLRbooth
       let xmlStr = `\uFEFF<?xml version="1.0" encoding="UTF-8"?>\r\n`;
-      xmlStr += `<Template Name="dslrbooth_${groomName}_${brideName}" Width="${width}" Height="${height}" Dimensions="0" Resolution="300" BackgroundColor="#FFFFFFFF" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-HAIVUSTUDIO">\r\n`;
+      xmlStr += `<Template Name="dslrbooth_${groomName}_${brideName}" Width="${width}" Height="${height}" Dimensions="0" Resolution="300" BackgroundColor="#FFFFFFFF" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-PICADESIGN">\r\n`;
       xmlStr += `  <Elements>\r\n`;
 
       // QrCode element (trên cùng)
