@@ -28,7 +28,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
     return () => observer.disconnect();
   }, [fitParent]);
 
-  const rawBg = frame.background_image_url || frame.backgroundImageUrl;
+  const rawBg = frame.background_image_url || frame.backgroundImageUrl || frame.thumbnail_url || frame.thumbnailUrl;
   const image = getCloudinaryThumbnailUrl(rawBg, fitParent ? 2400 : 1200) || rawBg;
   const width = Number(frame.width) || 1200;
   const height = Number(frame.height) || 1800;
@@ -53,11 +53,22 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
             style={{
               width: renderWidth,
               height: renderHeight,
-              backgroundImage: image ? `url("${image}")` : undefined,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
             }}
           >
+            {/* Crisp background image using native img tag */}
+            {image && (
+              <img
+                src={image}
+                alt={frame.name || 'Frame'}
+                className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
+                style={{
+                  imageRendering: '-webkit-optimize-contrast',
+                  transform: 'translateZ(0)',
+                  backfaceVisibility: 'hidden'
+                }}
+              />
+            )}
+
             {/* 1. Slot Placeholder Boxes */}
             {frame.slots?.map((slot: any, index: number) => (
               <div
@@ -72,7 +83,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
               />
             ))}
 
-            {/* 2. All Elements in exact array order (backgrounds, images, stickers, overlay frames, text) */}
+            {/* 2. All Elements in exact array order */}
             {frame.elements?.map((el: any, index: number) => {
               if (el.visible === false) return null;
               const leftPct = (el.x / width) * 100;
@@ -119,7 +130,8 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
                       height: `${heightPct}%`,
                       transform: rotation ? `rotate(${rotation}deg)` : undefined,
                       transformOrigin: 'center center',
-                      objectFit: el.id === 'background_frame' ? 'cover' : 'fill'
+                      objectFit: el.id === 'background_frame' ? 'cover' : 'fill',
+                      imageRendering: '-webkit-optimize-contrast'
                     }}
                   />
                 );
@@ -128,7 +140,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
               return null;
             })}
 
-            {/* 3. Slot Number Labels (ALWAYS ON TOP of all layers) */}
+            {/* 3. Slot Number Labels */}
             {frame.slots?.map((slot: any, index: number) => (
               <div
                 key={slot.id || `slot_label_${index}`}
@@ -149,22 +161,51 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
     );
   }
 
-  const baseSize = 92 * scale;
-  const thumbW = isLandscape ? baseSize : Math.max(42 * scale, Math.round((width / height) * baseSize));
-  const thumbH = isLandscape ? Math.max(42 * scale, Math.round((height / width) * baseSize)) : baseSize;
+  const containerH = Math.round(112 * scale);
+  const maxThumbH = containerH - 12;
+  const maxThumbW = Math.round(120 * scale);
+
+  let thumbW: number;
+  let thumbH: number;
+  if (isLandscape) {
+    thumbW = Math.min(maxThumbW, Math.round((width / height) * maxThumbH));
+    thumbH = Math.round((height / width) * thumbW);
+    if (thumbH > maxThumbH) {
+      thumbH = maxThumbH;
+      thumbW = Math.round((width / height) * thumbH);
+    }
+  } else {
+    thumbH = maxThumbH;
+    thumbW = Math.round((width / height) * thumbH);
+    if (thumbW > maxThumbW) {
+      thumbW = maxThumbW;
+      thumbH = Math.round((height / width) * thumbW);
+    }
+  }
 
   return (
-    <div className="flex items-center justify-center rounded-md bg-slate-100 p-2 w-full" style={{ height: 112 * scale }}>
+    <div className="flex items-center justify-center rounded-md bg-slate-100 p-2 w-full" style={{ height: containerH }}>
       <div
         className="relative overflow-hidden rounded-sm border border-slate-200 bg-[#f8eee5] shadow-sm flex-none"
         style={{
           width: thumbW,
           height: thumbH,
-          backgroundImage: image ? `url("${image}")` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
         }}
       >
+        {/* Crisp background image via img tag */}
+        {image && (
+          <img
+            src={image}
+            alt={frame.name || 'Frame'}
+            className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
+            style={{
+              imageRendering: '-webkit-optimize-contrast',
+              transform: 'translateZ(0)',
+              backfaceVisibility: 'hidden'
+            }}
+            loading="lazy"
+          />
+        )}
         {/* ONLY Render Elements in exact array order - NO slots, NO slot labels! */}
         {frame.elements?.map((el: any, index: number) => {
           if (el.visible === false) return null;

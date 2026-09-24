@@ -38,6 +38,7 @@ import {
   Search
 } from 'lucide-react';
 import { TemplateThumbnail } from './TemplateThumbnail';
+import { apiService } from '../services/api';
 
 const FRAME_CATEGORIES = [
   { id: 'all', label: 'Tất cả', icon: '✨' },
@@ -561,20 +562,43 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           Đặt lại
         </button>
 
-        <button
-          type="button"
-          onClick={onUpdateTemplateInDb}
-          disabled={isUsingSystemTemplate || isSavingTemplate}
-          title={isUsingSystemTemplate ? 'Đang dùng khung mẫu hệ thống (không thể lưu để tránh trùng lặp)' : 'Lưu khung hình'}
-          className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-2 text-xs font-bold transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-            isUsingSystemTemplate
-              ? 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed'
-              : 'border-rose-200 bg-white text-rose-700 hover:bg-rose-50 disabled:opacity-50 focus-visible:outline-rose-700'
-          }`}
-        >
-          <Save className="h-4 w-4" aria-hidden="true" />
-          {isSavingTemplate ? 'Đang lưu...' : isUsingSystemTemplate ? 'Khung mẫu hệ thống' : 'Lưu khung hình'}
-        </button>
+        {/* Save / Update buttons */}
+        {editingTemplateId ? (
+          <div className="inline-flex items-center rounded-md shadow-sm">
+            <button
+              type="button"
+              onClick={onUpdateTemplateInDb}
+              disabled={isSavingTemplate}
+              title="Cập nhật trực tiếp các thay đổi vào mẫu này"
+              className="inline-flex items-center gap-1.5 rounded-l-md border border-rose-600 bg-rose-700 px-3 py-2 text-xs font-bold text-white hover:bg-rose-800 disabled:opacity-50 transition-colors"
+            >
+              <Save className="h-4 w-4" aria-hidden="true" />
+              {isSavingTemplate ? 'Đang cập nhật...' : 'Cập nhật mẫu'}
+            </button>
+            {onSaveNewTemplateToDb && (
+              <button
+                type="button"
+                onClick={onSaveNewTemplateToDb}
+                disabled={isSavingTemplate}
+                title="Lưu bản sao thành một mẫu mới hoàn toàn"
+                className="inline-flex items-center rounded-r-md border border-l-0 border-rose-600 bg-rose-800 px-2.5 py-2 text-[11px] font-bold text-white hover:bg-rose-900 disabled:opacity-50 transition-colors"
+              >
+                + Lưu bản sao
+              </button>
+            )}
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={onUpdateTemplateInDb}
+            disabled={isSavingTemplate}
+            title="Lưu thiết kế mới vào thư viện"
+            className="inline-flex items-center gap-1.5 rounded-md border border-rose-300 bg-white px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-50 disabled:opacity-50 transition-colors shadow-sm"
+          >
+            <Save className="h-4 w-4" aria-hidden="true" />
+            {isSavingTemplate ? 'Đang lưu...' : 'Lưu mẫu mới'}
+          </button>
+        )}
 
         <button
           type="button"
@@ -657,38 +681,54 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
                 </div>
               ) : filteredSavedFrames.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                  {filteredSavedFrames.map((frame) => (
-                    <div
-                      key={frame.id}
-                      onClick={() => {
-                        setPreviewFrame(frame);
-                        setIsZoomed(false);
-                      }}
-                      className={`group relative flex cursor-pointer flex-col rounded-xl border p-3 text-left transition-all shadow-sm ${
-                        editingTemplateId === frame.id
-                          ? 'border-rose-700 bg-white ring-2 ring-rose-700'
-                          : 'border-slate-200 bg-white hover:border-rose-300 hover:shadow-md'
-                      }`}
-                    >
-                      <div className="relative w-full flex justify-center overflow-hidden rounded-lg bg-slate-100 p-1">
-                        <TemplateThumbnail frame={frame} scale={1.8} />
-                        {frame.category && (
-                          <span className="absolute top-1.5 right-1.5 rounded-md bg-slate-900/80 backdrop-blur-sm px-1.5 py-0.5 text-[9.5px] font-bold text-white shadow-sm">
-                            {FRAME_CATEGORIES.find((c) => c.id === frame.category)?.label || frame.category}
+                  {filteredSavedFrames.map((frame) => {
+                    const slotCount = (Array.isArray(frame.slots) && frame.slots.length > 0)
+                      ? frame.slots.length
+                      : (frame.name?.match(/#(\d+)\s*ảnh/i)?.[1]
+                        ? parseInt(frame.name.match(/#(\d+)\s*ảnh/i)[1], 10)
+                        : (frame.layout?.match(/(\d+)x(\d+)/)
+                          ? parseInt(RegExp.$1, 10) * parseInt(RegExp.$2, 10)
+                          : 0));
+
+                    return (
+                      <div
+                        key={frame.id}
+                        onClick={async () => {
+                          setPreviewFrame(frame);
+                          setIsZoomed(false);
+                          try {
+                            const full = await apiService.getFrame(frame.id);
+                            if (full) {
+                              setPreviewFrame((current: any) => (current?.id === frame.id ? { ...frame, ...full } : current));
+                            }
+                          } catch {}
+                        }}
+                        className={`group relative flex cursor-pointer flex-col rounded-xl border p-3 text-left transition-all shadow-sm ${
+                          editingTemplateId === frame.id
+                            ? 'border-rose-700 bg-white ring-2 ring-rose-700'
+                            : 'border-slate-200 bg-white hover:border-rose-300 hover:shadow-md'
+                        }`}
+                      >
+                        <div className="relative w-full flex justify-center overflow-hidden rounded-lg bg-slate-100 p-1">
+                          <TemplateThumbnail frame={frame} scale={1.8} />
+                          {frame.category && (
+                            <span className="absolute top-1.5 right-1.5 rounded-md bg-slate-900/80 backdrop-blur-sm px-1.5 py-0.5 text-[9.5px] font-bold text-white shadow-sm">
+                              {FRAME_CATEGORIES.find((c) => c.id === frame.category)?.label || frame.category}
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-2.5 min-w-0">
+                          <span className="block truncate text-xs font-bold text-slate-900 group-hover:text-rose-700">
+                            {frame.name}
                           </span>
-                        )}
-                      </div>
-                      <div className="mt-2.5 min-w-0">
-                        <span className="block truncate text-xs font-bold text-slate-900 group-hover:text-rose-700">
-                          {frame.name}
-                        </span>
-                        <div className="mt-1 flex items-center justify-between text-[10.5px] font-medium text-slate-500">
-                          <span>{frame.width} × {frame.height}</span>
-                          <span>{frame.slots?.length || 0} ô ảnh</span>
+                          <div className="mt-1 flex items-center justify-between text-[10.5px] font-medium text-slate-500">
+                            <span>{frame.width} × {frame.height}</span>
+                            <span>{slotCount > 0 ? `${slotCount} ô ảnh` : '0 ô ảnh'}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="py-16 text-center text-sm font-medium text-slate-500">

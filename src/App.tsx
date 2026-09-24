@@ -240,8 +240,9 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
     try {
       const fullFrame = await resolveFrameDetail(frame);
       tpl.handleLoadSavedFrame(fullFrame);
-      tpl.setEditingTemplateId(fullFrame.id && !String(fullFrame.id).startsWith('template_') && !String(fullFrame.id).startsWith('demo_') ? fullFrame.id : null);
-      setIsUsingSystemTemplate(true);
+      const isSystemPreset = !fullFrame.id || String(fullFrame.id).startsWith('template_') || String(fullFrame.id).startsWith('demo_');
+      tpl.setEditingTemplateId(!isSystemPreset ? fullFrame.id : null);
+      setIsUsingSystemTemplate(isSystemPreset);
       layers.setActiveSidebarTab('layers');
       setView('editor');
     } catch (error) {
@@ -268,11 +269,6 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
       showToast('Đây là mẫu minh họa, không có bản ghi để xóa.', 'info');
       return;
     }
-    // Bỏ check phân quyền ở frontend để user luôn thấy ô nhập pass admin
-    // if (tpl.userRole !== 'admin') {
-    //   showToast('Chỉ quản trị viên mới có quyền xóa mẫu.', 'error');
-    //   return;
-    // }
     const ok = await showConfirm({
       title: 'Xác nhận xóa',
       message: `Bạn có chắc chắn muốn xóa mẫu "${frame.name}"? Hành động này không thể hoàn tác.`,
@@ -291,19 +287,20 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
   };
 
   const handleRequestSave = async () => {
-    if (isUsingSystemTemplate) {
-      showToast('Bạn đang sử dụng khung mẫu hệ thống. Không thể lưu lại để tránh trùng lặp khung hình.', 'info');
+    // If editing an existing database template -> update directly
+    if (tpl.editingTemplateId) {
+      const ok = await tpl.handleUpdateTemplateInDb(cs.frameName, tpl.editingCategory || 'wedding');
+      if (ok && pendingExportAfterSave) {
+        setPendingExportAfterSave(false);
+        setView('preview');
+      }
       return;
     }
+    // New draft or preset without ID -> open save modal
     setIsSaveFrameOpen(true);
   };
 
   const handleSaveFrameName = async (name: string, category: string = 'wedding') => {
-    if (isUsingSystemTemplate) {
-      showToast('Bạn đang sử dụng khung mẫu hệ thống. Không thể lưu lại để tránh trùng lặp khung hình.', 'info');
-      return;
-    }
-
     const trimmedName = name.trim();
     if (!trimmedName) {
       showToast('Vui lòng nhập tên frame!', 'error');
@@ -311,7 +308,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
     }
 
     const isDuplicate = tpl.savedFrames.some(
-      (f) => f.name && f.name.toLowerCase().trim() === trimmedName.toLowerCase()
+      (f) => f.id !== tpl.editingTemplateId && f.name && f.name.toLowerCase().trim() === trimmedName.toLowerCase()
     );
     if (isDuplicate) {
       showToast(`Tên khung hình "${trimmedName}" đã tồn tại trong hệ thống. Vui lòng đặt tên khác để tránh trùng lặp!`, 'error');
@@ -546,10 +543,9 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
         onOpenPreview={handleOpenPreview}
         frameName={cs.frameName}
         onEditFrameName={() => {
-          if (isUsingSystemTemplate) {
-            showToast('Bạn đang sử dụng khung mẫu hệ thống. Không thể lưu lại để tránh trùng lặp.', 'info');
-            return;
-          }
+          setIsSaveFrameOpen(true);
+        }}
+        onSaveNewTemplateToDb={() => {
           setIsSaveFrameOpen(true);
         }}
         savedFrames={tpl.savedFrames}
