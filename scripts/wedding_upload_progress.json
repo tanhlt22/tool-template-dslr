@@ -20,5 +20,71 @@
     "driveConfigFileId": "1hiG_BUnE78irzXX-SQa8DHDR3lbIq7XT",
     "slotsCount": 3,
     "timestamp": "2026-09-20T12:28:05.022Z"
+  },
+  "ChatGPT Image 11_17_22 20 thg 9, 2026.png": {
+    "status": "DONE",
+    "frameId": "wedding_1790101153455_4s2n",
+    "name": "Khung Cưới Mới #6 ảnh (2x3)",
+    "category": "wedding",
+    "layout": "2x3",
+    "driveId": "1O4HeSofoVq8PN7ifVuGyqXAhFCH_es8V",
+    "driveConfigFileId": "1PhB53gft0Es11aQqa67FksClJd6C3CvE",
+    "slotsCount": 6,
+    "timestamp": "2026-09-22T18:19:19.615Z"
+  },
+  "ChatGPT Image 11_23_39 20 thg 9, 2026.png": {
+    "status": "DONE",
+    "frameId": "wedding_1790103515630_x7n8",
+    "name": "Khung Cưới Mới #4 ảnh (1x4)",
+    "category": "wedding",
+    "layout": "1x4",
+    "driveId": "13NRAhPmzq6AZbasaSx56sZg3zMDfZqeH",
+    "driveConfigFileId": "1szicy9XXHpJL9ytmXI4EU7x2YBC9BYME",
+    "slotsCount": 4,
+    "timestamp": "2026-09-22T18:58:44.423Z"
+  },
+  "ChatGPT Image 02_03_27 20 thg 9, 2026 (1).png": {
+    "status": "DONE",
+    "frameId": "wedding_1790162300445_xjtu",
+    "name": "Khung Cưới Mới #1 ảnh (1x1)",
+    "category": "wedding",
+    "layout": "1x1",
+    "driveId": "1jL7MsqmQDevCjrMwBPfPbJFLZwS9PO3B",
+    "driveConfigFileId": "1xn4iYoRHphuqJQ_PIcZLBYAfWfkZDLNN",
+    "slotsCount": 1,
+    "timestamp": "2026-09-23T11:18:28.483Z"
+  },
+  "ChatGPT Image 11_14_27 20 thg 9, 2026 (2).png": {
+    "status": "DONE",
+    "frameId": "wedding_1790179112885_xrtn",
+    "name": "Khung Cưới Mới #1 ảnh (1x1)",
+    "category": "wedding",
+    "layout": "1x1",
+    "driveId": "1umnvVC8D4bfofplyL4ebh4AZADPSQ8V3",
+    "driveConfigFileId": "12QB6dkOUZWNR--UqQl-qLHp8ILFZVfpM",
+    "slotsCount": 1,
+    "timestamp": "2026-09-23T15:58:38.555Z"
+  },
+  "ChatGPT Image 11_14_28 20 thg 9, 2026 (4).png": {
+    "status": "DONE",
+    "frameId": "wedding_1790179120017_8i2a",
+    "name": "Khung Cưới Mới #2 ảnh (1x2)",
+    "category": "wedding",
+    "layout": "1x2",
+    "driveId": "1UayoLUgLMJjWkA8Kj9Q_DDxloSyH60PP",
+    "driveConfigFileId": "1s1nyHDQi0kjzRsY84Fng2tdQGl2G-vHI",
+    "slotsCount": 2,
+    "timestamp": "2026-09-23T15:58:45.661Z"
+  },
+  "ChatGPT Image 09_48_55 24 thg 9, 2026.png": {
+    "status": "DONE",
+    "frameId": "wedding_1790218140075_mobu",
+    "name": "Khung Cưới Mới #5 ảnh (custom)",
+    "category": "wedding",
+    "layout": "custom",
+    "driveId": "1fxjTszuCvmn7UHDV-lzEeo8vxYJrgSVw",
+    "driveConfigFileId": "1DS5upzAb1a5_4ak-8s9B9RmEG63KEPYC",
+    "slotsCount": 5,
+    "timestamp": "2026-09-24T02:49:07.963Z"
   }
 }

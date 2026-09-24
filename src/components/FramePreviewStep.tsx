@@ -89,8 +89,8 @@ export const FramePreviewStep: React.FC<FramePreviewStepProps> = ({
               <div
                 className="relative overflow-hidden rounded-sm bg-slate-100 shadow-2xl ring-1 ring-slate-200"
                 style={{
-                  width: isLandscape ? 260 : Math.max(110, Math.round((width / height) * 260)),
-                  height: isLandscape ? Math.max(110, Math.round((height / width) * 260)) : 260
+                  width: isLandscape ? 340 : Math.max(140, Math.round((width / height) * 360)),
+                  height: isLandscape ? Math.max(140, Math.round((height / width) * 340)) : 360
                 }}
               >
                 {isRendering && item === 1 ? (
@@ -101,7 +101,7 @@ export const FramePreviewStep: React.FC<FramePreviewStepProps> = ({
                   <img
                     src={previewUrl}
                     alt={`Xem trước ${frameName}`}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain shadow-inner"
                     width={width}
                     height={height}
                   />

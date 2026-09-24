@@ -82,9 +82,23 @@ export function isBitmapDataUrl(value?: string | null): boolean {
   return !!value && value.startsWith('data:image/') && !value.includes('image/svg+xml');
 }
 
-export function getCloudinaryThumbnailUrl(url?: string | null, width = 360): string | null {
-  if (!url || isBitmapDataUrl(url)) return null;
+export function getCloudinaryThumbnailUrl(url?: string | null, width?: number): string | null {
+  if (!url) return null;
+  if (isBitmapDataUrl(url)) return url;
   if (!url.includes('res.cloudinary.com') || !url.includes('/image/upload/')) return url;
 
-  return url.replace('/image/upload/', `/image/upload/f_auto,q_auto,w_${width},c_limit/`);
+  const uploadToken = '/image/upload/';
+  const idx = url.indexOf(uploadToken);
+  if (idx === -1) return url;
+
+  const prefix = url.substring(0, idx + uploadToken.length);
+  let remainder = url.substring(idx + uploadToken.length);
+
+  const slashIdx = remainder.indexOf('/');
+  if (slashIdx !== -1 && !remainder.substring(0, slashIdx).match(/^v\d+$/)) {
+    remainder = remainder.substring(slashIdx + 1);
+  }
+
+  const transform = width && width > 0 ? `f_auto,q_auto:best,w_${Math.max(width, 2400)},c_limit/` : 'f_auto,q_auto:best/';
+  return `${prefix}${transform}${remainder}`;
 }

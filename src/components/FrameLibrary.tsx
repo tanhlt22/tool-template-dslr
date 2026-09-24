@@ -204,7 +204,7 @@ export const FrameLibrary: React.FC<FrameLibraryProps> = ({
                 className="group rounded-2xl border border-slate-200 bg-white p-2.5 shadow-sm transition-all hover:border-rose-200 hover:shadow-md"
               >
                 <div className="relative overflow-hidden rounded-xl bg-slate-100">
-                  <TemplateThumbnail frame={frame} />
+                  <TemplateThumbnail frame={frame} scale={1.8} />
                   {(frame as any).category && (
                     <span className="absolute top-2 right-2 rounded-lg bg-slate-900/80 backdrop-blur-sm px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
                       {(frame as any).category}

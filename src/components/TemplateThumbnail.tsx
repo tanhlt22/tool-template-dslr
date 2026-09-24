@@ -28,10 +28,8 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
     return () => observer.disconnect();
   }, [fitParent]);
 
-  const image = getCloudinaryThumbnailUrl(
-    frame.background_image_url || frame.backgroundImageUrl, 
-    fitParent ? 1200 : Math.round(240 * scale)
-  );
+  const rawBg = frame.background_image_url || frame.backgroundImageUrl;
+  const image = getCloudinaryThumbnailUrl(rawBg, fitParent ? 2400 : 1200) || rawBg;
   const width = Number(frame.width) || 1200;
   const height = Number(frame.height) || 1800;
   const isLandscape = width > height;
@@ -107,10 +105,11 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
               }
 
               if (el.content) {
+                const elSrc = getCloudinaryThumbnailUrl(el.content, 2400) || el.content;
                 return (
                   <img
                     key={el.id || `el_${index}`}
-                    src={el.content}
+                    src={elSrc}
                     alt={el.fileName || 'element'}
                     className="absolute pointer-events-none"
                     style={{
@@ -199,10 +198,11 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
           }
 
           if (el.content) {
+            const elSrc = getCloudinaryThumbnailUrl(el.content, 1200) || el.content;
             return (
               <img
                 key={el.id || `el_${index}`}
-                src={el.content}
+                src={elSrc}
                 alt={el.fileName || 'element'}
                 className="absolute pointer-events-none"
                 style={{
