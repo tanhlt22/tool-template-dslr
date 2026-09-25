@@ -270,20 +270,24 @@ app.get('/frames/:id', async (c) => {
 
     // If there is a drive_file_id, fetch JSON from Google Drive
     if (indexRecord.drive_file_id) {
-      const driveRes = await getFileContent(c.env, indexRecord.drive_file_id);
-      if (driveRes.ok) {
-        const configJson = (await driveRes.json()) as FrameLayoutPayload;
-        return c.json({
-          ...configJson,
-          id: indexRecord.id,
-          name: indexRecord.name || configJson.name,
-          category: indexRecord.category || configJson.category || 'general',
-          width: indexRecord.width || configJson.width,
-          height: indexRecord.height || configJson.height,
-          thumbnail_url: indexRecord.thumbnail_url || configJson.thumbnail_url,
-          background_image_url: indexRecord.background_image_url || configJson.background_image_url,
-          created_at: indexRecord.created_at
-        });
+      try {
+        const driveRes = await getFileContent(c.env, indexRecord.drive_file_id);
+        if (driveRes.ok) {
+          const configJson = (await driveRes.json()) as FrameLayoutPayload;
+          return c.json({
+            ...configJson,
+            id: indexRecord.id,
+            name: indexRecord.name || configJson.name,
+            category: indexRecord.category || configJson.category || 'general',
+            width: indexRecord.width || configJson.width,
+            height: indexRecord.height || configJson.height,
+            thumbnail_url: indexRecord.thumbnail_url || configJson.thumbnail_url,
+            background_image_url: indexRecord.background_image_url || configJson.background_image_url,
+            created_at: indexRecord.created_at
+          });
+        }
+      } catch (driveErr: any) {
+        console.warn(`Could not load drive JSON for frame ${id}:`, driveErr);
       }
     }
 

@@ -188,14 +188,62 @@ export const apiService = {
       return data;
     }
 
-    const res = await fetch(`/api/frames/${frameId}`);
-    if (!res.ok) {
-      throw new Error(`Failed to load frame configuration: ${frameId}`);
+    try {
+      const res = await fetch(`/api/frames/${frameId}`);
+      if (res.ok) {
+        const rawData = await res.json();
+        const data = normalizeFrameUrls(rawData);
+        frameDetailCache.set(frameId, data);
+        return data;
+      }
+    } catch (e) {
+      console.warn('API /frames/:id request failed, attempting direct recovery:', e);
     }
-    const rawData = await res.json();
-    const data = normalizeFrameUrls(rawData);
-    frameDetailCache.set(frameId, data);
-    return data;
+
+    const frames = await this.getFrames().catch(() => []);
+    const indexRecord = frames.find((f: any) => f.id === frameId);
+    if (indexRecord?.drive_file_id) {
+      try {
+        const directJsonRes = await fetch(`https://drive.google.com/uc?export=view&id=${indexRecord.drive_file_id}`);
+        if (directJsonRes.ok) {
+          const configJson = await directJsonRes.json();
+          const merged = normalizeFrameUrls({
+            ...configJson,
+            id: indexRecord.id,
+            name: indexRecord.name || configJson.name,
+            category: indexRecord.category || configJson.category || 'general',
+            width: indexRecord.width || configJson.width,
+            height: indexRecord.height || configJson.height,
+            thumbnail_url: indexRecord.thumbnail_url || configJson.thumbnail_url,
+            background_image_url: indexRecord.background_image_url || configJson.background_image_url,
+            created_at: indexRecord.created_at
+          });
+          frameDetailCache.set(frameId, merged);
+          return merged;
+        }
+      } catch (err) {
+        console.warn('Direct Google Drive JSON fetch failed:', err);
+      }
+    }
+
+    if (indexRecord) {
+      const fallback = normalizeFrameUrls({
+        id: indexRecord.id,
+        name: indexRecord.name,
+        category: indexRecord.category,
+        width: indexRecord.width,
+        height: indexRecord.height,
+        background_image_url: indexRecord.background_image_url,
+        thumbnail_url: indexRecord.thumbnail_url,
+        slots: indexRecord.slots || [],
+        elements: indexRecord.elements || [],
+        created_at: indexRecord.created_at
+      });
+      frameDetailCache.set(frameId, fallback);
+      return fallback;
+    }
+
+    throw new Error(`Failed to load frame configuration: ${frameId}`);
   },
 
   /**
