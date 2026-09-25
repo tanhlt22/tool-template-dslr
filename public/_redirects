@@ -1,0 +1,3 @@
+/api/* https://frame-storage-proxy.toashop2002.workers.dev/:splat 200
+/assets/* https://frame-storage-proxy.toashop2002.workers.dev/assets/:splat 200
+/* /index.html 200

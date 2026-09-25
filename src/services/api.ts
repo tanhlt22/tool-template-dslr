@@ -1,6 +1,15 @@
 import { FrameConfig } from '../types/canvas';
-import { isBitmapDataUrl, resolveAssetUrl } from '../utils/cloudinary';
+import { isBitmapDataUrl, resolveAssetUrl } from '../utils/storage';
 import { CentralFrame, getIdSystemSettings, idSystemApi } from './idSystemApi';
+
+function getWorkerApiUrl(path: string): string {
+  const workerBase = import.meta.env.VITE_WORKER_URL;
+  if (workerBase) {
+    const cleanPath = path.startsWith('/api') ? path.substring(4) : path;
+    return `${workerBase}${cleanPath}`;
+  }
+  return path;
+}
 
 // ─── Client-side in-memory cache ────────────────────────────────────────────
 const CLIENT_CACHE_TTL = 5 * 60 * 1000;
@@ -40,12 +49,12 @@ function normalizeFrameUrls(frame: any): any {
 
 function assertNoBitmapDataUrls(payload: any) {
   if (isBitmapDataUrl(payload.backgroundImageUrl)) {
-    throw new Error('Ảnh nền vẫn là base64. Cần tải lên Cloudinary trước khi lưu mẫu.');
+    throw new Error('Ảnh nền vẫn là base64. Cần tải lên hệ thống lưu trữ trước khi lưu mẫu.');
   }
 
   const badElement = (payload.elements || []).find((element: any) => isBitmapDataUrl(element?.content));
   if (badElement) {
-    throw new Error(`Lớp "${badElement.id || badElement.fileName || 'ảnh'}" vẫn là base64. Cần tải lên Cloudinary trước khi lưu mẫu.`);
+    throw new Error(`Lớp "${badElement.id || badElement.fileName || 'ảnh'}" vẫn là base64. Cần tải lên hệ thống lưu trữ trước khi lưu mẫu.`);
   }
 }
 
@@ -149,7 +158,7 @@ export const apiService = {
     }
 
     const query = category && category !== 'all' ? `?category=${encodeURIComponent(category)}` : '';
-    const res = await fetch(`/api/frames${query}`);
+    const res = await fetch(getWorkerApiUrl(`/frames${query}`));
     if (!res.ok) {
       throw new Error('Failed to fetch list of frames');
     }
@@ -166,7 +175,7 @@ export const apiService = {
    */
   async getCategories(): Promise<string[]> {
     try {
-      const res = await fetch('/api/categories');
+      const res = await fetch(getWorkerApiUrl('/categories'));
       if (!res.ok) return [];
       const data = await res.json();
       return data.categories || [];
@@ -189,7 +198,7 @@ export const apiService = {
     }
 
     try {
-      const res = await fetch(`/api/frames/${frameId}`);
+      const res = await fetch(getWorkerApiUrl(`/frames/${frameId}`));
       if (res.ok) {
         const rawData = await res.json();
         const data = normalizeFrameUrls(rawData);
@@ -305,7 +314,7 @@ export const apiService = {
 
     assertNoBitmapDataUrls(payload);
 
-    const res = await fetch('/api/frames', {
+    const res = await fetch(getWorkerApiUrl('/frames'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -335,7 +344,7 @@ export const apiService = {
 
     assertNoBitmapDataUrls(payload);
 
-    const res = await fetch('/api/frames', {
+    const res = await fetch(getWorkerApiUrl('/frames'), {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -364,7 +373,7 @@ export const apiService = {
       return { frame_id: frame.id, ...decodeCentralFrame(frame) };
     }
 
-    const res = await fetch(`/api/frames?id=${frameId}&password=${encodeURIComponent(password || '')}`, {
+    const res = await fetch(getWorkerApiUrl(`/frames?id=${frameId}&password=${encodeURIComponent(password || '')}`), {
       method: 'DELETE'
     });
     if (!res.ok) {

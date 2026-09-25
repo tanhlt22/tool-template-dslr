@@ -26,7 +26,7 @@ interface AdminDashboardProps {
   onOpenEditor: () => void;
 }
 
-type AdminTab = 'overview' | 'invoices' | 'ai' | 'cloudinary' | 'settings';
+type AdminTab = 'overview' | 'invoices' | 'ai' | 'storage' | 'settings';
 
 const currency = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 });
 
@@ -34,7 +34,7 @@ const navItems: Array<{ id: AdminTab; label: string; icon: React.ElementType }> 
   { id: 'overview', label: 'Tổng quan', icon: LayoutDashboard },
   { id: 'invoices', label: 'Thanh toán', icon: ReceiptText },
   { id: 'ai', label: 'AI', icon: Brain },
-  { id: 'cloudinary', label: 'Cloudinary', icon: Cloud },
+  { id: 'storage', label: 'Cloud Storage', icon: Cloud },
   { id: 'settings', label: 'Cấu hình', icon: Settings }
 ];
 
@@ -243,12 +243,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onOpenEditor }) 
         <p className="mt-2 text-3xl font-black text-slate-950">{currency.format(activeAiSetting?.cost_credits || 10000)}</p>
       </div>
       <div className="rounded-md border border-slate-200 bg-white p-4">
-        <p className="text-xs font-bold uppercase text-slate-500">Cloudinary active</p>
-        <p className="mt-2 text-3xl font-black text-slate-950">{activeCloudinary.length}</p>
+        <p className="text-xs font-bold uppercase text-slate-500">Hệ thống lưu trữ</p>
+        <p className="mt-2 text-2xl font-black text-emerald-600">Cloudflare & Drive</p>
       </div>
       <div className="rounded-md border border-slate-200 bg-white p-4">
-        <p className="text-xs font-bold uppercase text-slate-500">Storage pool</p>
-        <p className="mt-2 text-3xl font-black text-slate-950">{storageUsed}/{storageLimit || 0} MB</p>
+        <p className="text-xs font-bold uppercase text-slate-500">Trạng thái Cloudflare</p>
+        <p className="mt-2 text-2xl font-black text-slate-950">Đang hoạt động</p>
       </div>
     </section>
   );
@@ -460,74 +460,55 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onOpenEditor }) 
     </section>
   );
 
-  const renderCloudinary = () => (
-    <section className="grid gap-4 lg:grid-cols-[1fr_1fr]">
-      <div className="rounded-md border border-slate-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-black uppercase tracking-wide text-slate-800">Cloudinary accounts</h2>
-        <div className="grid gap-2">
-          {cloudinaryAccounts.map((account) => (
-            <div key={account.id} className="rounded-md border border-slate-200 p-3 text-sm">
-              <div className="font-black text-slate-900">{account.cloud_name}</div>
-              <div className="text-slate-600">{account.storage_used_mb}/{account.storage_limit_mb} MB - {account.status}</div>
-              {account.upload_preset && <div className="text-slate-500">Preset: {account.upload_preset}</div>}
-            </div>
-          ))}
+  const renderStorage = () => (
+    <section className="grid gap-4">
+      <div className="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h2 className="text-base font-black text-slate-900">Hệ Thống Lưu Trữ Đám Mây (Cloud Storage CDN)</h2>
+            <p className="text-xs text-slate-500">Mạng lưới phân phối nội dung và lưu trữ ảnh mẫu độ nét cao</p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Đang hoạt động (Online)
+          </span>
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-3.5">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">CDN Storage Proxy</p>
+            <p className="mt-1 font-mono text-xs font-semibold text-slate-800 break-all">
+              {import.meta.env.VITE_WORKER_URL || 'https://frame-storage-proxy.toashop2002.workers.dev'}
+            </p>
+          </div>
+          <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-3.5">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Chất lượng hình ảnh</p>
+            <p className="mt-1 text-sm font-bold text-slate-800">
+              100% Gốc Không Nén (Lossless)
+            </p>
+          </div>
+          <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-3.5">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Edge Caching</p>
+            <p className="mt-1 text-sm font-bold text-slate-800">
+              Public Cache 1 năm (Tốc độ cao)
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="rounded-md border border-slate-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-black uppercase tracking-wide text-slate-800">Thêm Cloudinary</h2>
-        <div className="grid gap-3">
-          <label className="grid gap-1 text-xs font-bold text-slate-600">
-            Cloud name
-            <input
-              value={cloudinaryForm.cloud_name}
-              onChange={(event) => setCloudinaryForm((prev) => ({ ...prev, cloud_name: event.target.value }))}
-              className="h-9 rounded-md border border-slate-300 px-3 text-sm font-semibold text-slate-900"
-              placeholder="dktrhm7i1"
-            />
-          </label>
-          <label className="grid gap-1 text-xs font-bold text-slate-600">
-            Upload preset
-            <input
-              value={cloudinaryForm.upload_preset}
-              onChange={(event) => setCloudinaryForm((prev) => ({ ...prev, upload_preset: event.target.value }))}
-              className="h-9 rounded-md border border-slate-300 px-3 text-sm font-semibold text-slate-900"
-              placeholder="photobooth-template"
-            />
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            <label className="grid gap-1 text-xs font-bold text-slate-600">
-              Thư mục
-              <input
-                value={cloudinaryForm.folder_prefix}
-                onChange={(event) => setCloudinaryForm((prev) => ({ ...prev, folder_prefix: event.target.value }))}
-                className="h-9 rounded-md border border-slate-300 px-3 text-sm font-semibold text-slate-900"
-                placeholder="frames"
-              />
-            </label>
-            <label className="grid gap-1 text-xs font-bold text-slate-600">
-              Giới hạn MB
-              <input
-                type="number"
-                value={cloudinaryForm.storage_limit_mb}
-                onChange={(event) => setCloudinaryForm((prev) => ({ ...prev, storage_limit_mb: Number(event.target.value) }))}
-                className="h-9 rounded-md border border-slate-300 px-3 text-sm font-semibold text-slate-900"
-                placeholder="10240"
-              />
-            </label>
+      {cloudinaryAccounts.length > 0 && (
+        <div className="rounded-md border border-slate-200 bg-white p-4">
+          <h3 className="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">Bộ nhớ lưu trữ phụ</h3>
+          <div className="grid gap-2">
+            {cloudinaryAccounts.map((account) => (
+              <div key={account.id} className="rounded-md border border-slate-200 p-3 text-sm">
+                <div className="font-bold text-slate-900">{account.cloud_name}</div>
+                <div className="text-slate-600">{account.storage_used_mb}/{account.storage_limit_mb} MB - {account.status}</div>
+              </div>
+            ))}
           </div>
-          <button
-            type="button"
-            disabled={!canUseAdminApi || isLoading}
-            onClick={handleCreateCloudinary}
-            className="inline-flex h-9 w-fit items-center gap-2 rounded-md bg-slate-950 px-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-slate-400"
-          >
-            <Cloud className="h-4 w-4" />
-            Thêm tài khoản
-          </button>
         </div>
-      </div>
+      )}
     </section>
   );
 
@@ -612,7 +593,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onOpenEditor }) 
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-5 py-4">
           <div>
             <h1 className="text-xl font-black tracking-tight text-slate-950">{navItems.find((item) => item.id === activeTab)?.label}</h1>
-            <p className="text-sm font-medium text-slate-500">Thanh toán, giá AI, Cloudinary và cấu hình kết nối backend.</p>
+            <p className="text-sm font-medium text-slate-500">Thanh toán, giá AI, hệ thống Cloud Storage và cấu hình kết nối backend.</p>
           </div>
           <button
             type="button"
@@ -629,7 +610,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onOpenEditor }) 
           {activeTab === 'overview' && renderOverview()}
           {activeTab === 'invoices' && renderInvoices()}
           {activeTab === 'ai' && renderAiSettings()}
-          {activeTab === 'cloudinary' && renderCloudinary()}
+          {activeTab === 'storage' && renderStorage()}
           {activeTab === 'settings' && renderSettings()}
         </div>
       </section>

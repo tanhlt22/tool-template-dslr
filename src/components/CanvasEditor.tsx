@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { fabric } from 'fabric';
 import { Hand, ZoomIn, ZoomOut } from 'lucide-react';
 import { FrameSlot, FrameElement } from '../types/canvas';
-import { resolveAssetUrl } from '../utils/cloudinary';
+import { resolveAssetUrl } from '../utils/storage';
 
 const globalFabricImageCache: Record<string, HTMLImageElement> = {};
 

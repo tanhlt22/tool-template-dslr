@@ -1,5 +1,5 @@
 import React, { useRef, useState, useLayoutEffect } from 'react';
-import { getCloudinaryThumbnailUrl } from '../utils/cloudinary';
+import { getAssetUrl } from '../utils/storage';
 
 export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent?: boolean }> = ({ 
   frame, 
@@ -29,7 +29,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
   }, [fitParent]);
 
   const rawBg = frame.background_image_url || frame.backgroundImageUrl || frame.thumbnail_url || frame.thumbnailUrl;
-  const image = getCloudinaryThumbnailUrl(rawBg, fitParent ? 2400 : 1200) || rawBg;
+  const image = getAssetUrl(rawBg) || rawBg;
   const width = Number(frame.width) || 1200;
   const height = Number(frame.height) || 1800;
   const isLandscape = width > height;
@@ -116,7 +116,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
               }
 
               if (el.content) {
-                const elSrc = getCloudinaryThumbnailUrl(el.content, 2400) || el.content;
+                const elSrc = getAssetUrl(el.content) || el.content;
                 return (
                   <img
                     key={el.id || `el_${index}`}
@@ -239,7 +239,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
           }
 
           if (el.content) {
-            const elSrc = getCloudinaryThumbnailUrl(el.content, 1200) || el.content;
+            const elSrc = getAssetUrl(el.content) || el.content;
             return (
               <img
                 key={el.id || `el_${index}`}

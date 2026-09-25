@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { FrameElement, FrameSlot } from '../types/canvas';
 import { apiService } from '../services/api';
 import { useUI } from '../contexts/UIContext';
-import { uploadToCloudinary } from '../utils/cloudinary';
+import { uploadToStorage } from '../utils/storage';
 
 interface UseTemplateDBOptions {
   setFrameName: (name: string) => void;
@@ -84,7 +84,7 @@ export function useTemplateDB(
       // 1. Upload background if it's base64
       let finalBgUrl = currentState.bgImageUrl;
       if (finalBgUrl && finalBgUrl.startsWith('data:image/')) {
-        finalBgUrl = await uploadToCloudinary(finalBgUrl);
+        finalBgUrl = await uploadToStorage(finalBgUrl);
         setBgImageUrl(finalBgUrl); // Update local state so it doesn't re-upload later
       }
 
@@ -95,7 +95,7 @@ export function useTemplateDB(
             if (finalBgUrl && el.content === currentState.bgImageUrl) {
               return { ...el, content: finalBgUrl };
             }
-            const uploadedUrl = await uploadToCloudinary(el.content);
+            const uploadedUrl = await uploadToStorage(el.content);
             return { ...el, content: uploadedUrl };
           }
           return el;
@@ -136,7 +136,7 @@ export function useTemplateDB(
       // 1. Upload background if it's base64
       let finalBgUrl = currentState.bgImageUrl;
       if (finalBgUrl && finalBgUrl.startsWith('data:image/')) {
-        finalBgUrl = await uploadToCloudinary(finalBgUrl);
+        finalBgUrl = await uploadToStorage(finalBgUrl);
         setBgImageUrl(finalBgUrl);
       }
 
@@ -147,7 +147,7 @@ export function useTemplateDB(
             if (finalBgUrl && el.content === currentState.bgImageUrl) {
               return { ...el, content: finalBgUrl };
             }
-            const uploadedUrl = await uploadToCloudinary(el.content);
+            const uploadedUrl = await uploadToStorage(el.content);
             return { ...el, content: uploadedUrl };
           }
           return el;

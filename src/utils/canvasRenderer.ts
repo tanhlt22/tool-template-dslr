@@ -2,7 +2,7 @@ import { FrameSlot, FrameElement } from '../types/canvas';
 import JSZip from 'jszip';
 import { formatDate, generateDslrboothId } from '../components/dslrbooth/utils';
 import QRCode from 'qrcode';
-import { resolveAssetUrl } from './cloudinary';
+import { resolveAssetUrl } from './storage';
 
 /**
  * Renders a background (color, gradient, or image) onto a canvas context.

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Trash, Sparkles, Image as ImageIcon, Camera, Type, Loader2, Lock, Cloud, FolderKanban } from 'lucide-react';
 import { apiService } from '../../services/api';
 import { useUI } from '../../contexts/UIContext';
-import { getCloudinaryThumbnailUrl } from '../../utils/cloudinary';
+import { getAssetUrl } from '../../utils/storage';
 
 interface Slot {
   id: string;
@@ -239,7 +239,7 @@ export const AdminTab: React.FC<AdminTabProps> = ({ onLoadTemplateToStudioAI }) 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {templates.map((tmpl) => {
                 const isDefault = tmpl.id.startsWith('template_');
-                const bgUrl = getCloudinaryThumbnailUrl(tmpl.background_image_url, 2400);
+                const bgUrl = getAssetUrl(tmpl.background_image_url);
 
                 return (
                   <div 

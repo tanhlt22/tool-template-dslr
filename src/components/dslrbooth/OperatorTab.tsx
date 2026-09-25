@@ -4,7 +4,7 @@ import JSZip from 'jszip';
 import { formatDate, generateDslrboothId } from './utils';
 import { apiService } from '../../services/api';
 import { useUI } from '../../contexts/UIContext';
-import { uploadFileToCloudinary } from '../../utils/cloudinary';
+import { uploadFileToStorage } from '../../utils/storage';
 
 export const OperatorTab: React.FC = () => {
   const { showToast } = useUI();
@@ -149,7 +149,7 @@ export const OperatorTab: React.FC = () => {
       const canvas = operatorCanvasRef.current;
       if (!canvas) throw new Error('Canvas not loaded');
 
-      const imageUrl = await uploadFileToCloudinary(operatorFile);
+      const imageUrl = await uploadFileToStorage(operatorFile);
 
       // Save frame layout metadata to D1 + Google Drive
       const payload = {

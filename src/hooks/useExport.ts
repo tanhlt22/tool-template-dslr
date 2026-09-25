@@ -69,7 +69,7 @@ export function useExport(options: UseExportOptions) {
       setBgImageUrl(data.image);
       setBackgroundType('ai');
       window.dispatchEvent(new Event('id-system-balance-refresh'));
-      showToast('Đã sinh ảnh AI và lưu lên Cloudinary.', 'success');
+      showToast('Đã sinh ảnh AI và lưu trữ thành công.', 'success');
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       if (idSystemApi.settings.isConfigured()) {
