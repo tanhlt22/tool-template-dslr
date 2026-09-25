@@ -34,7 +34,7 @@ const navItems: Array<{ id: AdminTab; label: string; icon: React.ElementType }> 
   { id: 'overview', label: 'Tổng quan', icon: LayoutDashboard },
   { id: 'invoices', label: 'Thanh toán', icon: ReceiptText },
   { id: 'ai', label: 'AI', icon: Brain },
-  { id: 'storage', label: 'Cloud Storage', icon: Cloud },
+  { id: 'storage', label: 'Lưu trữ đám mây', icon: Cloud },
   { id: 'settings', label: 'Cấu hình', icon: Settings }
 ];
 
@@ -244,11 +244,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onOpenEditor }) 
       </div>
       <div className="rounded-md border border-slate-200 bg-white p-4">
         <p className="text-xs font-bold uppercase text-slate-500">Hệ thống lưu trữ</p>
-        <p className="mt-2 text-2xl font-black text-emerald-600">Cloudflare & Drive</p>
+        <p className="mt-2 text-2xl font-black text-emerald-600">Cloud Storage</p>
       </div>
       <div className="rounded-md border border-slate-200 bg-white p-4">
-        <p className="text-xs font-bold uppercase text-slate-500">Trạng thái Cloudflare</p>
-        <p className="mt-2 text-2xl font-black text-slate-950">Đang hoạt động</p>
+        <p className="text-xs font-bold uppercase text-slate-500">Trạng thái Cloud</p>
+        <p className="mt-2 text-2xl font-black text-slate-950">Hoạt động tốt</p>
       </div>
     </section>
   );
@@ -462,35 +462,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onOpenEditor }) 
 
   const renderStorage = () => (
     <section className="grid gap-4">
-      <div className="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+      <div className="rounded-md border border-slate-200 bg-white p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
           <div>
-            <h2 className="text-base font-black text-slate-900">Hệ Thống Lưu Trữ Đám Mây (Cloud Storage CDN)</h2>
-            <p className="text-xs text-slate-500">Mạng lưới phân phối nội dung và lưu trữ ảnh mẫu độ nét cao</p>
+            <h2 className="text-base font-black text-slate-900">Hệ thống lưu trữ đám mây (Cloud Storage)</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Lưu trữ ảnh mẫu, tài nguyên và cấu hình tự động qua hạ tầng Edge Cloud</p>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
             Đang hoạt động (Online)
           </span>
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-3.5">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">CDN Storage Proxy</p>
+          <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Endpoint Lưu Trữ Cloud</span>
             <p className="mt-1 font-mono text-xs font-semibold text-slate-800 break-all">
-              {import.meta.env.VITE_WORKER_URL || 'https://frame-storage-proxy.toashop2002.workers.dev'}
+              https://frame-storage-proxy.toashop2002.workers.dev
             </p>
           </div>
-          <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-3.5">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Chất lượng hình ảnh</p>
-            <p className="mt-1 text-sm font-bold text-slate-800">
-              100% Gốc Không Nén (Lossless)
+          <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Chất lượng hiển thị</span>
+            <p className="mt-1 text-xs font-bold text-slate-800">
+              100% Độ phân giải gốc không nén
             </p>
           </div>
-          <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-3.5">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Edge Caching</p>
-            <p className="mt-1 text-sm font-bold text-slate-800">
-              Public Cache 1 năm (Tốc độ cao)
+          <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tốc độ & CDN</span>
+            <p className="mt-1 text-xs font-bold text-slate-800">
+              Edge Cache toàn cầu (Tối ưu tải tức thì)
             </p>
           </div>
         </div>
@@ -498,11 +498,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onOpenEditor }) 
 
       {cloudinaryAccounts.length > 0 && (
         <div className="rounded-md border border-slate-200 bg-white p-4">
-          <h3 className="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">Bộ nhớ lưu trữ phụ</h3>
+          <h2 className="mb-3 text-sm font-black uppercase tracking-wide text-slate-800">Tài khoản lưu trữ mở rộng</h2>
           <div className="grid gap-2">
             {cloudinaryAccounts.map((account) => (
               <div key={account.id} className="rounded-md border border-slate-200 p-3 text-sm">
-                <div className="font-bold text-slate-900">{account.cloud_name}</div>
+                <div className="font-black text-slate-900">{account.cloud_name}</div>
                 <div className="text-slate-600">{account.storage_used_mb}/{account.storage_limit_mb} MB - {account.status}</div>
               </div>
             ))}
@@ -593,7 +593,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onOpenEditor }) 
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-5 py-4">
           <div>
             <h1 className="text-xl font-black tracking-tight text-slate-950">{navItems.find((item) => item.id === activeTab)?.label}</h1>
-            <p className="text-sm font-medium text-slate-500">Thanh toán, giá AI, hệ thống Cloud Storage và cấu hình kết nối backend.</p>
+            <p className="text-sm font-medium text-slate-500">Thanh toán, giá AI, hệ thống lưu trữ Cloud và cấu hình kết nối backend.</p>
           </div>
           <button
             type="button"

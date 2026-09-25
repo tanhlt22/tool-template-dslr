@@ -213,7 +213,7 @@ export const apiService = {
     const indexRecord = frames.find((f: any) => f.id === frameId);
     if (indexRecord?.drive_file_id) {
       try {
-        const directJsonRes = await fetch(`https://drive.google.com/uc?export=view&id=${indexRecord.drive_file_id}`);
+        const directJsonRes = await fetch(getWorkerApiUrl(`/assets/${indexRecord.drive_file_id}`));
         if (directJsonRes.ok) {
           const configJson = await directJsonRes.json();
           const merged = normalizeFrameUrls({
@@ -231,7 +231,7 @@ export const apiService = {
           return merged;
         }
       } catch (err) {
-        console.warn('Direct Google Drive JSON fetch failed:', err);
+        console.warn('Storage layout asset fetch failed:', err);
       }
     }
 

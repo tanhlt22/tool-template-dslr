@@ -168,10 +168,11 @@ app.post('/upload', async (c) => {
       success: true,
       file_id: driveFile.id,
       name: driveFile.name,
-      url: proxyUrl
+      url: proxyUrl,
+      direct_url: proxyUrl
     });
   } catch (err: any) {
-    return c.json({ error: err.message || 'Lỗi tải ảnh lên hệ thống lưu trữ' }, 500);
+    return c.json({ error: err.message || 'Lỗi upload ảnh lên hệ thống lưu trữ' }, 500);
   }
 });
 
