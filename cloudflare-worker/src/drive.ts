@@ -111,6 +111,31 @@ export async function uploadToDrive(
 }
 
 export async function getFileContent(env: Env, fileId: string): Promise<Response> {
+  // 1. Ưu tiên tải trực tiếp qua CDN public của Google (nhanh, ổn định, không phụ thuộc OAuth token)
+  try {
+    const directRes = await fetch(`https://lh3.googleusercontent.com/d/${fileId}`, {
+      redirect: 'follow'
+    });
+    if (directRes.ok && directRes.status === 200) {
+      return directRes;
+    }
+  } catch (err) {
+    console.warn(`Direct fetch failed for ${fileId}, trying alternatives:`, err);
+  }
+
+  // 2. Thử qua endpoint direct uc export của Google Drive
+  try {
+    const ucRes = await fetch(`https://drive.google.com/uc?export=view&id=${fileId}`, {
+      redirect: 'follow'
+    });
+    if (ucRes.ok && ucRes.status === 200) {
+      return ucRes;
+    }
+  } catch (err) {
+    console.warn(`UC export fetch failed for ${fileId}:`, err);
+  }
+
+  // 3. Fallback sang Google Drive API có token nếu các cách trên không được
   const token = await getAccessToken(env);
   const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
     headers: { Authorization: `Bearer ${token}` }

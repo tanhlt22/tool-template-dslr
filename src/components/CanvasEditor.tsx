@@ -2,18 +2,20 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { fabric } from 'fabric';
 import { Hand, ZoomIn, ZoomOut } from 'lucide-react';
 import { FrameSlot, FrameElement } from '../types/canvas';
+import { resolveAssetUrl } from '../utils/cloudinary';
 
 const globalFabricImageCache: Record<string, HTMLImageElement> = {};
 
 const loadCachedFabricImage = (url: string, callback: (img: fabric.Image) => void) => {
-  if (globalFabricImageCache[url]) {
-    const img = new fabric.Image(globalFabricImageCache[url]);
+  const resolvedUrl = resolveAssetUrl(url);
+  if (globalFabricImageCache[resolvedUrl]) {
+    const img = new fabric.Image(globalFabricImageCache[resolvedUrl]);
     callback(img);
   } else {
-    fabric.Image.fromURL(url, (img) => {
+    fabric.Image.fromURL(resolvedUrl, (img) => {
       if (!img) return;
       if (img.getElement()) {
-        globalFabricImageCache[url] = img.getElement() as HTMLImageElement;
+        globalFabricImageCache[resolvedUrl] = img.getElement() as HTMLImageElement;
       }
       callback(img);
     }, { crossOrigin: 'anonymous' });
@@ -1012,7 +1014,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           const fabricImg = existing as fabric.Image;
           if (existing.data?.content !== elem.content) {
             // Image source changed
-            fabricImg.setSrc(elem.content, () => {
+            fabricImg.setSrc(resolveAssetUrl(elem.content), () => {
               fabricImg.set({
                 scaleX: elem.width / (fabricImg.width || 1),
                 scaleY: elem.height / (fabricImg.height || 1),

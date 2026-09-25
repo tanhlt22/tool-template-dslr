@@ -2,6 +2,7 @@ import { FrameSlot, FrameElement } from '../types/canvas';
 import JSZip from 'jszip';
 import { formatDate, generateDslrboothId } from '../components/dslrbooth/utils';
 import QRCode from 'qrcode';
+import { resolveAssetUrl } from './cloudinary';
 
 /**
  * Renders a background (color, gradient, or image) onto a canvas context.
@@ -43,7 +44,7 @@ export async function renderBackground(
         resolve(null);
       };
       bgImg.onerror = () => resolve(null);
-      bgImg.src = bgImageUrl;
+      bgImg.src = resolveAssetUrl(bgImageUrl);
     });
   }
 }
@@ -72,7 +73,7 @@ export async function renderImageElements(
         resolve(null);
       };
       img.onerror = () => resolve(null);
-      img.src = elem.content;
+      img.src = resolveAssetUrl(elem.content);
     });
   }
 }

@@ -1,5 +1,5 @@
 import { FrameConfig } from '../types/canvas';
-import { isBitmapDataUrl } from '../utils/cloudinary';
+import { isBitmapDataUrl, resolveAssetUrl } from '../utils/cloudinary';
 import { CentralFrame, getIdSystemSettings, idSystemApi } from './idSystemApi';
 
 // ─── Client-side in-memory cache ────────────────────────────────────────────
@@ -10,6 +10,32 @@ const frameDetailCache = new Map<string, any>();
 function invalidateFramesCache() {
   framesCache = null;
   frameDetailCache.clear();
+}
+
+function normalizeFrameUrls(frame: any): any {
+  if (!frame) return frame;
+  const copy = { ...frame };
+  if (copy.background_image_url) {
+    copy.background_image_url = resolveAssetUrl(copy.background_image_url);
+  }
+  if (copy.backgroundImageUrl) {
+    copy.backgroundImageUrl = resolveAssetUrl(copy.backgroundImageUrl);
+  }
+  if (copy.thumbnail_url) {
+    copy.thumbnail_url = resolveAssetUrl(copy.thumbnail_url);
+  }
+  if (copy.thumbnailUrl) {
+    copy.thumbnailUrl = resolveAssetUrl(copy.thumbnailUrl);
+  }
+  if (Array.isArray(copy.elements)) {
+    copy.elements = copy.elements.map((el: any) => {
+      if (el && (el.type === 'image' || el.type === 'icon') && el.content) {
+        return { ...el, content: resolveAssetUrl(el.content) };
+      }
+      return el;
+    });
+  }
+  return copy;
 }
 
 function assertNoBitmapDataUrls(payload: any) {
@@ -127,7 +153,8 @@ export const apiService = {
     if (!res.ok) {
       throw new Error('Failed to fetch list of frames');
     }
-    const data = await res.json();
+    const rawData = await res.json();
+    const data = Array.isArray(rawData) ? rawData.map(normalizeFrameUrls) : rawData;
     if (!category) {
       framesCache = { data, timestamp: now };
     }
@@ -165,7 +192,8 @@ export const apiService = {
     if (!res.ok) {
       throw new Error(`Failed to load frame configuration: ${frameId}`);
     }
-    const data = await res.json();
+    const rawData = await res.json();
+    const data = normalizeFrameUrls(rawData);
     frameDetailCache.set(frameId, data);
     return data;
   },
