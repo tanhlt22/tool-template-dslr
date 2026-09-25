@@ -239,7 +239,7 @@ export const AdminTab: React.FC<AdminTabProps> = ({ onLoadTemplateToStudioAI }) 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {templates.map((tmpl) => {
                 const isDefault = tmpl.id.startsWith('template_');
-                const bgUrl = getCloudinaryThumbnailUrl(tmpl.background_image_url, 360);
+                const bgUrl = getCloudinaryThumbnailUrl(tmpl.background_image_url, 2400);
 
                 return (
                   <div 

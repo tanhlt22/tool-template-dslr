@@ -84,10 +84,13 @@ export function isBitmapDataUrl(value?: string | null): boolean {
 
 export function resolveAssetUrl(url?: string | null): string {
   if (!url) return '';
-  // Chuyển đổi URL asset qua Cloudflare Worker hoặc Google Drive ID sang link direct CDN Google
+  // Chuyển đổi URL asset qua Cloudflare Worker hoặc Google Drive ID sang link direct CDN Google ở chế độ nét nhất (=s0)
   const driveMatch = url.match(/(?:\/assets\/|frame-storage-proxy[^/]*\/assets\/)([a-zA-Z0-9_-]+)/);
   if (driveMatch && driveMatch[1]) {
-    return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+    return `https://lh3.googleusercontent.com/d/${driveMatch[1]}=s0`;
+  }
+  if (url.startsWith('https://lh3.googleusercontent.com/d/') && !url.includes('=s0')) {
+    return `${url}=s0`;
   }
   return url;
 }
@@ -96,10 +99,13 @@ export function getCloudinaryThumbnailUrl(url?: string | null, width?: number): 
   if (!url) return null;
   if (isBitmapDataUrl(url)) return url;
 
-  // Nếu là ảnh từ Google Drive proxy, chuyển sang Google direct CDN
+  // Nếu là ảnh từ Google Drive proxy, chuyển sang Google direct CDN ở chế độ nét nhất (=s0)
   const driveMatch = url.match(/(?:\/assets\/|frame-storage-proxy[^/]*\/assets\/)([a-zA-Z0-9_-]+)/);
   if (driveMatch && driveMatch[1]) {
-    return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+    return `https://lh3.googleusercontent.com/d/${driveMatch[1]}=s0`;
+  }
+  if (url.startsWith('https://lh3.googleusercontent.com/d/') && !url.includes('=s0')) {
+    return `${url}=s0`;
   }
 
   if (!url.includes('res.cloudinary.com') || !url.includes('/image/upload/')) return url;

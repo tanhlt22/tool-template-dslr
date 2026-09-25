@@ -111,9 +111,9 @@ export async function uploadToDrive(
 }
 
 export async function getFileContent(env: Env, fileId: string): Promise<Response> {
-  // 1. Ưu tiên tải trực tiếp qua CDN public của Google (nhanh, ổn định, không phụ thuộc OAuth token)
+  // 1. Ưu tiên tải trực tiếp qua CDN public của Google ở chế độ nét nhất (=s0)
   try {
-    const directRes = await fetch(`https://lh3.googleusercontent.com/d/${fileId}`, {
+    const directRes = await fetch(`https://lh3.googleusercontent.com/d/${fileId}=s0`, {
       redirect: 'follow'
     });
     if (directRes.ok && directRes.status === 200) {
