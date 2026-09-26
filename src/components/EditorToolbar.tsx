@@ -69,6 +69,7 @@ interface EditorToolbarProps {
   canUndo: boolean;
   canRedo: boolean;
   userRole: string;
+  isAdmin?: boolean;
   editingTemplateId: string | null;
   isSavingTemplate: boolean;
   onUpdateTemplateInDb: () => void;
@@ -221,8 +222,10 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   onLoadSavedFrame,
   onSelectRegion,
   onOpenTransparentSlotPicker,
-  isUsingSystemTemplate = false
+  isUsingSystemTemplate = false,
+  isAdmin = false
 }) => {
+  const canUpdateTemplate = Boolean(isAdmin || userRole === 'admin');
   const [showShapes, setShowShapes] = useState(false);
   const [showSlotMenu, setShowSlotMenu] = useState(false);
   const [showFrameModal, setShowFrameModal] = useState(false);
@@ -528,31 +531,16 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
       <div className="ml-auto flex flex-wrap items-center gap-1.5">
         {selectedId && (
-          <>
-            {onDuplicateElement && (
-              <button
-                type="button"
-                onClick={() => onDuplicateElement(selectedId)}
-                title="Nhân bản đối tượng đang chọn (Ctrl+D)"
-                className="inline-flex items-center gap-1.5 rounded-md border border-indigo-200 bg-indigo-50 px-3 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 transition-colors shadow-sm"
-              >
-                <Copy className="h-4 w-4" aria-hidden="true" />
-                <span>Nhân bản</span>
-                <span className="hidden xl:inline text-[10px] text-indigo-500 font-semibold">(Ctrl+D)</span>
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => onDeleteElement(selectedId)}
-              title="Xóa đối tượng đang chọn (Delete)"
-              className="inline-flex items-center gap-1.5 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
-            >
-              <Trash2 className="h-4 w-4" aria-hidden="true" />
-              <span>Xóa chọn</span>
-            </button>
-          </>
+          <button
+            type="button"
+            onClick={() => onDeleteElement(selectedId)}
+            title="Xóa đối tượng đang chọn (Delete)"
+            className="inline-flex items-center gap-1.5 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700 shadow-sm"
+          >
+            <Trash2 className="h-4 w-4" aria-hidden="true" />
+            <span>Xóa chọn</span>
+          </button>
         )}
-
 
         <button
           type="button"
@@ -562,14 +550,14 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           Đặt lại
         </button>
 
-        {/* Save / Update buttons */}
-        {editingTemplateId ? (
+        {/* Save / Update buttons - Chỉ admin mới có quyền cập nhật đè mẫu có sẵn */}
+        {editingTemplateId && canUpdateTemplate ? (
           <div className="inline-flex items-center rounded-md shadow-sm">
             <button
               type="button"
               onClick={onUpdateTemplateInDb}
               disabled={isSavingTemplate}
-              title="Cập nhật trực tiếp các thay đổi vào mẫu này"
+              title="Cập nhật trực tiếp các thay đổi vào mẫu này (Chỉ dành cho Admin)"
               className="inline-flex items-center gap-1.5 rounded-l-md border border-rose-600 bg-rose-700 px-3 py-2 text-xs font-bold text-white hover:bg-rose-800 disabled:opacity-50 transition-colors"
             >
               <Save className="h-4 w-4" aria-hidden="true" />
@@ -590,13 +578,13 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
         ) : (
           <button
             type="button"
-            onClick={onUpdateTemplateInDb}
+            onClick={onSaveNewTemplateToDb || onUpdateTemplateInDb}
             disabled={isSavingTemplate}
-            title="Lưu thiết kế mới vào thư viện"
+            title={editingTemplateId ? "Lưu bản sao thành mẫu mới vào thư viện" : "Lưu thiết kế mới vào thư viện"}
             className="inline-flex items-center gap-1.5 rounded-md border border-rose-300 bg-white px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-50 disabled:opacity-50 transition-colors shadow-sm"
           >
             <Save className="h-4 w-4" aria-hidden="true" />
-            {isSavingTemplate ? 'Đang lưu...' : 'Lưu mẫu mới'}
+            {isSavingTemplate ? 'Đang lưu...' : (editingTemplateId ? 'Lưu bản sao mới' : 'Lưu mẫu mới')}
           </button>
         )}
 

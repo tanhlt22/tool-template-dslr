@@ -78,6 +78,12 @@ export function useTemplateDB(
       return handleSaveNewTemplateToDb(templateName, category);
     }
 
+    const isAdmin = sessionStorage.getItem('photobooth_admin_auth') === 'true' || userRole === 'admin';
+    if (!isAdmin) {
+      showToast('Chỉ tài khoản Admin mới có quyền cập nhật đè lên mẫu có sẵn. Đang lưu thành mẫu mới...', 'info');
+      return handleSaveNewTemplateToDb(templateName, category);
+    }
+
     setIsSavingTemplate(true);
     showToast('Đang tải ảnh và lưu mẫu lên hệ thống...', 'info');
     try {

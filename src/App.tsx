@@ -265,6 +265,12 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
   };
 
   const handleDeleteFrame = async (frame: any) => {
+    if (!isAdminAuthenticated && tpl.userRole !== 'admin') {
+      showToast('Chỉ tài khoản Admin mới có quyền xóa mẫu khỏi hệ thống.', 'error');
+      setIsAdminPasswordModalOpen(true);
+      return;
+    }
+
     if (!frame.id || String(frame.id).startsWith('demo_')) {
       showToast('Đây là mẫu minh họa, không có bản ghi để xóa.', 'info');
       return;
@@ -287,8 +293,9 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
   };
 
   const handleRequestSave = async () => {
-    // If editing an existing database template -> update directly
-    if (tpl.editingTemplateId) {
+    // Chỉ Admin mới được quyền cập nhật đè trực tiếp lên mẫu có sẵn trong database
+    const canUpdate = Boolean(isAdminAuthenticated || tpl.userRole === 'admin');
+    if (tpl.editingTemplateId && canUpdate) {
       const ok = await tpl.handleUpdateTemplateInDb(cs.frameName, tpl.editingCategory || 'wedding');
       if (ok && pendingExportAfterSave) {
         setPendingExportAfterSave(false);
@@ -296,7 +303,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
       }
       return;
     }
-    // New draft or preset without ID -> open save modal
+    // Chưa lưu hoặc tài khoản thường -> mở modal để lưu thành mẫu mới
     setIsSaveFrameOpen(true);
   };
 
@@ -315,8 +322,9 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
       return;
     }
 
+    const canUpdate = Boolean(isAdminAuthenticated || tpl.userRole === 'admin');
     let ok = false;
-    if (tpl.editingTemplateId) {
+    if (tpl.editingTemplateId && canUpdate) {
       ok = await tpl.handleUpdateTemplateInDb(trimmedName, category);
       if (ok) {
         cs.setFrameName(trimmedName);
@@ -531,6 +539,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
         canUndo={layers.canUndo}
         canRedo={layers.canRedo}
         userRole={tpl.userRole}
+        isAdmin={isAdminAuthenticated}
         editingTemplateId={tpl.editingTemplateId}
         isSavingTemplate={tpl.isSavingTemplate}
         onUpdateTemplateInDb={handleRequestSave}
