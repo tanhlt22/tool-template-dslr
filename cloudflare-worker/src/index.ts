@@ -320,7 +320,14 @@ app.post('/frames', async (c) => {
     const category = payload.category || 'general';
     const width = Number(payload.width) || 1200;
     const height = Number(payload.height) || 1800;
-    const bgUrl = payload.backgroundImageUrl || payload.background_image_url || null;
+    let bgUrl = payload.backgroundImageUrl || payload.background_image_url || null;
+    if (!bgUrl && Array.isArray(payload.elements)) {
+      const bgEl = payload.elements.find((el: any) =>
+        (el?.type === 'image' || el?.type === 'icon') &&
+        (el?.id?.startsWith('background_frame') || (el?.width === width && el?.height === height) || el?.content)
+      );
+      if (bgEl?.content) bgUrl = bgEl.content;
+    }
     const thumbUrl = payload.thumbnail_url || bgUrl || null;
 
     // 1. Upload full JSON config to Google Drive
@@ -395,10 +402,17 @@ app.put('/frames/:id', async (c) => {
     const category = payload.category || existing.category;
     const width = Number(payload.width) || existing.width;
     const height = Number(payload.height) || existing.height;
-    const bgUrl =
+    let bgUrl =
       payload.backgroundImageUrl ||
       payload.background_image_url ||
       existing.background_image_url;
+    if (!bgUrl && Array.isArray(payload.elements)) {
+      const bgEl = payload.elements.find((el: any) =>
+        (el?.type === 'image' || el?.type === 'icon') &&
+        (el?.id?.startsWith('background_frame') || (el?.width === width && el?.height === height) || el?.content)
+      );
+      if (bgEl?.content) bgUrl = bgEl.content;
+    }
     const thumbUrl = payload.thumbnail_url || existing.thumbnail_url || bgUrl;
 
     let driveFileId = existing.drive_file_id;
@@ -479,10 +493,17 @@ app.put('/frames', async (c) => {
     const category = payload.category || existing.category;
     const width = Number(payload.width) || existing.width;
     const height = Number(payload.height) || existing.height;
-    const bgUrl =
+    let bgUrl =
       payload.backgroundImageUrl ||
       payload.background_image_url ||
       existing.background_image_url;
+    if (!bgUrl && Array.isArray(payload.elements)) {
+      const bgEl = payload.elements.find((el: any) =>
+        (el?.type === 'image' || el?.type === 'icon') &&
+        (el?.id?.startsWith('background_frame') || (el?.width === width && el?.height === height) || el?.content)
+      );
+      if (bgEl?.content) bgUrl = bgEl.content;
+    }
     const thumbUrl = payload.thumbnail_url || existing.thumbnail_url || bgUrl;
 
     let driveFileId = existing.drive_file_id;

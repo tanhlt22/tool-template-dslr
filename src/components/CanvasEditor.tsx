@@ -640,7 +640,11 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
               ...style,
               color: textObj.fill as string || '#ffffff',
               fontSize: newFontSize,
-              fontFamily: textObj.fontFamily || 'Outfit'
+              fontFamily: textObj.fontFamily || 'Outfit',
+              fontWeight: (textObj.fontWeight as string) || style?.fontWeight || 'normal',
+              fontStyle: (textObj.fontStyle as string) || style?.fontStyle || 'normal',
+              strokeWidth: typeof textObj.strokeWidth === 'number' ? textObj.strokeWidth : (style?.strokeWidth || 0),
+              stroke: (textObj.stroke as string) || style?.stroke
             }
           });
         } else if (obj.data.type === 'icon' || obj.data.type === 'image' || obj.data.type === 'qr') {
@@ -1002,14 +1006,24 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
         if (elem.type === 'text') {
           const textObj = existing as fabric.IText;
+          const strokeWidth = elem.style?.strokeWidth || 0;
+          const textColor = elem.style?.color || '#ffffff';
+          const strokeColor = strokeWidth > 0 ? (elem.style?.stroke || textColor) : undefined;
           textObj.set({
             text: elem.content,
-            fill: elem.style?.color || '#ffffff',
+            fill: textColor,
             fontSize: elem.style?.fontSize || 24,
             fontFamily: elem.style?.fontFamily || 'Outfit',
+            fontWeight: elem.style?.fontWeight || 'normal',
+            fontStyle: (elem.style?.fontStyle as any) || 'normal',
+            stroke: strokeColor,
+            strokeWidth: strokeWidth,
+            paintFirst: 'stroke',
             scaleX: 1,
             scaleY: 1
           });
+          textObj.initDimensions();
+          textObj.setCoords();
         } else if (elem.type === 'image' || elem.type === 'icon') {
           const fabricImg = existing as fabric.Image;
           if (existing.data?.content !== elem.content) {
@@ -1050,13 +1064,20 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         }
       } else {
         if (elem.type === 'text') {
+          const strokeWidth = elem.style?.strokeWidth || 0;
+          const textColor = elem.style?.color || '#ffffff';
+          const strokeColor = strokeWidth > 0 ? (elem.style?.stroke || textColor) : undefined;
           const text = new fabric.IText(elem.content, {
             left: elem.x,
             top: elem.y,
             fontSize: elem.style?.fontSize || 24,
             fontFamily: elem.style?.fontFamily || 'Outfit',
-            fontWeight: elem.style?.fontWeight || 'bold',
-            fill: elem.style?.color || '#ffffff',
+            fontWeight: elem.style?.fontWeight || 'normal',
+            fontStyle: (elem.style?.fontStyle as any) || 'normal',
+            stroke: strokeColor,
+            strokeWidth: strokeWidth,
+            paintFirst: 'stroke',
+            fill: textColor,
             angle: elem.rotation,
             visible: isVisible,
             shadow: '2px 2px 4px rgba(0,0,0,0.5)',

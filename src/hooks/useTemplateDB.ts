@@ -110,6 +110,16 @@ export function useTemplateDB(
       // Update local elements with new URLs
       setElements(finalElements);
 
+      if (!finalBgUrl) {
+        const bgEl = finalElements.find((e: any) => 
+          (e.type === 'image' || e.type === 'icon') && 
+          (e.id?.startsWith('background_frame') || (e.width === currentState.width && e.height === currentState.height) || e.content)
+        );
+        if (bgEl?.content) {
+          finalBgUrl = bgEl.content;
+        }
+      }
+
       await apiService.updateFrame({
         id: editingTemplateId,
         name: templateName || currentState.frameName,
@@ -118,6 +128,7 @@ export function useTemplateDB(
         height: currentState.height,
         backgroundPrompt: currentState.prompt,
         backgroundImageUrl: finalBgUrl,
+        thumbnail_url: finalBgUrl,
         slots: currentState.slots,
         elements: finalElements
       });
@@ -161,6 +172,16 @@ export function useTemplateDB(
       );
       setElements(finalElements);
 
+      if (!finalBgUrl) {
+        const bgEl = finalElements.find((e: any) => 
+          (e.type === 'image' || e.type === 'icon') && 
+          (e.id?.startsWith('background_frame') || (e.width === currentState.width && e.height === currentState.height) || e.content)
+        );
+        if (bgEl?.content) {
+          finalBgUrl = bgEl.content;
+        }
+      }
+
       const result = await apiService.createFrame({
         name: finalName,
         category: category || 'general',
@@ -168,6 +189,7 @@ export function useTemplateDB(
         height: currentState.height,
         backgroundPrompt: currentState.prompt,
         backgroundImageUrl: finalBgUrl,
+        thumbnail_url: finalBgUrl,
         slots: currentState.slots,
         elements: finalElements
       });

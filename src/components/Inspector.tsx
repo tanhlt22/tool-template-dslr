@@ -3,11 +3,13 @@ import {
   AlignCenter,
   AlignLeft,
   AlignRight,
+  Bold,
   Camera,
   ChevronDown,
   ChevronUp,
   Copy,
   Image as ImageIcon,
+  Italic,
   Layers,
   MousePointer,
   QrCode,
@@ -364,31 +366,133 @@ export const Inspector: React.FC<InspectorProps> = ({
                     className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-xs font-semibold focus:border-rose-700 focus:outline-none"
                   />
                 </label>
+
+                {/* Phông chữ */}
                 <label className="block text-xs font-bold text-slate-700">
-                  Phông chữ
+                  Phông chữ (Calligraphy & Typography)
                   <select
                     name="fontFamily"
-                    value={activeElement.style?.fontFamily || 'Outfit'}
+                    value={(() => {
+                      const cur = activeElement.style?.fontFamily || 'Outfit';
+                      const clean = cur.replace(/['"]/g, '').split(',')[0].trim().toLowerCase();
+                      const match = GOOGLE_FONTS.find(f => f.value.toLowerCase().includes(clean) || f.name.toLowerCase().includes(clean));
+                      return match ? match.value : cur;
+                    })()}
                     onChange={(event) => onUpdateProp('fontFamily', event.target.value)}
-                    className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-xs font-semibold focus:border-rose-700 focus:outline-none"
+                    className="mt-1 w-full rounded-md border border-slate-300 px-2 py-2 text-xs font-semibold focus:border-rose-700 focus:outline-none bg-white shadow-xs"
                   >
                     {GOOGLE_FONTS.map((font) => (
-                      <option key={font.name} value={font.value}>
+                      <option key={font.name} value={font.value} style={{ fontFamily: font.value }}>
                         {font.name}
                       </option>
                     ))}
                   </select>
                 </label>
-                <NumberField label="Cỡ chữ" name="fontSize" value={activeElement.style?.fontSize || 24} onChange={(value) => onUpdateProp('fontSize', value)} />
-                <label className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                  Màu chữ
+
+                {/* Cỡ chữ & In nghiêng */}
+                <div className="grid grid-cols-2 gap-2 items-end">
+                  <NumberField label="Cỡ chữ (px)" name="fontSize" value={activeElement.style?.fontSize || 24} onChange={(value) => onUpdateProp('fontSize', value)} />
+                  <div>
+                    <span className="block text-xs font-bold text-slate-700 mb-1">Kiểu chữ</span>
+                    <button
+                      type="button"
+                      onClick={() => onUpdateProp('fontStyle', activeElement.style?.fontStyle === 'italic' ? 'normal' : 'italic')}
+                      className={`w-full flex items-center justify-center gap-1.5 rounded-md border px-2 py-1.5 text-xs font-bold transition-all shadow-xs ${
+                        activeElement.style?.fontStyle === 'italic'
+                          ? 'border-rose-700 bg-rose-50 text-rose-800'
+                          : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <Italic className="h-3.5 w-3.5" />
+                      In nghiêng
+                    </button>
+                  </div>
+                </div>
+
+                {/* Độ đậm font (Font Weight) */}
+                <label className="block text-xs font-bold text-slate-700">
+                  Độ đậm phông chữ (Weight)
+                  <select
+                    name="fontWeight"
+                    value={activeElement.style?.fontWeight || 'normal'}
+                    onChange={(event) => onUpdateProp('fontWeight', event.target.value)}
+                    className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-xs font-semibold focus:border-rose-700 focus:outline-none bg-white"
+                  >
+                    <option value="300">300 - Mảnh (Light)</option>
+                    <option value="normal">400 - Tiêu chuẩn (Regular)</option>
+                    <option value="500">500 - Vừa (Medium)</option>
+                    <option value="600">600 - Bán đậm (SemiBold)</option>
+                    <option value="bold">700 - Đậm (Bold)</option>
+                    <option value="800">800 - Rất đậm (ExtraBold)</option>
+                  </select>
+                </label>
+
+                {/* Độ dày nét chữ (Stroke / Nét thanh mảnh ↔ Đậm dày) */}
+                <div className="rounded-lg border border-rose-100 bg-rose-50/50 p-2.5 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-800">
+                    <span className="flex items-center gap-1 text-rose-900">
+                      <span className="inline-block w-2 h-2 rounded-full bg-rose-600"></span>
+                      Độ dày nét chữ (Mỏng ↔ Dày)
+                    </span>
+                    <span className="text-[11px] font-black px-1.5 py-0.5 rounded bg-white text-rose-700 border border-rose-200">
+                      {(activeElement.style?.strokeWidth ?? 0)} px
+                    </span>
+                  </div>
+
                   <input
-                    aria-label="Màu chữ"
-                    type="color"
-                    value={activeElement.style?.color || '#111827'}
-                    onChange={(event) => onUpdateProp('color', event.target.value)}
-                    className="h-8 w-12 rounded border border-slate-300 bg-white"
+                    type="range"
+                    min="0"
+                    max="6"
+                    step="0.5"
+                    value={activeElement.style?.strokeWidth ?? 0}
+                    onChange={(event) => onUpdateProp('strokeWidth', parseFloat(event.target.value) || 0)}
+                    className="w-full accent-rose-700 cursor-pointer h-1.5 bg-slate-200 rounded-lg appearance-none"
                   />
+
+                  {/* Nút chọn nhanh độ dày nét */}
+                  <div className="grid grid-cols-5 gap-1 pt-1">
+                    {[
+                      { label: 'Gốc', val: 0 },
+                      { label: 'Thanh', val: 0.5 },
+                      { label: 'Vừa', val: 1 },
+                      { label: 'Đậm', val: 2 },
+                      { label: 'Dày', val: 3.5 }
+                    ].map((preset) => {
+                      const isSelected = (activeElement.style?.strokeWidth ?? 0) === preset.val;
+                      return (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => onUpdateProp('strokeWidth', preset.val)}
+                          className={`rounded py-1 text-[10.5px] font-bold transition-all ${
+                            isSelected
+                              ? 'bg-rose-700 text-white shadow-xs'
+                              : 'bg-white text-slate-700 border border-slate-200 hover:border-rose-300'
+                          }`}
+                        >
+                          {preset.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[10px] text-slate-500 italic leading-snug">
+                    * Thích hợp tinh chỉnh nét chữ ký, thư pháp calligraphy thanh mảnh hoặc làm dày nét chữ.
+                  </p>
+                </div>
+
+                {/* Màu chữ */}
+                <label className="flex items-center justify-between text-xs font-bold text-slate-700 pt-1">
+                  <span>Màu sắc chữ:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono text-slate-600 font-semibold">{activeElement.style?.color || '#111827'}</span>
+                    <input
+                      aria-label="Màu chữ"
+                      type="color"
+                      value={activeElement.style?.color || '#111827'}
+                      onChange={(event) => onUpdateProp('color', event.target.value)}
+                      className="h-8 w-10 cursor-pointer rounded border border-slate-300 bg-white p-0.5"
+                    />
+                  </div>
                 </label>
               </section>
             )}

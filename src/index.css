@@ -1,4 +1,87 @@
-@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&family=Great+Vibes&family=Pacifico&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@400;600;800&family=Bungee&family=Dancing+Script:wght@400;700&family=Cinzel:wght@400;700&family=Alex+Brush&family=Pinyon+Script&family=Lobster&family=Sacramento&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&family=Great+Vibes&family=Pacifico&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@400;600;800&family=Bungee&family=Dancing+Script:wght@400;700&family=Cinzel:wght@400;700&family=Alex+Brush&family=Pinyon+Script&family=Lobster&family=Sacramento&family=Allura&display=swap');
+
+/* ==========================================================================
+   Modern Calligraphy & Handwritten Script Fonts
+   ========================================================================== */
+@font-face {
+  font-family: 'Brittany Signature';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/BrittanySignature.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Amsterdam Four';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/AmsterdamFour.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Amsterdam';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/AmsterdamFour.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bickham Script Pro';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/BickhamScriptPro-Regular.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bickham Script Pro';
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/BickhamScriptPro-Semibold.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bickham Script Pro';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/BickhamScriptPro-Bold.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bickham Script Pro';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/fonts/BickhamScriptPro-Regular.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bickham Script';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/BickhamScriptPro-Regular.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bickham Script';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/BickhamScriptPro-Bold.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Allura';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/Allura-Regular.ttf') format('truetype');
+  font-display: swap;
+}
 
 @tailwind base;
 @tailwind components;

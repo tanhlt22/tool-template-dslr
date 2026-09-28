@@ -18,6 +18,8 @@ export interface ElementStyle {
   order?: number;
   fontWeight?: string;
   fontStyle?: string;
+  stroke?: string;
+  strokeWidth?: number;
 }
 
 export interface FrameElement {

@@ -92,6 +92,10 @@ interface EditorToolbarProps {
 }
 
 const textPresets = [
+  { label: 'Chữ ký Brittany', value: 'Brittany & Alexander', category: 'wedding', style: { fontFamily: 'Brittany Signature', fontSize: 46, color: '#be123c' } },
+  { label: 'Amsterdam Script', value: 'Together With Our Families', category: 'wedding', style: { fontFamily: 'Amsterdam Four', fontSize: 42, color: '#9f1239' } },
+  { label: 'Bickham Luxury', value: 'Save The Date', category: 'wedding', style: { fontFamily: 'Bickham Script Pro', fontSize: 48, color: '#881337' } },
+  { label: 'Allura Modern', value: 'Forever & Always', category: 'wedding', style: { fontFamily: 'Allura', fontSize: 50, color: '#e11d48' } },
   { label: 'Cô dâu & Chú rể', value: 'Cô Dâu & Chú Rể', category: 'wedding', style: { fontFamily: 'Great Vibes', fontSize: 44, color: '#e11d48' } },
   { label: 'Lễ Thành Hôn', value: 'LỄ THÀNH HÔN', category: 'wedding', style: { fontFamily: 'Cinzel', fontSize: 38, color: '#b91c1c' } },
   { label: 'Lễ Vu Quy', value: 'LỄ VU QUY', category: 'wedding', style: { fontFamily: 'Playfair Display', fontSize: 38, color: '#dc2626' } },

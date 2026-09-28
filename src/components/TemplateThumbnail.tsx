@@ -1,5 +1,6 @@
-import React, { useRef, useState, useLayoutEffect } from 'react';
+import React, { useRef, useState, useLayoutEffect, useEffect } from 'react';
 import { getAssetUrl } from '../utils/storage';
+import { apiService } from '../services/api';
 
 export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent?: boolean }> = ({ 
   frame, 
@@ -8,6 +9,16 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
+  const [detailFrame, setDetailFrame] = useState<any>(null);
+
+  useEffect(() => {
+    const rawBgCheck = frame.background_image_url || frame.backgroundImageUrl || frame.thumbnail_url || frame.thumbnailUrl;
+    if (!rawBgCheck && (!frame.elements || frame.elements.length === 0) && frame.id) {
+      apiService.getFrame(frame.id).then((full) => {
+        if (full) setDetailFrame(full);
+      }).catch(() => {});
+    }
+  }, [frame.id, frame.background_image_url, frame.backgroundImageUrl, frame.thumbnail_url, frame.thumbnailUrl, frame.elements]);
 
   useLayoutEffect(() => {
     if (!fitParent || !containerRef.current) return;
@@ -28,10 +39,11 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
     return () => observer.disconnect();
   }, [fitParent]);
 
-  const rawBg = frame.background_image_url || frame.backgroundImageUrl || frame.thumbnail_url || frame.thumbnailUrl;
+  const activeFrame = detailFrame ? { ...frame, ...detailFrame } : frame;
+  const rawBg = activeFrame.background_image_url || activeFrame.backgroundImageUrl || activeFrame.thumbnail_url || activeFrame.thumbnailUrl;
   const image = getAssetUrl(rawBg) || rawBg;
-  const width = Number(frame.width) || 1200;
-  const height = Number(frame.height) || 1800;
+  const width = Number(activeFrame.width) || 1200;
+  const height = Number(activeFrame.height) || 1800;
   const isLandscape = width > height;
 
   if (fitParent) {
@@ -70,7 +82,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
             )}
 
             {/* 1. Slot Placeholder Boxes */}
-            {frame.slots?.map((slot: any, index: number) => (
+            {activeFrame.slots?.map((slot: any, index: number) => (
               <div
                 key={slot.id || `slot_box_${index}`}
                 className="absolute rounded-sm border border-slate-400/60 bg-slate-200/80 shadow-xs backdrop-blur-[1px]"
@@ -84,7 +96,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
             ))}
 
             {/* 2. All Elements in exact array order */}
-            {frame.elements?.map((el: any, index: number) => {
+            {activeFrame.elements?.map((el: any, index: number) => {
               if (el.visible === false) return null;
               const leftPct = (el.x / width) * 100;
               const topPct = (el.y / height) * 100;
@@ -93,6 +105,8 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
               const rotation = el.rotation || 0;
 
               if (el.type === 'text') {
+                const textStrokeWidth = el.style?.strokeWidth ? (el.style.strokeWidth * (renderHeight / height)) : 0;
+                const textStrokeColor = textStrokeWidth > 0 ? (el.style?.stroke || el.style?.color || '#ffffff') : undefined;
                 return (
                   <div
                     key={el.id || `text_${index}`}
@@ -107,7 +121,10 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
                       color: el.style?.color || '#ffffff',
                       fontFamily: el.style?.fontFamily || 'Outfit',
                       fontSize: `${(el.style?.fontSize || 24) * (renderHeight / height)}px`,
-                      fontWeight: el.style?.fontWeight || 'bold'
+                      fontWeight: el.style?.fontWeight || 'normal',
+                      fontStyle: el.style?.fontStyle || 'normal',
+                      WebkitTextStroke: textStrokeWidth > 0 ? `${textStrokeWidth}px ${textStrokeColor}` : undefined,
+                      paintOrder: 'stroke fill'
                     }}
                   >
                     {el.content}
@@ -141,7 +158,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
             })}
 
             {/* 3. Slot Number Labels */}
-            {frame.slots?.map((slot: any, index: number) => (
+            {activeFrame.slots?.map((slot: any, index: number) => (
               <div
                 key={slot.id || `slot_label_${index}`}
                 className="absolute pointer-events-none flex items-center justify-center text-xs md:text-sm font-black text-rose-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]"
@@ -207,7 +224,7 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
           />
         )}
         {/* ONLY Render Elements in exact array order - NO slots, NO slot labels! */}
-        {frame.elements?.map((el: any, index: number) => {
+        {activeFrame.elements?.map((el: any, index: number) => {
           if (el.visible === false) return null;
           const leftPct = (el.x / width) * 100;
           const topPct = (el.y / height) * 100;
@@ -216,6 +233,8 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
           const rotation = el.rotation || 0;
 
           if (el.type === 'text') {
+            const textStrokeWidth = el.style?.strokeWidth ? (el.style.strokeWidth * (thumbH / height)) : 0;
+            const textStrokeColor = textStrokeWidth > 0 ? (el.style?.stroke || el.style?.color || '#ffffff') : undefined;
             return (
               <div
                 key={el.id || `text_${index}`}
@@ -230,7 +249,10 @@ export const TemplateThumbnail: React.FC<{ frame: any; scale?: number; fitParent
                   color: el.style?.color || '#ffffff',
                   fontFamily: el.style?.fontFamily || 'Outfit',
                   fontSize: `${(el.style?.fontSize || 24) * (thumbH / height)}px`,
-                  fontWeight: el.style?.fontWeight || 'bold'
+                  fontWeight: el.style?.fontWeight || 'normal',
+                  fontStyle: el.style?.fontStyle || 'normal',
+                  WebkitTextStroke: textStrokeWidth > 0 ? `${textStrokeWidth}px ${textStrokeColor}` : undefined,
+                  paintOrder: 'stroke fill'
                 }}
               >
                 {el.content}

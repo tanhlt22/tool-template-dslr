@@ -74,19 +74,26 @@ export const PAPER_SIZES = [
 ];
 
 export const GOOGLE_FONTS = [
-  { name: 'NVN Motherland Signature', value: "'NVN Motherland Signature', cursive" },
-  { name: 'Hanken Grotesk (Hiện đại)', value: "'Hanken Grotesk', sans-serif" },
+  // Modern Calligraphy & Handwritten Script (Đám cưới & Chữ ký nghệ thuật)
+  { name: 'Brittany Signature (Nét chữ ký tự nhiên)', value: "'Brittany Signature', cursive" },
+  { name: 'Amsterdam Four (Mềm mại & thanh thoát)', value: "'Amsterdam Four', 'Amsterdam', cursive" },
+  { name: 'Bickham Script (Cưới hoàng gia sang trọng)', value: "'Bickham Script Pro', 'Bickham Script', cursive" },
+  { name: 'Allura (Thư pháp hiện đại, dễ đọc)', value: "'Allura', cursive" },
+  { name: 'Great Vibes (Cổ điển & lãng mạn cưới)', value: "'Great Vibes', cursive" },
+  { name: 'NVN Motherland Signature (Chữ ký)', value: "'NVN Motherland Signature', cursive" },
+  { name: 'Dancing Script (Bay bổng tự nhiên)', value: "'Dancing Script', cursive" },
   { name: 'Pacifico (Nghệ thuật)', value: "'Pacifico', cursive" },
-  { name: 'Great Vibes (Mềm mại)', value: "'Great Vibes', cursive" },
-  { name: 'Outfit (Sắc nét)', value: "'Outfit', sans-serif" },
-  { name: 'Playfair Display (Cổ điển)', value: "'Playfair Display', serif" },
-  { name: 'Bungee (Cá tính)', value: "'Bungee', sans-serif" },
-  { name: 'Dancing Script (Bay bổng)', value: "'Dancing Script', cursive" },
-  { name: 'Cinzel (Hoàng gia)', value: "'Cinzel', serif" },
-  { name: 'Alex Brush (Mảnh mai)', value: "'Alex Brush', cursive" },
+  { name: 'Alex Brush (Mảnh mai thanh tao)', value: "'Alex Brush', cursive" },
   { name: 'Pinyon Script (Quý phái)', value: "'Pinyon Script', cursive" },
+  { name: 'Sacramento (Thanh lịch)', value: "'Sacramento', cursive" },
   { name: 'Lobster (Cổ điển Retro)', value: "'Lobster', cursive" },
-  { name: 'Sacramento (Thanh lịch)', value: "'Sacramento', cursive" }
+
+  // Typography hiện đại & tiêu đề
+  { name: 'Hanken Grotesk (Hiện đại)', value: "'Hanken Grotesk', sans-serif" },
+  { name: 'Outfit (Sắc nét)', value: "'Outfit', sans-serif" },
+  { name: 'Playfair Display (Cổ điển Serif)', value: "'Playfair Display', serif" },
+  { name: 'Cinzel (Hoàng gia La Mã)', value: "'Cinzel', serif" },
+  { name: 'Bungee (Cá tính & đậm)', value: "'Bungee', sans-serif" }
 ];
 
 export const BACKGROUND_PRESETS = [
@@ -100,4 +107,3 @@ export const BACKGROUND_PRESETS = [
   { name: 'Neon Deep Cyan', value: 'linear-gradient(135deg, #0058be 0%, #2170e4 100%)', type: 'gradient' },
   { name: 'Vũ trụ đêm', value: 'linear-gradient(135deg, #0f172a 0%, #020617 100%)', type: 'gradient' }
 ];
-

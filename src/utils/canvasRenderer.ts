@@ -85,6 +85,11 @@ export async function renderAllElements(
   ctx: CanvasRenderingContext2D,
   elements: FrameElement[]
 ): Promise<void> {
+  if (typeof document !== 'undefined' && document.fonts) {
+    try {
+      await document.fonts.ready;
+    } catch {}
+  }
   for (const elem of elements.filter(e => e.visible !== false)) {
     ctx.save();
     const theta = (elem.rotation || 0) * Math.PI / 180;
@@ -94,10 +99,28 @@ export async function renderAllElements(
     ctx.rotate(theta);
 
     if (elem.type === 'text') {
-      ctx.font = `bold ${elem.style?.fontSize || 24}px ${elem.style?.fontFamily || 'Outfit'}, Outfit, sans-serif`;
-      ctx.fillStyle = elem.style?.color || '#ffffff';
+      const fontSize = elem.style?.fontSize || 24;
+      const fontFamily = elem.style?.fontFamily || 'Outfit';
+      const fontWeight = elem.style?.fontWeight || 'normal';
+      const fontStyle = elem.style?.fontStyle || 'normal';
+      const strokeWidth = elem.style?.strokeWidth || 0;
+      const textColor = elem.style?.color || '#ffffff';
+      const strokeColor = strokeWidth > 0 ? (elem.style?.stroke || textColor) : undefined;
+
+      const stylePrefix = fontStyle !== 'normal' ? `${fontStyle} ` : '';
+      ctx.font = `${stylePrefix}${fontWeight} ${fontSize}px ${fontFamily}, Outfit, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+
+      if (strokeWidth > 0 && strokeColor) {
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = strokeWidth * 2;
+        ctx.lineJoin = 'round';
+        ctx.miterLimit = 2;
+        ctx.strokeText(elem.content, 0, 0);
+      }
+
+      ctx.fillStyle = textColor;
       ctx.fillText(elem.content, 0, 0);
       ctx.restore();
     } else if (elem.type === 'icon' || elem.type === 'image') {

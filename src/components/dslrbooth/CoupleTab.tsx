@@ -158,11 +158,20 @@ export const CoupleTab: React.FC = () => {
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
 
-      const calligraphy = currentTemplate.calligraphyFont === 'Pacifico'
-        ? "42px 'Pacifico', cursive"
-        : currentTemplate.calligraphyFont === 'Great Vibes'
-          ? "56px 'Great Vibes', cursive"
-          : "bold 34px 'Outfit', sans-serif";
+      const font = currentTemplate.calligraphyFont;
+      const calligraphy = font === 'Brittany Signature'
+        ? "52px 'Brittany Signature', cursive"
+        : font === 'Amsterdam Four' || font === 'Amsterdam'
+          ? "50px 'Amsterdam Four', 'Amsterdam', cursive"
+          : font === 'Bickham Script' || font === 'Bickham Script Pro'
+            ? "54px 'Bickham Script Pro', cursive"
+            : font === 'Allura'
+              ? "52px 'Allura', cursive"
+              : font === 'Pacifico'
+                ? "42px 'Pacifico', cursive"
+                : font === 'Great Vibes'
+                  ? "56px 'Great Vibes', cursive"
+                  : "bold 34px 'Outfit', sans-serif";
 
       ctx.font = calligraphy;
       const coupleText = `${brideName} & ${groomName}`;
@@ -244,11 +253,21 @@ export const CoupleTab: React.FC = () => {
             ctx.fillStyle = el.style?.color || '#000000';
             const fontSize = el.style?.fontSize || 24;
             const fontFamily = el.style?.fontFamily || 'Outfit';
-            const fontWeight = el.style?.fontWeight || 'bold';
+            const fontWeight = el.style?.fontWeight || 'normal';
+            const fontStyle = el.style?.fontStyle || 'normal';
+            const strokeWidth = el.style?.strokeWidth || 0;
+            const stylePrefix = fontStyle !== 'normal' ? `${fontStyle} ` : '';
 
-            ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}, sans-serif`;
+            ctx.font = `${stylePrefix}${fontWeight} ${fontSize}px ${fontFamily}, sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
+
+            if (strokeWidth > 0) {
+              ctx.strokeStyle = el.style?.stroke || el.style?.color || '#000000';
+              ctx.lineWidth = strokeWidth * 2;
+              ctx.lineJoin = 'round';
+              ctx.strokeText(content, el.x + el.width / 2, el.y + el.height / 2);
+            }
 
             ctx.fillText(content, el.x + el.width / 2, el.y + el.height / 2);
           } else if (el.type === 'qr') {
