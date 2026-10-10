@@ -248,8 +248,12 @@ export async function generateClientBase64(
 }
 
 /**
- * Generates a DSLRbooth ZIP file (background.jpg + overlay.png + preview.png + template.xml).
- * Tuân thủ format chuẩn DSLRbooth: không có template.json, có preview.png, QrCode element trong XML.
+ * Generates a DSLRbooth ZIP file (preview.png + template.xml + optional overlay.png / background.jpg).
+ * Đồng bộ chuẩn dslrBooth:
+ * - Không sinh background.jpg nếu nền chỉ là màu đơn sắc (dùng BackgroundColor="#AARRGGBB" của thẻ Template).
+ * - Không sinh overlay.png nếu không có phần tử trang trí / text / sticker đè lên.
+ * - Loại bỏ các thuộc tính XML thừa (ShadowEnabled, Thickness=0, Opacity=100 khi không dùng).
+ * - Sắp xếp ZIndex chuẩn theo thứ tự hiển thị.
  */
 export async function generateDslrboothZip(
   width: number,
@@ -271,10 +275,16 @@ export async function generateDslrboothZip(
   const exportHeight = Math.round(height * exportScale);
   const scaled = (value: number) => Math.round(value * exportScale);
 
-  // A. background.jpg
-  const hasBackground = bgOptions.backgroundType !== 'color' || elements.some(e => e.id.startsWith('background_frame'));
+  // 1. Kiểm tra có cần file background.jpg hay không
+  // Chỉ tạo background.jpg nếu nền là AI image thật sự (không trùng layer) hoặc gradient.
+  // Nếu backgroundType là 'color' -> dslrBooth tự fill màu bằng thuộc tính BackgroundColor của Template, không cần ảnh nền.
+  const hasBgFrameLayer = elements.some(e => e.id.startsWith('background_frame') || (e.type === 'image' && e.content === bgOptions.bgImageUrl));
+  const hasRealBackgroundImage =
+    (bgOptions.backgroundType === 'ai' && !!bgOptions.bgImageUrl && !hasBgFrameLayer) ||
+    (bgOptions.backgroundType === 'gradient' && !!bgOptions.bgGradient);
+
   let bgBlob: Blob | null = null;
-  if (hasBackground) {
+  if (hasRealBackgroundImage) {
     const bgCanvas = document.createElement('canvas');
     bgCanvas.width = exportWidth;
     bgCanvas.height = exportHeight;
@@ -288,24 +298,28 @@ export async function generateDslrboothZip(
     if (bgBlob) zip.file('background.jpg', bgBlob);
   }
 
-  // B. overlay.png — decoration elements (text, sticker). QR không vào overlay.
-  const overlayCanvas = document.createElement('canvas');
-  overlayCanvas.width = exportWidth;
-  overlayCanvas.height = exportHeight;
-  const overCtx = overlayCanvas.getContext('2d');
-  if (overCtx) {
-    overCtx.imageSmoothingEnabled = true;
-    overCtx.imageSmoothingQuality = 'high';
-    const nonQrElements = elements.filter(e => e.type !== 'qr');
-    overCtx.save();
-    overCtx.scale(exportScale, exportScale);
-    await renderAllElements(overCtx, nonQrElements);
-    overCtx.restore();
-  }
-  const overBlob = await new Promise<Blob | null>(res => overlayCanvas.toBlob(res, 'image/png'));
-  if (overBlob) zip.file('overlay.png', overBlob);
+  // 2. Kiểm tra có phần tử overlay hay không (tất cả các element khác QR)
+  const nonQrElements = elements.filter(e => e.type !== 'qr' && e.visible !== false);
+  const hasOverlay = nonQrElements.length > 0;
 
-  // C. preview.png — ảnh xem trước tổng hợp (như bản gốc DSLRbooth)
+  if (hasOverlay) {
+    const overlayCanvas = document.createElement('canvas');
+    overlayCanvas.width = exportWidth;
+    overlayCanvas.height = exportHeight;
+    const overCtx = overlayCanvas.getContext('2d');
+    if (overCtx) {
+      overCtx.imageSmoothingEnabled = true;
+      overCtx.imageSmoothingQuality = 'high';
+      overCtx.save();
+      overCtx.scale(exportScale, exportScale);
+      await renderAllElements(overCtx, nonQrElements);
+      overCtx.restore();
+    }
+    const overBlob = await new Promise<Blob | null>(res => overlayCanvas.toBlob(res, 'image/png'));
+    if (overBlob) zip.file('overlay.png', overBlob);
+  }
+
+  // 3. preview.png — ảnh xem trước tổng hợp (bắt buộc cho dslrBooth hiển thị thumbnail)
   const previewCanvas = document.createElement('canvas');
   previewCanvas.width = exportWidth;
   previewCanvas.height = exportHeight;
@@ -323,7 +337,7 @@ export async function generateDslrboothZip(
       const theta = (s.rotation || 0) * Math.PI / 180;
       const cx = s.x + (s.width / 2) * Math.cos(theta) - (s.height / 2) * Math.sin(theta);
       const cy = s.y + (s.width / 2) * Math.sin(theta) + (s.height / 2) * Math.cos(theta);
-      
+
       prevCtx.translate(cx, cy);
       prevCtx.rotate(theta);
 
@@ -343,23 +357,22 @@ export async function generateDslrboothZip(
   const prevBlob = await new Promise<Blob | null>(res => previewCanvas.toBlob(res, 'image/png'));
   if (prevBlob) zip.file('preview.png', prevBlob);
 
-  // D. template.xml — chuẩn DSLRbooth (UTF-8 BOM, CRLF, blank lines, đúng thứ tự ZIndex)
+  // 4. template.xml — chuẩn DSLRbooth (UTF-8 BOM, CRLF, đúng thứ tự ZIndex, loại bỏ thuộc tính thừa)
   const xmlDate = formatDate();
   const xmlId = generateDslrboothId();
   const visibleSlots = slots.filter(s => s.visible !== false);
   const qrElements = elements.filter(e => e.type === 'qr' && e.visible !== false);
-  
-  // ZIndex chuẩn DSLRbooth: Duy nhất và tăng dần từ dưới lên trên
+
+  // Tính ZIndex tăng dần từ dưới lên trên
   let currentZIndex = 0;
-  const bgZIndex = hasBackground ? currentZIndex++ : -1;
-  
-  // Photos nhận ZIndex tăng dần từ currentZIndex
+  const bgZIndex = hasRealBackgroundImage ? currentZIndex++ : -1;
+
   const photoZIndices: { [id: string]: number } = {};
   visibleSlots.forEach(s => {
     photoZIndices[s.id] = currentZIndex++;
   });
-  
-  const overlayZIndex = currentZIndex++;
+
+  const overlayZIndex = hasOverlay ? currentZIndex++ : -1;
   const qrBaseZIndex = currentZIndex;
 
   // Xử lý BackgroundColor (chuyển #RRGGBB sang #AARRGGBB)
@@ -373,14 +386,17 @@ export async function generateDslrboothZip(
     }
   }
 
+  // Tên template chuẩn hóa (không ép prefix dslrbooth_ nếu frameName đã sạch)
+  const cleanName = (frameName || 'Template').trim();
+
   // BOM (EF BB BF) bắt buộc cho .NET XML parser của DSLRbooth
   let xmlStr = `\uFEFF<?xml version="1.0" encoding="UTF-8"?>\r\n`;
-  xmlStr += `<Template Name="dslrbooth_${frameName.replace(/\s+/g, '_')}" Width="${exportWidth}" Height="${exportHeight}" Dimensions="0" Resolution="${Math.round(resolution)}" BackgroundColor="${argbBackground}" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-PICADESIGN">\r\n`;
+  xmlStr += `<Template Name="${cleanName}" Width="${exportWidth}" Height="${exportHeight}" Dimensions="0" Resolution="${Math.round(resolution)}" BackgroundColor="${argbBackground}" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-PHOTOBOOTH">\r\n`;
   xmlStr += `  <Elements>\r\n`;
 
-  // Ghi XML theo thứ tự ZIndex giảm dần (cao nhất ghi trước)
+  // Ghi XML theo thứ tự ZIndex giảm dần (cao nhất ghi trước) chuẩn dslrBooth
 
-  // 1. QrCode elements (trên cùng)
+  // A. QrCode elements (trên cùng)
   qrElements.forEach((qr, idx) => {
     const qrZIndex = qrBaseZIndex + idx;
     const qrTheta = (qr.rotation || 0) * Math.PI / 180;
@@ -389,44 +405,44 @@ export async function generateDslrboothZip(
     const qrLeft = qcx - qr.width / 2;
     const qrTop = qcy - qr.height / 2;
     const qrRotation = Math.round(((qr.rotation || 0) % 360 + 360) % 360);
-    xmlStr += `    <QrCode Name="QR Code ${idx + 1}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" UseUploadUrl="True" Width="${scaled(qr.width)}" Height="${scaled(qr.height)}" BackgroundColor="#00FFFFFF" ZIndex="${qrZIndex}" Left="${scaled(qrLeft)}" Top="${scaled(qrTop)}" Rotation="${qrRotation}" />\r\n`;
+    xmlStr += `    <QrCode Name="QR Code ${idx + 1}" UseUploadUrl="True" Width="${scaled(qr.width)}" Height="${scaled(qr.height)}" BackgroundColor="#00FFFFFF" ZIndex="${qrZIndex}" Left="${scaled(qrLeft)}" Top="${scaled(qrTop)}" Rotation="${qrRotation}" />\r\n`;
   });
 
-  // 2. Overlay
-  xmlStr += `    <Image Name="overlay" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${exportWidth}" Height="${exportHeight}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" Rotation="0" />\r\n`;
+  // B. Overlay (nếu có phần tử trang trí)
+  if (hasOverlay) {
+    xmlStr += `    <Image Name="overlay" Width="${exportWidth}" Height="${exportHeight}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" Rotation="0" />\r\n`;
+  }
 
-  // 3. Photos (ZIndex giảm dần)
-  // Xếp visibleSlots theo ZIndex giảm dần để in ra XML
+  // C. Photos (ZIndex giảm dần)
   const sortedSlots = [...visibleSlots].sort((a, b) => photoZIndices[b.id] - photoZIndices[a.id]);
   sortedSlots.forEach((s, index) => {
-    // PhotoNumber vẫn giữ nguyên logic gốc của người dùng (slot.order hoặc index+1), cho phép trùng nhau (như dải 2x6)
     const value = Number(s.order);
     const photoNum = Number.isFinite(value) && value > 0 ? Math.round(value) : index + 1;
-    
+
     const theta = (s.rotation || 0) * Math.PI / 180;
     const cx = s.x + (s.width / 2) * Math.cos(theta) - (s.height / 2) * Math.sin(theta);
     const cy = s.y + (s.width / 2) * Math.sin(theta) + (s.height / 2) * Math.cos(theta);
-    
+
     const dslrWidth = s.width;
     const dslrHeight = s.height;
     const dslrLeft = cx - dslrWidth / 2;
     const dslrTop = cy - dslrHeight / 2;
     const dslrRotation = Math.round(((s.rotation || 0) % 360 + 360) % 360);
-    
+
     const zIndex = photoZIndices[s.id];
 
-    xmlStr += `    <Photo Name="Photo ${photoNum}" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${scaled(dslrWidth)}" Height="${scaled(dslrHeight)}" Top="${scaled(dslrTop)}" Left="${scaled(dslrLeft)}" ImagePath="" KeepAspect="False" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${photoNum}" ZIndex="${zIndex}" Rotation="${dslrRotation}" />\r\n`;
+    xmlStr += `    <Photo Name="Photo ${photoNum}" Width="${scaled(dslrWidth)}" Height="${scaled(dslrHeight)}" Top="${scaled(dslrTop)}" Left="${scaled(dslrLeft)}" ImagePath="" KeepAspect="False" Thickness="0" StrokeColor="#FF000000" PhotoNumber="${photoNum}" ZIndex="${zIndex}" Rotation="${dslrRotation}" />\r\n`;
   });
 
-  // 4. Background (nếu có, dưới cùng)
-  if (hasBackground) {
-    xmlStr += `    <Image Name="Background" IsVisible="True" Opacity="100" ShadowEnabled="False" ShadowColor="#FF000000" ShadowDepth="10" ShadowRadius="20" ShadowDirection="-45" Width="${exportWidth}" Height="${exportHeight}" Top="0" Left="0" ImagePath="background.jpg" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${bgZIndex}" Rotation="0" />\r\n`;
+  // D. Background (nếu có ảnh nền thực sự, ZIndex thấp nhất)
+  if (hasRealBackgroundImage) {
+    xmlStr += `    <Image Name="Background" Width="${exportWidth}" Height="${exportHeight}" Top="0" Left="0" ImagePath="background.jpg" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${bgZIndex}" Rotation="0" />\r\n`;
   }
 
   xmlStr += `  </Elements>\r\n`;
   xmlStr += `</Template>\r\n`;
   zip.file('template.xml', xmlStr);
 
-  // DEFLATE compression (method=8) — bắt buộc theo format DSLRbooth
+  // DEFLATE compression (method=8) — chuẩn nén zip của dslrBooth
   return await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
 }

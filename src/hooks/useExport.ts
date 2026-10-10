@@ -153,9 +153,13 @@ export function useExport(options: UseExportOptions) {
     try {
       const blob = await generateDslrboothZip(width, height, slots, getExportElements(), frameName, bgOptions, resolution);
       const url = URL.createObjectURL(blob);
+      const safeName = (frameName || 'template').trim().replace(/\s+/g, '_');
+      const downloadName = safeName.toLowerCase().startsWith('dslrbooth_')
+        ? `${safeName}.zip`
+        : `dslrbooth_${safeName}.zip`;
       const link = document.createElement('a');
       link.href = url;
-      link.download = `dslrbooth_${frameName.replace(/\s+/g, '_')}.zip`;
+      link.download = downloadName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
