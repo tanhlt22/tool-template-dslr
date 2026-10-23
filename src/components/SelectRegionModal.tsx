@@ -4,6 +4,7 @@ import {
   Lock,
   Maximize2,
   PaintBucket,
+  Paintbrush,
   Pipette,
   Redo2,
   RotateCcw,
@@ -16,6 +17,7 @@ import {
 import { FrameElement, FrameSlot } from '../types/canvas';
 
 export type RegionModalMode = 'punch_color' | 'punch_slot' | 'crop' | 'recolor';
+export type RecolorSubTool = 'brush' | 'bucket' | 'replace';
 
 export interface SelectRegionModalProps {
   isOpen: boolean;
@@ -137,7 +139,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
   canvasHeight,
   slots,
   targetElement,
-  initialMode = 'punch_color',
+  initialMode = 'recolor',
   onClose,
   onApply
 }) => {
@@ -169,21 +171,51 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
   const [fitToCanvasOnApply, setFitToCanvasOnApply] = useState(true);
 
   // --- TAB 4: RECOLOR STATE ---
+  const [recolorTool, setRecolorTool] = useState<RecolorSubTool>('brush');
+  const [brushSize, setBrushSize] = useState(30);
+  const [brushOpacity, setBrushOpacity] = useState(100);
+  const [brushSoftness, setBrushSoftness] = useState(25);
+  const [isSamplingColor, setIsSamplingColor] = useState(false);
+  const [isAltSampling, setIsAltSampling] = useState(false);
+  const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(null);
+
+  // Painting refs
+  const isPaintingRef = useRef<boolean>(false);
+  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
+
   const [pickedSourceColor, setPickedSourceColor] = useState<[number, number, number] | null>(null);
-  const [pickedTargetColor, setPickedTargetColor] = useState<[number, number, number]>([255, 255, 255]);
+  const [pickedTargetColor, setPickedTargetColor] = useState<[number, number, number]>([212, 175, 55]); // Champagne Gold
   const [recolorTolerance, setRecolorTolerance] = useState(15);
   const [activeEyedropper, setActiveEyedropper] = useState<'source' | 'destination' | null>(null);
-  const [recolorScope, setRecolorScope] = useState<'global' | 'flood'>('global');
-  const [clickSeedPoint, setClickSeedPoint] = useState<{ x: number; y: number } | null>(null);
-  const [recolorBlendMode, setRecolorBlendMode] = useState<'color' | 'solid' | 'soft'>('color');
+  const [recolorBlendMode, setRecolorBlendMode] = useState<'color' | 'solid'>('color');
   const [recolorMatchCount, setRecolorMatchCount] = useState(0);
 
-  // Update display dimensions of main canvas on resize or render
+  // Measure display dimensions of main canvas
   const updateDisplayDimensions = useCallback(() => {
     const cvs = canvasRef.current;
     if (cvs && cvs.clientWidth > 0 && cvs.clientHeight > 0) {
       setDisplayDim({ width: cvs.clientWidth, height: cvs.clientHeight });
     }
+  }, []);
+
+  // Alt key detection for quick color sampling like Photoshop
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Alt') {
+        setIsAltSampling(true);
+      }
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Alt') {
+        setIsAltSampling(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
   }, []);
 
   // Initialize modal when opened
@@ -197,10 +229,11 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     setPunchMatchCount(0);
     setPunchTolerance(10);
     setPickedSourceColor(null);
-    setPickedTargetColor([255, 255, 255]);
+    setPickedTargetColor([212, 175, 55]);
     setActiveEyedropper(null);
-    setClickSeedPoint(null);
+    setIsSamplingColor(false);
     setRecolorMatchCount(0);
+    setRecolorTool('brush');
   }, [isOpen, imageUrl, initialMode]);
 
   // Load image whenever workingImageUrl changes
@@ -296,7 +329,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     setPunchPickedColor(null);
     setPickedSourceColor(null);
     setActiveEyedropper(null);
-    setClickSeedPoint(null);
+    setIsSamplingColor(false);
   };
 
   const handleUndo = () => {
@@ -357,14 +390,12 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     setPunchMatchCount(matches);
   };
 
-  // Redraw preview for Recolor (live recoloring)
-  const redrawRecolorPreview = (
+  // Redraw preview for Replace Color (global replace)
+  const redrawGlobalReplacePreview = (
     srcCol: [number, number, number] | null,
     targetCol: [number, number, number],
     tol: number,
-    scope: 'global' | 'flood',
-    seed: { x: number; y: number } | null,
-    blend: 'color' | 'solid' | 'soft'
+    blend: 'color' | 'solid'
   ) => {
     const canvas = canvasRef.current;
     const source = sourceDataRef.current;
@@ -381,8 +412,6 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     const preview = ctx.createImageData(source.width, source.height);
     preview.data.set(source.data);
     const data = preview.data;
-    const width = source.width;
-    const height = source.height;
 
     const [tr, tg, tb] = srcCol;
     const [nr, ng, nb] = targetCol;
@@ -390,101 +419,26 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     const threshold = (tol / 100) * 441.7;
 
     let recoloredCount = 0;
-
-    if (scope === 'flood' && seed) {
-      const visited = new Uint8Array(width * height);
-      const queue = new Int32Array(width * height);
-      let head = 0;
-      let tail = 0;
-
-      const startIndex = seed.y * width + seed.x;
-      if (startIndex >= 0 && startIndex < width * height) {
-        visited[startIndex] = 1;
-        queue[tail++] = startIndex;
-
-        while (head < tail) {
-          const idx = queue[head++];
-          const px = idx % width;
-          const py = Math.floor(idx / width);
-          const pi = idx * 4;
-
-          const r = data[pi];
-          const g = data[pi + 1];
-          const b = data[pi + 2];
-          const a = data[pi + 3];
-
-          if (a > 0) {
-            recoloredCount++;
-            if (blend === 'color') {
-              const [, , l] = rgbToHsl(r, g, b);
-              const [cr, cg, cb] = hslToRgb(nh, ns, l);
-              data[pi] = cr;
-              data[pi + 1] = cg;
-              data[pi + 2] = cb;
-            } else if (blend === 'soft' && threshold > 0) {
-              const dist = distance(r, g, b, tr, tg, tb);
-              const factor = Math.max(0, 1 - dist / threshold);
-              data[pi] = Math.round(r * (1 - factor) + nr * factor);
-              data[pi + 1] = Math.round(g * (1 - factor) + ng * factor);
-              data[pi + 2] = Math.round(b * (1 - factor) + nb * factor);
-            } else {
-              data[pi] = nr;
-              data[pi + 1] = ng;
-              data[pi + 2] = nb;
-            }
-          }
-
-          const neighbors = [
-            px > 0 ? idx - 1 : -1,
-            px < width - 1 ? idx + 1 : -1,
-            py > 0 ? idx - width : -1,
-            py < height - 1 ? idx + width : -1
-          ];
-
-          for (let i = 0; i < 4; i++) {
-            const nIdx = neighbors[i];
-            if (nIdx >= 0 && visited[nIdx] === 0) {
-              const nPi = nIdx * 4;
-              const nR = data[nPi];
-              const nG = data[nPi + 1];
-              const nB = data[nPi + 2];
-              const nA = data[nPi + 3];
-              if (nA > 0 && distance(nR, nG, nB, tr, tg, tb) <= threshold) {
-                visited[nIdx] = 1;
-                queue[tail++] = nIdx;
-              }
-            }
-          }
-        }
-      }
-    } else {
-      // Global recolor
-      const len = data.length;
-      for (let i = 0; i < len; i += 4) {
-        const a = data[i + 3];
-        if (a === 0) continue;
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        const dist = distance(r, g, b, tr, tg, tb);
-        if (dist <= threshold) {
-          recoloredCount++;
-          if (blend === 'color') {
-            const [, , l] = rgbToHsl(r, g, b);
-            const [cr, cg, cb] = hslToRgb(nh, ns, l);
-            data[i] = cr;
-            data[i + 1] = cg;
-            data[i + 2] = cb;
-          } else if (blend === 'soft' && threshold > 0) {
-            const factor = Math.max(0, 1 - dist / threshold);
-            data[i] = Math.round(r * (1 - factor) + nr * factor);
-            data[i + 1] = Math.round(g * (1 - factor) + ng * factor);
-            data[i + 2] = Math.round(b * (1 - factor) + nb * factor);
-          } else {
-            data[i] = nr;
-            data[i + 1] = ng;
-            data[i + 2] = nb;
-          }
+    const len = data.length;
+    for (let i = 0; i < len; i += 4) {
+      const a = data[i + 3];
+      if (a === 0) continue;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const dist = distance(r, g, b, tr, tg, tb);
+      if (dist <= threshold) {
+        recoloredCount++;
+        if (blend === 'color') {
+          const [, , l] = rgbToHsl(r, g, b);
+          const [cr, cg, cb] = hslToRgb(nh, ns, l);
+          data[i] = cr;
+          data[i + 1] = cg;
+          data[i + 2] = cb;
+        } else {
+          data[i] = nr;
+          data[i + 1] = ng;
+          data[i + 2] = nb;
         }
       }
     }
@@ -493,37 +447,277 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     setRecolorMatchCount(recoloredCount);
   };
 
-  // Canvas click handler for eyedropper / color selection
-  const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  // Execute Paint Bucket (Flood fill) at clicked point
+  const executeFloodFill = (startX: number, startY: number) => {
+    const canvas = canvasRef.current;
+    const source = sourceDataRef.current;
+    if (!canvas || !source) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const currentImgData = ctx.getImageData(0, 0, source.width, source.height);
+    const data = currentImgData.data;
+    const width = source.width;
+    const height = source.height;
+
+    const clickIdx = (startY * width + startX) * 4;
+    const tr = data[clickIdx];
+    const tg = data[clickIdx + 1];
+    const tb = data[clickIdx + 2];
+    const ta = data[clickIdx + 3];
+    if (ta === 0) return;
+
+    const [nr, ng, nb] = pickedTargetColor;
+    const [nh, ns] = rgbToHsl(nr, ng, nb);
+    const threshold = (recolorTolerance / 100) * 441.7;
+
+    const visited = new Uint8Array(width * height);
+    const queue = new Int32Array(width * height);
+    let head = 0;
+    let tail = 0;
+
+    const startIndex = startY * width + startX;
+    visited[startIndex] = 1;
+    queue[tail++] = startIndex;
+
+    while (head < tail) {
+      const idx = queue[head++];
+      const px = idx % width;
+      const py = Math.floor(idx / width);
+      const pi = idx * 4;
+
+      const r = data[pi];
+      const g = data[pi + 1];
+      const b = data[pi + 2];
+      const a = data[pi + 3];
+
+      if (a > 0) {
+        if (recolorBlendMode === 'color') {
+          const [, , l] = rgbToHsl(r, g, b);
+          const [cr, cg, cb] = hslToRgb(nh, ns, l);
+          data[pi] = cr;
+          data[pi + 1] = cg;
+          data[pi + 2] = cb;
+        } else {
+          data[pi] = nr;
+          data[pi + 1] = ng;
+          data[pi + 2] = nb;
+        }
+      }
+
+      const neighbors = [
+        px > 0 ? idx - 1 : -1,
+        px < width - 1 ? idx + 1 : -1,
+        py > 0 ? idx - width : -1,
+        py < height - 1 ? idx + width : -1
+      ];
+
+      for (let i = 0; i < 4; i++) {
+        const nIdx = neighbors[i];
+        if (nIdx >= 0 && visited[nIdx] === 0) {
+          const nPi = nIdx * 4;
+          const nR = data[nPi];
+          const nG = data[nPi + 1];
+          const nB = data[nPi + 2];
+          const nA = data[nPi + 3];
+          if (nA > 0 && distance(nR, nG, nB, tr, tg, tb) <= threshold) {
+            visited[nIdx] = 1;
+            queue[tail++] = nIdx;
+          }
+        }
+      }
+    }
+
+    ctx.putImageData(currentImgData, 0, 0);
+    sourceDataRef.current = ctx.getImageData(0, 0, width, height);
+    commitStep(canvas.toDataURL('image/png'));
+  };
+
+  // Hardware-accelerated brush stroke painting
+  const paintBrushSegment = (
+    fromX: number,
+    fromY: number,
+    toX: number,
+    toY: number
+  ) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.save();
+    ctx.globalCompositeOperation = recolorBlendMode === 'color' ? 'color' : 'source-over';
+    ctx.globalAlpha = brushOpacity / 100;
+
+    const [r, g, b] = pickedTargetColor;
+    ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+    ctx.lineWidth = brushSize;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if (brushSoftness > 0) {
+      ctx.shadowColor = `rgb(${r}, ${g}, ${b})`;
+      ctx.shadowBlur = (brushSoftness / 100) * (brushSize * 0.6);
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(toX, toY, brushSize / 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  };
+
+  // Convert client mouse/touch event to natural image coordinates
+  const getImageCoordinates = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = Math.floor((e.clientX - rect.left) * scaleX);
+    const y = Math.floor((e.clientY - rect.top) * scaleY);
+    return {
+      x: Math.max(0, Math.min(canvas.width - 1, x)),
+      y: Math.max(0, Math.min(canvas.height - 1, y))
+    };
+  };
+
+  // --- CANVAS POINTER EVENTS FOR BRUSHING & COLOR SAMPLING ---
+  const handleCanvasPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const coords = getImageCoordinates(e);
+    if (!coords) return;
+
     const canvas = canvasRef.current;
     const source = sourceDataRef.current;
     if (!canvas || !source) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const x = Math.floor((event.clientX - rect.left) * scaleX);
-    const y = Math.floor((event.clientY - rect.top) * scaleY);
+    // Check if sampling color via Eyedropper button or Alt key
+    if (isSamplingColor || isAltSampling || (mode === 'recolor' && activeEyedropper !== null)) {
+      const idx = (coords.y * source.width + coords.x) * 4;
+      const color: [number, number, number] = [
+        source.data[idx],
+        source.data[idx + 1],
+        source.data[idx + 2]
+      ];
 
-    if (x < 0 || y < 0 || x >= source.width || y >= source.height) return;
-
-    const idx = (y * source.width + x) * 4;
-    const color: [number, number, number] = [source.data[idx], source.data[idx + 1], source.data[idx + 2]];
+      if (activeEyedropper === 'source') {
+        setPickedSourceColor(color);
+        setActiveEyedropper(null);
+        redrawGlobalReplacePreview(color, pickedTargetColor, recolorTolerance, recolorBlendMode);
+      } else {
+        setPickedTargetColor(color);
+        setIsSamplingColor(false);
+        setActiveEyedropper(null);
+        if (recolorTool === 'replace') {
+          redrawGlobalReplacePreview(pickedSourceColor, color, recolorTolerance, recolorBlendMode);
+        }
+      }
+      return;
+    }
 
     if (mode === 'punch_color') {
+      const idx = (coords.y * source.width + coords.x) * 4;
+      const color: [number, number, number] = [
+        source.data[idx],
+        source.data[idx + 1],
+        source.data[idx + 2]
+      ];
       setPunchPickedColor(color);
       redrawPunchColorPreview(color, punchTolerance);
-    } else if (mode === 'recolor') {
-      if (activeEyedropper === 'destination') {
-        setPickedTargetColor(color);
-        setActiveEyedropper(null);
-        redrawRecolorPreview(pickedSourceColor, color, recolorTolerance, recolorScope, clickSeedPoint, recolorBlendMode);
-      } else {
-        // Source color (default)
+      return;
+    }
+
+    if (mode === 'recolor') {
+      if (recolorTool === 'bucket') {
+        executeFloodFill(coords.x, coords.y);
+        return;
+      }
+
+      if (recolorTool === 'replace') {
+        const idx = (coords.y * source.width + coords.x) * 4;
+        const color: [number, number, number] = [
+          source.data[idx],
+          source.data[idx + 1],
+          source.data[idx + 2]
+        ];
         setPickedSourceColor(color);
-        setClickSeedPoint({ x, y });
-        setActiveEyedropper(null);
-        redrawRecolorPreview(color, pickedTargetColor, recolorTolerance, recolorScope, { x, y }, recolorBlendMode);
+        redrawGlobalReplacePreview(color, pickedTargetColor, recolorTolerance, recolorBlendMode);
+        return;
+      }
+
+      if (recolorTool === 'brush') {
+        try {
+          (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        } catch {}
+        isPaintingRef.current = true;
+        lastPointRef.current = coords;
+        paintBrushSegment(coords.x, coords.y, coords.x, coords.y);
+      }
+    }
+  };
+
+  const handleCanvasPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    setCursorPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+
+    if (mode === 'recolor' && recolorTool === 'brush' && isPaintingRef.current && lastPointRef.current) {
+      const coords = getImageCoordinates(e);
+      if (!coords) return;
+      paintBrushSegment(lastPointRef.current.x, lastPointRef.current.y, coords.x, coords.y);
+      lastPointRef.current = coords;
+    }
+  };
+
+  const handleCanvasPointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+
+    if (mode === 'recolor' && recolorTool === 'brush' && isPaintingRef.current) {
+      isPaintingRef.current = false;
+      lastPointRef.current = null;
+
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      sourceDataRef.current = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/png');
+
+      const nextHistory = history.slice(0, historyIndex + 1);
+      nextHistory.push(dataUrl);
+      setHistory(nextHistory);
+      setHistoryIndex(nextHistory.length - 1);
+      setWorkingImageUrl(dataUrl);
+    }
+  };
+
+  const handleCanvasPointerLeave = () => {
+    setCursorPos(null);
+    if (isPaintingRef.current) {
+      isPaintingRef.current = false;
+      lastPointRef.current = null;
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          sourceDataRef.current = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/png');
+          const nextHistory = history.slice(0, historyIndex + 1);
+          nextHistory.push(dataUrl);
+          setHistory(nextHistory);
+          setHistoryIndex(nextHistory.length - 1);
+          setWorkingImageUrl(dataUrl);
+        }
       }
     }
   };
@@ -890,7 +1084,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
       }
       setIsProcessing(false);
     } else if (mode === 'recolor') {
-      const recolored = pickedSourceColor ? generateRecolorDataUrl() : workingImageUrl;
+      const recolored = generateRecolorDataUrl() || workingImageUrl;
       if (recolored) {
         onApply(recolored, false, naturalSize);
       }
@@ -913,6 +1107,8 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
   const dispW = Math.round(cropRect.width * displayScale);
   const dispH = Math.round(cropRect.height * displayScale);
 
+  const isEyedropperActive = isSamplingColor || isAltSampling || (mode === 'recolor' && activeEyedropper !== null);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
       <div className="flex w-full max-w-4xl max-h-[94vh] flex-col rounded-xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
@@ -930,7 +1126,9 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
                 {mode === 'punch_color' && 'Đục lỗ nền theo màu (chấm vào màu cần xóa và khử răng cưa viền).'}
                 {mode === 'punch_slot' && 'Đục lỗ các ô ảnh theo khung slot hiện tại (mở rộng 3px tránh lem viền).'}
                 {mode === 'crop' && 'Cắt ảnh (Crop) theo kích thước pixel hoặc tỷ lệ chuẩn cho photobooth.'}
-                {mode === 'recolor' && 'Tô đổi màu như Photoshop: Chọn màu trên ảnh, lấy màu mới và tuỳ chỉnh hoà trộn.'}
+                {mode === 'recolor' && recolorTool === 'brush' && 'Cọ tô màu: Chấm lấy màu từ ảnh hoặc bảng màu, rồi giữ chuột tô trực tiếp lên ảnh!'}
+                {mode === 'recolor' && recolorTool === 'bucket' && 'Thùng sơn: Bấm vào một vùng trên ảnh để đổ màu liền kề.'}
+                {mode === 'recolor' && recolorTool === 'replace' && 'Thay thế màu: Chọn màu gốc trên ảnh và thay đổi tất cả điểm màu tương đồng.'}
               </p>
             </div>
           </div>
@@ -942,7 +1140,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
                 type="button"
                 onClick={handleUndo}
                 disabled={historyIndex === 0}
-                title="Hoàn tác bước trước (Undo)"
+                title="Hoàn tác nét vẽ / bước trước (Undo)"
                 className="rounded p-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-30 disabled:pointer-events-none"
               >
                 <Undo2 className="h-4 w-4" />
@@ -951,7 +1149,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
                 type="button"
                 onClick={handleRedo}
                 disabled={historyIndex >= history.length - 1}
-                title="Làm lại bước sau (Redo)"
+                title="Làm lại nét vẽ / bước sau (Redo)"
                 className="rounded p-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-30 disabled:pointer-events-none"
               >
                 <Redo2 className="h-4 w-4" />
@@ -984,6 +1182,41 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
             <button
               type="button"
               onClick={() => {
+                setMode('recolor');
+                setRecolorTool('brush');
+                if (sourceDataRef.current) {
+                  canvasRef.current?.getContext('2d')?.putImageData(sourceDataRef.current, 0, 0);
+                }
+                setTimeout(updateDisplayDimensions, 30);
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${
+                mode === 'recolor' ? 'bg-rose-700 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <Paintbrush className="h-3.5 w-3.5" />
+              Tô màu ảnh (Cọ / Photoshop)
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setMode('crop');
+                if (sourceDataRef.current) {
+                  canvasRef.current?.getContext('2d')?.putImageData(sourceDataRef.current, 0, 0);
+                }
+                setTimeout(updateDisplayDimensions, 30);
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${
+                mode === 'crop' ? 'bg-rose-700 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <Crop className="h-3.5 w-3.5" />
+              Cắt ảnh (Crop kích thước)
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
                 setMode('punch_color');
                 if (sourceDataRef.current) {
                   canvasRef.current?.getContext('2d')?.putImageData(sourceDataRef.current, 0, 0);
@@ -1012,49 +1245,15 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
               <Square className="h-3.5 w-3.5" />
               Đục lỗ (Khung slot)
             </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setMode('crop');
-                if (sourceDataRef.current) {
-                  canvasRef.current?.getContext('2d')?.putImageData(sourceDataRef.current, 0, 0);
-                }
-                setTimeout(updateDisplayDimensions, 30);
-              }}
-              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${
-                mode === 'crop' ? 'bg-rose-700 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              <Crop className="h-3.5 w-3.5" />
-              Cắt ảnh (Crop kích thước)
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setMode('recolor');
-                if (sourceDataRef.current) {
-                  canvasRef.current?.getContext('2d')?.putImageData(sourceDataRef.current, 0, 0);
-                }
-                setTimeout(updateDisplayDimensions, 30);
-              }}
-              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${
-                mode === 'recolor' ? 'bg-rose-700 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              <PaintBucket className="h-3.5 w-3.5" />
-              Tô đổi màu (Photoshop)
-            </button>
           </div>
 
           <div className="text-xs text-slate-500 font-semibold">
-            Kích thước ảnh gốc: <span className="text-slate-800">{naturalSize.width} × {naturalSize.height} px</span>
+            Kích thước: <span className="text-slate-800">{naturalSize.width} × {naturalSize.height} px</span>
           </div>
         </div>
 
         {/* Canvas Display Viewport */}
-        <div className="flex-1 overflow-auto bg-slate-900/5 p-4 flex items-center justify-center min-h-[280px]">
+        <div className="flex-1 overflow-auto bg-slate-900/5 p-4 flex items-center justify-center min-h-[300px]">
           <div
             className="flex items-center justify-center rounded-lg border border-dashed border-slate-300 p-2 shadow-inner"
             style={CHECKER_STYLE}
@@ -1067,7 +1266,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
               }`}
             />
 
-            {/* Main Interactive Canvas & Crop Overlay Wrapper */}
+            {/* Main Interactive Canvas & Overlays Wrapper */}
             <div
               className={`relative select-none ${mode !== 'punch_slot' ? 'inline-block' : 'hidden'}`}
               style={{
@@ -1077,15 +1276,34 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
             >
               <canvas
                 ref={canvasRef}
-                onClick={handleCanvasClick}
-                className={`block max-h-[380px] w-auto max-w-full rounded shadow-sm select-none ${
-                  mode === 'punch_color' || (mode === 'recolor' && activeEyedropper !== null)
+                onPointerDown={handleCanvasPointerDown}
+                onPointerMove={handleCanvasPointerMove}
+                onPointerUp={handleCanvasPointerUp}
+                onPointerLeave={handleCanvasPointerLeave}
+                className={`block max-h-[380px] w-auto max-w-full rounded shadow-sm select-none touch-none ${
+                  isEyedropperActive || mode === 'punch_color'
                     ? 'cursor-crosshair'
+                    : mode === 'recolor' && recolorTool === 'brush'
+                    ? 'cursor-none'
                     : mode === 'recolor'
                     ? 'cursor-pointer'
                     : 'cursor-default'
                 }`}
               />
+
+              {/* Photoshop-style floating brush circle cursor */}
+              {mode === 'recolor' && recolorTool === 'brush' && !isEyedropperActive && cursorPos && (
+                <div
+                  className="pointer-events-none absolute rounded-full border border-white shadow-[0_0_0_1px_rgba(0,0,0,0.8)]"
+                  style={{
+                    left: `${cursorPos.x}px`,
+                    top: `${cursorPos.y}px`,
+                    width: `${Math.max(4, brushSize * displayScale)}px`,
+                    height: `${Math.max(4, brushSize * displayScale)}px`,
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                />
+              )}
 
               {/* Crop Overlay */}
               {mode === 'crop' && displayDim.width > 0 && (
@@ -1165,6 +1383,304 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
 
         {/* Tab Controls Panel */}
         <div className="border-t border-slate-200 bg-white p-4">
+          {/* TAB 4: RECOLOR & BRUSH PAINTING */}
+          {mode === 'recolor' && (
+            <div className="flex flex-col gap-3">
+              {/* Tool sub-mode selector + Color selector */}
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-2.5">
+                {/* 3 Tools: Brush (Giữ chuột tô), Bucket (Đổ màu), Replace (Thay thế) */}
+                <div className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-slate-50 p-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecolorTool('brush');
+                      setIsSamplingColor(false);
+                      setActiveEyedropper(null);
+                    }}
+                    className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${
+                      recolorTool === 'brush'
+                        ? 'bg-rose-700 text-white shadow-sm'
+                        : 'text-slate-700 hover:bg-slate-200/70'
+                    }`}
+                  >
+                    <Paintbrush className="h-3.5 w-3.5" />
+                    Cọ vẽ (Giữ chuột tô lên ảnh)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecolorTool('bucket');
+                      setIsSamplingColor(false);
+                      setActiveEyedropper(null);
+                    }}
+                    className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${
+                      recolorTool === 'bucket'
+                        ? 'bg-rose-700 text-white shadow-sm'
+                        : 'text-slate-700 hover:bg-slate-200/70'
+                    }`}
+                  >
+                    <PaintBucket className="h-3.5 w-3.5" />
+                    Đổ màu vùng (Thùng sơn)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecolorTool('replace');
+                      setIsSamplingColor(false);
+                      setActiveEyedropper(null);
+                    }}
+                    className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${
+                      recolorTool === 'replace'
+                        ? 'bg-rose-700 text-white shadow-sm'
+                        : 'text-slate-700 hover:bg-slate-200/70'
+                    }`}
+                  >
+                    <Pipette className="h-3.5 w-3.5" />
+                    Thay thế màu (Toàn ảnh)
+                  </button>
+                </div>
+
+                {/* Color picking for Brush & Bucket */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSamplingColor(!isSamplingColor);
+                      setActiveEyedropper(null);
+                    }}
+                    className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-bold transition-all ${
+                      isSamplingColor || isAltSampling
+                        ? 'border-rose-600 bg-rose-50 text-rose-800 ring-2 ring-rose-500'
+                        : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+                    }`}
+                    title="Bấm nút này rồi bấm vào ảnh để lấy màu, hoặc giữ phím Alt khi rê chuột"
+                  >
+                    <Pipette className="h-3.5 w-3.5 text-rose-700" />
+                    {isSamplingColor || isAltSampling ? 'Đang chấm màu trên ảnh...' : 'Lấy màu từ ảnh (Alt)'}
+                  </button>
+
+                  <div className="flex items-center gap-1.5">
+                    <label htmlFor="recolor-custom-picker" className="sr-only">
+                      Chọn màu
+                    </label>
+                    <input
+                      id="recolor-custom-picker"
+                      type="color"
+                      value={rgbToHex(pickedTargetColor[0], pickedTargetColor[1], pickedTargetColor[2])}
+                      onChange={(e) => {
+                        const nextColor = hexToRgb(e.target.value);
+                        setPickedTargetColor(nextColor);
+                        if (recolorTool === 'replace' && pickedSourceColor) {
+                          redrawGlobalReplacePreview(pickedSourceColor, nextColor, recolorTolerance, recolorBlendMode);
+                        }
+                      }}
+                      className="h-7 w-8 cursor-pointer rounded border border-slate-300 bg-white p-0.5"
+                    />
+                    <span className="text-xs font-mono font-bold text-slate-700">
+                      {rgbToHex(pickedTargetColor[0], pickedTargetColor[1], pickedTargetColor[2])}
+                    </span>
+                  </div>
+
+                  {/* Palette pills */}
+                  <div className="flex items-center gap-1 ml-1">
+                    {POPULAR_PALETTE.map((item) => (
+                      <button
+                        key={item.hex}
+                        type="button"
+                        onClick={() => {
+                          const rgb = hexToRgb(item.hex);
+                          setPickedTargetColor(rgb);
+                          if (recolorTool === 'replace' && pickedSourceColor) {
+                            redrawGlobalReplacePreview(pickedSourceColor, rgb, recolorTolerance, recolorBlendMode);
+                          }
+                        }}
+                        title={item.name}
+                        style={{ backgroundColor: item.hex }}
+                        className="h-5 w-5 rounded-full border border-slate-300 shadow-sm hover:scale-125 transition-transform"
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Sub-tool specific options */}
+              {recolorTool === 'brush' && (
+                <div className="flex flex-wrap items-center gap-4">
+                  {/* Brush Size */}
+                  <div className="flex flex-1 min-w-[170px] items-center gap-2">
+                    <label htmlFor="brush-size" className="text-xs font-bold text-slate-700 whitespace-nowrap">
+                      Cỡ cọ:
+                    </label>
+                    <input
+                      id="brush-size"
+                      type="range"
+                      min={2}
+                      max={150}
+                      value={brushSize}
+                      onChange={(e) => setBrushSize(Number(e.target.value))}
+                      className="flex-1 accent-rose-700"
+                    />
+                    <span className="w-8 text-right text-xs font-bold text-slate-700">{brushSize}px</span>
+                  </div>
+
+                  {/* Brush Opacity */}
+                  <div className="flex flex-1 min-w-[170px] items-center gap-2">
+                    <label htmlFor="brush-opacity" className="text-xs font-bold text-slate-700 whitespace-nowrap">
+                      Độ đậm:
+                    </label>
+                    <input
+                      id="brush-opacity"
+                      type="range"
+                      min={10}
+                      max={100}
+                      value={brushOpacity}
+                      onChange={(e) => setBrushOpacity(Number(e.target.value))}
+                      className="flex-1 accent-rose-700"
+                    />
+                    <span className="w-8 text-right text-xs font-bold text-slate-700">{brushOpacity}%</span>
+                  </div>
+
+                  {/* Softness */}
+                  <div className="flex flex-1 min-w-[170px] items-center gap-2">
+                    <label htmlFor="brush-softness" className="text-xs font-bold text-slate-700 whitespace-nowrap">
+                      Mềm viền:
+                    </label>
+                    <input
+                      id="brush-softness"
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={brushSoftness}
+                      onChange={(e) => setBrushSoftness(Number(e.target.value))}
+                      className="flex-1 accent-rose-700"
+                    />
+                    <span className="w-8 text-right text-xs font-bold text-slate-700">{brushSoftness}%</span>
+                  </div>
+
+                  {/* Blend Mode */}
+                  <div className="flex items-center gap-1.5">
+                    <label htmlFor="recolor-blend" className="text-xs font-bold text-slate-700 whitespace-nowrap">
+                      Chế độ:
+                    </label>
+                    <select
+                      id="recolor-blend"
+                      value={recolorBlendMode}
+                      onChange={(e) => setRecolorBlendMode(e.target.value as 'color' | 'solid')}
+                      className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm"
+                    >
+                      <option value="color">Giữ sáng tối & vân ảnh (Photoshop Color)</option>
+                      <option value="solid">Tô màu phẳng (Solid Color)</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {recolorTool === 'bucket' && (
+                <div className="flex flex-wrap items-center gap-4">
+                  <p className="text-xs text-slate-600 font-medium">
+                    👉 Bấm vào bất kỳ điểm nào trên ảnh để đổ màu toàn bộ vùng liền kề đó.
+                  </p>
+
+                  <div className="flex flex-1 min-w-[200px] items-center gap-2">
+                    <label htmlFor="bucket-tol" className="text-xs font-bold text-slate-700 whitespace-nowrap">
+                      Độ nhạy màu
+                    </label>
+                    <input
+                      id="bucket-tol"
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={recolorTolerance}
+                      onChange={(e) => setRecolorTolerance(Number(e.target.value))}
+                      className="flex-1 accent-rose-700"
+                    />
+                    <span className="w-9 text-right text-xs font-bold text-slate-700">{recolorTolerance}%</span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <label htmlFor="bucket-blend" className="text-xs font-bold text-slate-700 whitespace-nowrap">
+                      Chế độ:
+                    </label>
+                    <select
+                      id="bucket-blend"
+                      value={recolorBlendMode}
+                      onChange={(e) => setRecolorBlendMode(e.target.value as 'color' | 'solid')}
+                      className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm"
+                    >
+                      <option value="color">Giữ sáng tối & vân ảnh (Photoshop Color)</option>
+                      <option value="solid">Tô màu phẳng (Solid Color)</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {recolorTool === 'replace' && (
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setActiveEyedropper(activeEyedropper === 'source' ? null : 'source')}
+                      className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-bold transition-all ${
+                        activeEyedropper === 'source'
+                          ? 'border-rose-600 bg-rose-50 text-rose-800 ring-2 ring-rose-500'
+                          : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <Pipette className="h-3.5 w-3.5" />
+                      Chấm màu gốc cần đổi
+                    </button>
+
+                    <div
+                      className="h-7 w-7 rounded-md border border-slate-300 shadow-inner"
+                      style={{
+                        backgroundColor: pickedSourceColor
+                          ? `rgb(${pickedSourceColor.join(',')})`
+                          : 'transparent'
+                      }}
+                    />
+                    {pickedSourceColor ? (
+                      <span className="text-xs font-mono font-bold text-slate-700">
+                        {rgbToHex(pickedSourceColor[0], pickedSourceColor[1], pickedSourceColor[2])}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-slate-400 italic">Chưa chọn</span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-1 min-w-[200px] items-center gap-2">
+                    <label htmlFor="replace-tol" className="text-xs font-bold text-slate-700 whitespace-nowrap">
+                      Độ nhạy màu
+                    </label>
+                    <input
+                      id="replace-tol"
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={recolorTolerance}
+                      onChange={(e) => {
+                        const tol = Number(e.target.value);
+                        setRecolorTolerance(tol);
+                        if (pickedSourceColor) {
+                          redrawGlobalReplacePreview(pickedSourceColor, pickedTargetColor, tol, recolorBlendMode);
+                        }
+                      }}
+                      className="flex-1 accent-rose-700"
+                    />
+                    <span className="w-9 text-right text-xs font-bold text-slate-700">{recolorTolerance}%</span>
+                  </div>
+
+                  {pickedSourceColor && (
+                    <span className="text-xs font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                      {recolorMatchCount.toLocaleString()} điểm ảnh khớp màu
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* TAB 1: PUNCH COLOR */}
           {mode === 'punch_color' && (
             <div className="flex flex-wrap items-center gap-4">
@@ -1375,224 +1891,6 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
               </div>
             </div>
           )}
-
-          {/* TAB 4: RECOLOR PHOTOSHOP */}
-          {mode === 'recolor' && (
-            <div className="flex flex-col gap-3">
-              {/* Color selectors row */}
-              <div className="flex flex-wrap items-center gap-4">
-                {/* 1. Source Color */}
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setActiveEyedropper(activeEyedropper === 'source' ? null : 'source')}
-                    className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-bold transition-all ${
-                      activeEyedropper === 'source'
-                        ? 'border-rose-600 bg-rose-50 text-rose-800 ring-2 ring-rose-500'
-                        : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    <Pipette className="h-3.5 w-3.5" />
-                    Chấm màu cần đổi
-                  </button>
-
-                  <div
-                    className="h-7 w-7 rounded-md border border-slate-300 shadow-inner"
-                    style={{
-                      backgroundColor: pickedSourceColor
-                        ? `rgb(${pickedSourceColor.join(',')})`
-                        : 'transparent'
-                    }}
-                  />
-                  {pickedSourceColor ? (
-                    <span className="text-xs font-mono font-bold text-slate-700">
-                      {rgbToHex(pickedSourceColor[0], pickedSourceColor[1], pickedSourceColor[2])}
-                    </span>
-                  ) : (
-                    <span className="text-xs text-slate-400 italic">Chưa chọn</span>
-                  )}
-                </div>
-
-                <span className="text-slate-400 font-bold">➔</span>
-
-                {/* 2. Destination Color */}
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setActiveEyedropper(activeEyedropper === 'destination' ? null : 'destination')}
-                    className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-bold transition-all ${
-                      activeEyedropper === 'destination'
-                        ? 'border-rose-600 bg-rose-50 text-rose-800 ring-2 ring-rose-500'
-                        : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    <Pipette className="h-3.5 w-3.5 text-rose-700" />
-                    Lấy màu khác từ ảnh
-                  </button>
-
-                  <div className="flex items-center gap-1.5">
-                    <label htmlFor="recolor-custom-picker" className="sr-only">
-                      Chọn màu tùy chỉnh
-                    </label>
-                    <input
-                      id="recolor-custom-picker"
-                      type="color"
-                      value={rgbToHex(pickedTargetColor[0], pickedTargetColor[1], pickedTargetColor[2])}
-                      onChange={(e) => {
-                        const nextColor = hexToRgb(e.target.value);
-                        setPickedTargetColor(nextColor);
-                        redrawRecolorPreview(
-                          pickedSourceColor,
-                          nextColor,
-                          recolorTolerance,
-                          recolorScope,
-                          clickSeedPoint,
-                          recolorBlendMode
-                        );
-                      }}
-                      className="h-7 w-8 cursor-pointer rounded border border-slate-300 bg-white p-0.5"
-                    />
-                    <span className="text-xs font-mono font-bold text-slate-700">
-                      {rgbToHex(pickedTargetColor[0], pickedTargetColor[1], pickedTargetColor[2])}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Quick Palette */}
-                <div className="flex items-center gap-1 ml-auto">
-                  <span className="text-[11px] font-bold text-slate-500 mr-1">Bảng màu nhanh:</span>
-                  {POPULAR_PALETTE.map((item) => (
-                    <button
-                      key={item.hex}
-                      type="button"
-                      onClick={() => {
-                        const rgb = hexToRgb(item.hex);
-                        setPickedTargetColor(rgb);
-                        redrawRecolorPreview(
-                          pickedSourceColor,
-                          rgb,
-                          recolorTolerance,
-                          recolorScope,
-                          clickSeedPoint,
-                          recolorBlendMode
-                        );
-                      }}
-                      title={item.name}
-                      style={{ backgroundColor: item.hex }}
-                      className="h-5 w-5 rounded-full border border-slate-300 shadow-sm hover:scale-125 transition-transform"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Recolor options row */}
-              <div className="flex flex-wrap items-center gap-4 pt-1">
-                {/* Tolerance */}
-                <div className="flex flex-1 min-w-[200px] items-center gap-2">
-                  <label htmlFor="recolor-tol" className="text-xs font-bold text-slate-700 whitespace-nowrap">
-                    Độ nhạy màu
-                  </label>
-                  <input
-                    id="recolor-tol"
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={recolorTolerance}
-                    onChange={(e) => {
-                      const tol = Number(e.target.value);
-                      setRecolorTolerance(tol);
-                      redrawRecolorPreview(
-                        pickedSourceColor,
-                        pickedTargetColor,
-                        tol,
-                        recolorScope,
-                        clickSeedPoint,
-                        recolorBlendMode
-                      );
-                    }}
-                    className="flex-1 accent-rose-700"
-                  />
-                  <span className="w-9 text-right text-xs font-bold text-slate-700">{recolorTolerance}%</span>
-                </div>
-
-                {/* Scope */}
-                <div className="flex items-center gap-1 rounded-md border border-slate-300 bg-slate-50 p-0.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRecolorScope('global');
-                      redrawRecolorPreview(
-                        pickedSourceColor,
-                        pickedTargetColor,
-                        recolorTolerance,
-                        'global',
-                        clickSeedPoint,
-                        recolorBlendMode
-                      );
-                    }}
-                    className={`rounded px-2.5 py-1 text-xs font-bold ${
-                      recolorScope === 'global' ? 'bg-white text-rose-800 shadow-sm' : 'text-slate-600'
-                    }`}
-                  >
-                    Toàn bộ ảnh
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRecolorScope('flood');
-                      redrawRecolorPreview(
-                        pickedSourceColor,
-                        pickedTargetColor,
-                        recolorTolerance,
-                        'flood',
-                        clickSeedPoint,
-                        recolorBlendMode
-                      );
-                    }}
-                    className={`rounded px-2.5 py-1 text-xs font-bold ${
-                      recolorScope === 'flood' ? 'bg-white text-rose-800 shadow-sm' : 'text-slate-600'
-                    }`}
-                  >
-                    Đổ màu vùng liền kề (Thùng sơn)
-                  </button>
-                </div>
-
-                {/* Blend Mode */}
-                <div className="flex items-center gap-1.5">
-                  <label htmlFor="recolor-blend" className="text-xs font-bold text-slate-700 whitespace-nowrap">
-                    Chế độ tô:
-                  </label>
-                  <select
-                    id="recolor-blend"
-                    value={recolorBlendMode}
-                    onChange={(e) => {
-                      const b = e.target.value as 'color' | 'solid' | 'soft';
-                      setRecolorBlendMode(b);
-                      redrawRecolorPreview(
-                        pickedSourceColor,
-                        pickedTargetColor,
-                        recolorTolerance,
-                        recolorScope,
-                        clickSeedPoint,
-                        b
-                      );
-                    }}
-                    className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm"
-                  >
-                    <option value="color">Giữ sáng tối & vân ảnh (Photoshop Color)</option>
-                    <option value="solid">Tô màu phẳng (Solid Color)</option>
-                    <option value="soft">Phủ màu mịn viền (Soft Tint)</option>
-                  </select>
-                </div>
-
-                {pickedSourceColor && (
-                  <span className="text-xs font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
-                    {recolorMatchCount.toLocaleString()} điểm ảnh đã đổi màu
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Footer actions */}
@@ -1613,7 +1911,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
             </button>
 
             {/* Apply this step button to keep editing */}
-            {(mode === 'crop' || (mode === 'punch_color' && punchPickedColor) || (mode === 'recolor' && pickedSourceColor)) && (
+            {(mode === 'crop' || (mode === 'punch_color' && punchPickedColor) || (mode === 'recolor' && recolorTool === 'replace' && pickedSourceColor)) && (
               <button
                 type="button"
                 onClick={handleApplyCurrentStep}
