@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   Crop,
+  Eraser,
   Lock,
   Maximize2,
   PaintBucket,
@@ -17,7 +18,7 @@ import {
 import { FrameElement, FrameSlot } from '../types/canvas';
 
 export type RegionModalMode = 'punch_color' | 'punch_slot' | 'crop' | 'recolor';
-export type RecolorSubTool = 'brush' | 'bucket' | 'replace';
+export type RecolorSubTool = 'brush' | 'eraser' | 'bucket' | 'replace';
 
 export interface SelectRegionModalProps {
   isOpen: boolean;
@@ -144,20 +145,21 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
   onApply
 }) => {
   const [mode, setMode] = useState<RegionModalMode>(initialMode);
-  const [workingImageUrl, setWorkingImageUrl] = useState<string | null>(null);
-  const [history, setHistory] = useState<string[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Natural image dimensions
   const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
-  const [displayDim, setDisplayDim] = useState({ width: 0, height: 0 });
 
   // Canvas refs
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const slotCanvasRef = useRef<HTMLCanvasElement>(null);
-  const sourceDataRef = useRef<ImageData | null>(null);
   const loadedImageRef = useRef<HTMLImageElement | null>(null);
+
+  // Fast in-memory undo/redo snapshot stack
+  const canvasSnapshotsRef = useRef<ImageData[]>([]);
+  const snapshotIndexRef = useRef<number>(0);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
 
   // --- TAB 1: PUNCH COLOR STATE ---
   const [punchTolerance, setPunchTolerance] = useState(10);
@@ -170,11 +172,11 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
   const [cropPreset, setCropPreset] = useState<string>('free');
   const [fitToCanvasOnApply, setFitToCanvasOnApply] = useState(true);
 
-  // --- TAB 4: RECOLOR STATE ---
+  // --- TAB 4: RECOLOR / PAINTING STATE ---
   const [recolorTool, setRecolorTool] = useState<RecolorSubTool>('brush');
   const [brushSize, setBrushSize] = useState(30);
   const [brushOpacity, setBrushOpacity] = useState(100);
-  const [brushSoftness, setBrushSoftness] = useState(25);
+  const [brushSoftness, setBrushSoftness] = useState(0);
   const [isSamplingColor, setIsSamplingColor] = useState(false);
   const [isAltSampling, setIsAltSampling] = useState(false);
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(null);
@@ -187,43 +189,115 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
   const [pickedTargetColor, setPickedTargetColor] = useState<[number, number, number]>([212, 175, 55]); // Champagne Gold
   const [recolorTolerance, setRecolorTolerance] = useState(15);
   const [activeEyedropper, setActiveEyedropper] = useState<'source' | 'destination' | null>(null);
-  const [recolorBlendMode, setRecolorBlendMode] = useState<'color' | 'solid'>('color');
+  // Default to solid (Normal) like Photoshop Brush Tool
+  const [recolorBlendMode, setRecolorBlendMode] = useState<'solid' | 'color'>('solid');
   const [recolorMatchCount, setRecolorMatchCount] = useState(0);
 
-  // Measure display dimensions of main canvas
-  const updateDisplayDimensions = useCallback(() => {
-    const cvs = canvasRef.current;
-    if (cvs && cvs.clientWidth > 0 && cvs.clientHeight > 0) {
-      setDisplayDim({ width: cvs.clientWidth, height: cvs.clientHeight });
+  // Save current canvas state to snapshot stack (synchronous, 1ms, zero lag)
+  const saveCanvasSnapshot = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const currentSnapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const nextSnapshots = canvasSnapshotsRef.current.slice(0, snapshotIndexRef.current + 1);
+    nextSnapshots.push(currentSnapshot);
+
+    // Keep max 30 snapshots in memory
+    if (nextSnapshots.length > 30) {
+      nextSnapshots.shift();
+    }
+
+    canvasSnapshotsRef.current = nextSnapshots;
+    snapshotIndexRef.current = nextSnapshots.length - 1;
+    setCanUndo(snapshotIndexRef.current > 0);
+    setCanRedo(false);
+  }, []);
+
+  // Photoshop-like Undo
+  const handleUndo = useCallback(() => {
+    if (snapshotIndexRef.current > 0) {
+      snapshotIndexRef.current--;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.putImageData(canvasSnapshotsRef.current[snapshotIndexRef.current], 0, 0);
+      setCanUndo(snapshotIndexRef.current > 0);
+      setCanRedo(snapshotIndexRef.current < canvasSnapshotsRef.current.length - 1);
     }
   }, []);
 
-  // Alt key detection for quick color sampling like Photoshop
+  // Photoshop-like Redo
+  const handleRedo = useCallback(() => {
+    if (snapshotIndexRef.current < canvasSnapshotsRef.current.length - 1) {
+      snapshotIndexRef.current++;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.putImageData(canvasSnapshotsRef.current[snapshotIndexRef.current], 0, 0);
+      setCanUndo(true);
+      setCanRedo(snapshotIndexRef.current < canvasSnapshotsRef.current.length - 1);
+    }
+  }, []);
+
+  // Reset to original image
+  const handleResetToOriginal = useCallback(() => {
+    if (canvasSnapshotsRef.current.length > 0) {
+      snapshotIndexRef.current = 0;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.putImageData(canvasSnapshotsRef.current[0], 0, 0);
+      setCanUndo(false);
+      setCanRedo(canvasSnapshotsRef.current.length > 1);
+    }
+  }, []);
+
+  // Keyboard shortcuts like Photoshop (Alt = Eyedropper, [ and ] = Brush size, Ctrl+Z = Undo)
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Alt') {
         setIsAltSampling(true);
+      } else if (e.key === '[') {
+        setBrushSize((s) => Math.max(2, s - 5));
+      } else if (e.key === ']') {
+        setBrushSize((s) => Math.min(200, s + 5));
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleRedo();
+        } else {
+          handleUndo();
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        handleRedo();
       }
     };
+
     const handleKeyUp = (e: KeyboardEvent) => {
       if (e.key === 'Alt') {
         setIsAltSampling(false);
       }
     };
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [isOpen, handleUndo, handleRedo]);
 
   // Initialize modal when opened
   useEffect(() => {
     if (!isOpen || !imageUrl) return;
-    setWorkingImageUrl(imageUrl);
-    setHistory([imageUrl]);
-    setHistoryIndex(0);
     setMode(initialMode);
     setPunchPickedColor(null);
     setPunchMatchCount(0);
@@ -234,11 +308,9 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     setIsSamplingColor(false);
     setRecolorMatchCount(0);
     setRecolorTool('brush');
-  }, [isOpen, imageUrl, initialMode]);
-
-  // Load image whenever workingImageUrl changes
-  useEffect(() => {
-    if (!isOpen || !workingImageUrl) return;
+    setRecolorBlendMode('solid');
+    setBrushOpacity(100);
+    setBrushSoftness(0);
 
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -261,25 +333,22 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
         if (ctx) {
           ctx.clearRect(0, 0, natW, natH);
           ctx.drawImage(img, 0, 0);
-          sourceDataRef.current = ctx.getImageData(0, 0, natW, natH);
+
+          // Save baseline snapshot
+          const initialSnapshot = ctx.getImageData(0, 0, natW, natH);
+          canvasSnapshotsRef.current = [initialSnapshot];
+          snapshotIndexRef.current = 0;
+          setCanUndo(false);
+          setCanRedo(false);
         }
       }
 
       // Draw slot preview
       drawSlotPreview(img);
-
-      // Force measure displayed size
-      setTimeout(updateDisplayDimensions, 50);
     };
-    img.src = workingImageUrl;
+    img.src = imageUrl;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, workingImageUrl]);
-
-  // Handle window resize for overlay alignment
-  useEffect(() => {
-    window.addEventListener('resize', updateDisplayDimensions);
-    return () => window.removeEventListener('resize', updateDisplayDimensions);
-  }, [updateDisplayDimensions]);
+  }, [isOpen, imageUrl, initialMode]);
 
   // Draw slot overlay preview for punch_slot
   const drawSlotPreview = (img: HTMLImageElement) => {
@@ -319,53 +388,17 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
       });
   };
 
-  // Helper to commit a new step to history inside the modal
-  const commitStep = (newDataUrl: string) => {
-    const nextHistory = history.slice(0, historyIndex + 1);
-    nextHistory.push(newDataUrl);
-    setHistory(nextHistory);
-    setHistoryIndex(nextHistory.length - 1);
-    setWorkingImageUrl(newDataUrl);
-    setPunchPickedColor(null);
-    setPickedSourceColor(null);
-    setActiveEyedropper(null);
-    setIsSamplingColor(false);
-  };
-
-  const handleUndo = () => {
-    if (historyIndex > 0) {
-      const prevIdx = historyIndex - 1;
-      setHistoryIndex(prevIdx);
-      setWorkingImageUrl(history[prevIdx]);
-    }
-  };
-
-  const handleRedo = () => {
-    if (historyIndex < history.length - 1) {
-      const nextIdx = historyIndex + 1;
-      setHistoryIndex(nextIdx);
-      setWorkingImageUrl(history[nextIdx]);
-    }
-  };
-
-  const handleResetToOriginal = () => {
-    if (imageUrl) {
-      setHistory([imageUrl]);
-      setHistoryIndex(0);
-      setWorkingImageUrl(imageUrl);
-    }
-  };
-
   // Redraw preview for Punch Color (red highlight)
   const redrawPunchColorPreview = (color: [number, number, number] | null, tol: number) => {
     const canvas = canvasRef.current;
-    const source = sourceDataRef.current;
-    if (!canvas || !source) return;
+    if (!canvas || canvasSnapshotsRef.current.length === 0) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const preview = ctx.createImageData(source.width, source.height);
-    preview.data.set(source.data);
+    // Use current baseline snapshot
+    const baseline = canvasSnapshotsRef.current[snapshotIndexRef.current];
+    const preview = ctx.createImageData(baseline.width, baseline.height);
+    preview.data.set(baseline.data);
 
     let matches = 0;
     if (color) {
@@ -398,19 +431,19 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     blend: 'color' | 'solid'
   ) => {
     const canvas = canvasRef.current;
-    const source = sourceDataRef.current;
-    if (!canvas || !source) return;
+    if (!canvas || canvasSnapshotsRef.current.length === 0) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const baseline = canvasSnapshotsRef.current[snapshotIndexRef.current];
     if (!srcCol) {
-      ctx.putImageData(source, 0, 0);
+      ctx.putImageData(baseline, 0, 0);
       setRecolorMatchCount(0);
       return;
     }
 
-    const preview = ctx.createImageData(source.width, source.height);
-    preview.data.set(source.data);
+    const preview = ctx.createImageData(baseline.width, baseline.height);
+    preview.data.set(baseline.data);
     const data = preview.data;
 
     const [tr, tg, tb] = srcCol;
@@ -450,15 +483,14 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
   // Execute Paint Bucket (Flood fill) at clicked point
   const executeFloodFill = (startX: number, startY: number) => {
     const canvas = canvasRef.current;
-    const source = sourceDataRef.current;
-    if (!canvas || !source) return;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const currentImgData = ctx.getImageData(0, 0, source.width, source.height);
+    const currentImgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = currentImgData.data;
-    const width = source.width;
-    const height = source.height;
+    const width = currentImgData.width;
+    const height = currentImgData.height;
 
     const clickIdx = (startY * width + startX) * 4;
     const tr = data[clickIdx];
@@ -529,48 +561,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     }
 
     ctx.putImageData(currentImgData, 0, 0);
-    sourceDataRef.current = ctx.getImageData(0, 0, width, height);
-    commitStep(canvas.toDataURL('image/png'));
-  };
-
-  // Hardware-accelerated brush stroke painting
-  const paintBrushSegment = (
-    fromX: number,
-    fromY: number,
-    toX: number,
-    toY: number
-  ) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.save();
-    ctx.globalCompositeOperation = recolorBlendMode === 'color' ? 'color' : 'source-over';
-    ctx.globalAlpha = brushOpacity / 100;
-
-    const [r, g, b] = pickedTargetColor;
-    ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
-    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-    ctx.lineWidth = brushSize;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    if (brushSoftness > 0) {
-      ctx.shadowColor = `rgb(${r}, ${g}, ${b})`;
-      ctx.shadowBlur = (brushSoftness / 100) * (brushSize * 0.6);
-    }
-
-    ctx.beginPath();
-    ctx.moveTo(fromX, fromY);
-    ctx.lineTo(toX, toY);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(toX, toY, brushSize / 2, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
+    saveCanvasSnapshot();
   };
 
   // Convert client mouse/touch event to natural image coordinates
@@ -578,6 +569,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return null;
     const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return null;
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     const x = Math.floor((e.clientX - rect.left) * scaleX);
@@ -588,23 +580,69 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     };
   };
 
+  // Direct, smooth, continuous brush stroke painting
+  const paintStroke = (fromX: number, fromY: number, toX: number, toY: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.save();
+
+    if (recolorTool === 'eraser') {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.globalAlpha = brushOpacity / 100;
+      ctx.lineWidth = brushSize;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = 'rgba(0,0,0,1)';
+      ctx.fillStyle = 'rgba(0,0,0,1)';
+    } else {
+      // Brush: Normal (Solid) or Photoshop Color blend
+      ctx.globalCompositeOperation = recolorBlendMode === 'color' ? 'color' : 'source-over';
+      ctx.globalAlpha = brushOpacity / 100;
+      const [r, g, b] = pickedTargetColor;
+      ctx.lineWidth = brushSize;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+      ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+
+      if (brushSoftness > 0) {
+        ctx.shadowColor = `rgb(${r}, ${g}, ${b})`;
+        ctx.shadowBlur = (brushSoftness / 100) * (brushSize * 0.45);
+      }
+    }
+
+    // Draw connecting stroke
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+
+    // Draw circle cap at destination point
+    ctx.beginPath();
+    ctx.arc(toX, toY, brushSize / 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  };
+
   // --- CANVAS POINTER EVENTS FOR BRUSHING & COLOR SAMPLING ---
   const handleCanvasPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
     const coords = getImageCoordinates(e);
     if (!coords) return;
 
-    const canvas = canvasRef.current;
-    const source = sourceDataRef.current;
-    if (!canvas || !source) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
     // Check if sampling color via Eyedropper button or Alt key
-    if (isSamplingColor || isAltSampling || (mode === 'recolor' && activeEyedropper !== null)) {
-      const idx = (coords.y * source.width + coords.x) * 4;
-      const color: [number, number, number] = [
-        source.data[idx],
-        source.data[idx + 1],
-        source.data[idx + 2]
-      ];
+    if (isSamplingColor || isAltSampling || activeEyedropper !== null) {
+      const pixel = ctx.getImageData(coords.x, coords.y, 1, 1).data;
+      const color: [number, number, number] = [pixel[0], pixel[1], pixel[2]];
 
       if (activeEyedropper === 'source') {
         setPickedSourceColor(color);
@@ -614,7 +652,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
         setPickedTargetColor(color);
         setIsSamplingColor(false);
         setActiveEyedropper(null);
-        if (recolorTool === 'replace') {
+        if (recolorTool === 'replace' && pickedSourceColor) {
           redrawGlobalReplacePreview(pickedSourceColor, color, recolorTolerance, recolorBlendMode);
         }
       }
@@ -622,12 +660,8 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     }
 
     if (mode === 'punch_color') {
-      const idx = (coords.y * source.width + coords.x) * 4;
-      const color: [number, number, number] = [
-        source.data[idx],
-        source.data[idx + 1],
-        source.data[idx + 2]
-      ];
+      const pixel = ctx.getImageData(coords.x, coords.y, 1, 1).data;
+      const color: [number, number, number] = [pixel[0], pixel[1], pixel[2]];
       setPunchPickedColor(color);
       redrawPunchColorPreview(color, punchTolerance);
       return;
@@ -640,24 +674,20 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
       }
 
       if (recolorTool === 'replace') {
-        const idx = (coords.y * source.width + coords.x) * 4;
-        const color: [number, number, number] = [
-          source.data[idx],
-          source.data[idx + 1],
-          source.data[idx + 2]
-        ];
+        const pixel = ctx.getImageData(coords.x, coords.y, 1, 1).data;
+        const color: [number, number, number] = [pixel[0], pixel[1], pixel[2]];
         setPickedSourceColor(color);
         redrawGlobalReplacePreview(color, pickedTargetColor, recolorTolerance, recolorBlendMode);
         return;
       }
 
-      if (recolorTool === 'brush') {
+      if (recolorTool === 'brush' || recolorTool === 'eraser') {
         try {
           (e.target as HTMLElement).setPointerCapture(e.pointerId);
         } catch {}
         isPaintingRef.current = true;
         lastPointRef.current = coords;
-        paintBrushSegment(coords.x, coords.y, coords.x, coords.y);
+        paintStroke(coords.x, coords.y, coords.x, coords.y);
       }
     }
   };
@@ -668,10 +698,10 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     const rect = canvas.getBoundingClientRect();
     setCursorPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
 
-    if (mode === 'recolor' && recolorTool === 'brush' && isPaintingRef.current && lastPointRef.current) {
+    if (isPaintingRef.current && lastPointRef.current) {
       const coords = getImageCoordinates(e);
       if (!coords) return;
-      paintBrushSegment(lastPointRef.current.x, lastPointRef.current.y, coords.x, coords.y);
+      paintStroke(lastPointRef.current.x, lastPointRef.current.y, coords.x, coords.y);
       lastPointRef.current = coords;
     }
   };
@@ -681,23 +711,10 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
       (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     } catch {}
 
-    if (mode === 'recolor' && recolorTool === 'brush' && isPaintingRef.current) {
+    if (isPaintingRef.current) {
       isPaintingRef.current = false;
       lastPointRef.current = null;
-
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      sourceDataRef.current = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/png');
-
-      const nextHistory = history.slice(0, historyIndex + 1);
-      nextHistory.push(dataUrl);
-      setHistory(nextHistory);
-      setHistoryIndex(nextHistory.length - 1);
-      setWorkingImageUrl(dataUrl);
+      saveCanvasSnapshot();
     }
   };
 
@@ -706,19 +723,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     if (isPaintingRef.current) {
       isPaintingRef.current = false;
       lastPointRef.current = null;
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          sourceDataRef.current = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const dataUrl = canvas.toDataURL('image/png');
-          const nextHistory = history.slice(0, historyIndex + 1);
-          nextHistory.push(dataUrl);
-          setHistory(nextHistory);
-          setHistoryIndex(nextHistory.length - 1);
-          setWorkingImageUrl(dataUrl);
-        }
-      }
+      saveCanvasSnapshot();
     }
   };
 
@@ -927,8 +932,8 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
 
   // 1. Generate Cropped DataURL
   const generateCroppedDataUrl = (): string | null => {
-    const img = loadedImageRef.current;
-    if (!img || cropRect.width <= 0 || cropRect.height <= 0) return null;
+    const canvas = canvasRef.current;
+    if (!canvas || cropRect.width <= 0 || cropRect.height <= 0) return null;
 
     const outCanvas = document.createElement('canvas');
     outCanvas.width = cropRect.width;
@@ -937,7 +942,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     if (!outCtx) return null;
 
     outCtx.drawImage(
-      img,
+      canvas,
       cropRect.x,
       cropRect.y,
       cropRect.width,
@@ -953,15 +958,16 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
 
   // 2. Generate Punched Color DataURL
   const generatePunchColorDataUrl = (): string | null => {
-    const source = sourceDataRef.current;
-    if (!source || !punchPickedColor) return null;
+    const canvas = canvasRef.current;
+    if (!canvas || !punchPickedColor || canvasSnapshotsRef.current.length === 0) return null;
 
+    const baseline = canvasSnapshotsRef.current[snapshotIndexRef.current];
     const [pr, pg, pb] = punchPickedColor;
     const threshold = (punchTolerance / 100) * 441.7;
-    const output = new ImageData(new Uint8ClampedArray(source.data), source.width, source.height);
+    const output = new ImageData(new Uint8ClampedArray(baseline.data), baseline.width, baseline.height);
     const data = output.data;
-    const w = source.width;
-    const h = source.height;
+    const w = output.width;
+    const h = output.height;
 
     const matchMask = new Uint8Array(w * h);
     for (let i = 0; i < w * h; i++) {
@@ -1000,68 +1006,43 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     return outCanvas.toDataURL('image/png');
   };
 
-  // 3. Generate Recolor DataURL
-  const generateRecolorDataUrl = (): string | null => {
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-    return canvas.toDataURL('image/png');
-  };
-
-  // 4. Generate Punch Slot DataURL
+  // 3. Generate Punch Slot DataURL
   const generatePunchSlotDataUrl = (onDone: (dataUrl: string) => void) => {
-    if (slots.length === 0 || !workingImageUrl) return;
+    const canvas = canvasRef.current;
+    if (slots.length === 0 || !canvas) return;
 
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = canvasWidth;
-      canvas.height = canvasHeight;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = canvasWidth;
+    outCanvas.height = canvasHeight;
+    const ctx = outCanvas.getContext('2d');
+    if (!ctx) return;
 
-      if (targetElement) {
-        ctx.save();
-        ctx.translate(targetElement.x, targetElement.y);
-        ctx.rotate(((targetElement.rotation || 0) * Math.PI) / 180);
-        ctx.drawImage(img, 0, 0, targetElement.width, targetElement.height);
-        ctx.restore();
-      } else {
-        ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-      }
-
-      ctx.globalCompositeOperation = 'destination-out';
-      const bleed = 3;
-      slots
-        .filter((slot) => slot.visible !== false)
-        .forEach((slot) => {
-          ctx.save();
-          ctx.translate(slot.x, slot.y);
-          ctx.rotate(((slot.rotation || 0) * Math.PI) / 180);
-          ctx.fillStyle = 'black';
-          ctx.beginPath();
-          ctx.rect(-bleed, -bleed, slot.width + bleed * 2, slot.height + bleed * 2);
-          ctx.fill();
-          ctx.restore();
-        });
-
-      onDone(canvas.toDataURL('image/png'));
-    };
-    img.src = workingImageUrl;
-  };
-
-  // Apply current step inside the modal and allow more edits
-  const handleApplyCurrentStep = () => {
-    if (mode === 'crop') {
-      const cropped = generateCroppedDataUrl();
-      if (cropped) commitStep(cropped);
-    } else if (mode === 'punch_color') {
-      const punched = generatePunchColorDataUrl();
-      if (punched) commitStep(punched);
-    } else if (mode === 'recolor') {
-      const recolored = generateRecolorDataUrl();
-      if (recolored) commitStep(recolored);
+    if (targetElement) {
+      ctx.save();
+      ctx.translate(targetElement.x, targetElement.y);
+      ctx.rotate(((targetElement.rotation || 0) * Math.PI) / 180);
+      ctx.drawImage(canvas, 0, 0, targetElement.width, targetElement.height);
+      ctx.restore();
+    } else {
+      ctx.drawImage(canvas, 0, 0, canvasWidth, canvasHeight);
     }
+
+    ctx.globalCompositeOperation = 'destination-out';
+    const bleed = 3;
+    slots
+      .filter((slot) => slot.visible !== false)
+      .forEach((slot) => {
+        ctx.save();
+        ctx.translate(slot.x, slot.y);
+        ctx.rotate(((slot.rotation || 0) * Math.PI) / 180);
+        ctx.fillStyle = 'black';
+        ctx.beginPath();
+        ctx.rect(-bleed, -bleed, slot.width + bleed * 2, slot.height + bleed * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+    onDone(outCanvas.toDataURL('image/png'));
   };
 
   // Final apply to canvas and close
@@ -1069,7 +1050,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
     setIsProcessing(true);
 
     if (mode === 'crop') {
-      const cropped = generateCroppedDataUrl() || workingImageUrl;
+      const cropped = generateCroppedDataUrl();
       if (cropped) {
         onApply(cropped, fitToCanvasOnApply, {
           width: cropRect.width,
@@ -1078,15 +1059,15 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
       }
       setIsProcessing(false);
     } else if (mode === 'punch_color') {
-      const punched = punchPickedColor ? generatePunchColorDataUrl() : workingImageUrl;
+      const punched = punchPickedColor ? generatePunchColorDataUrl() : canvasRef.current?.toDataURL('image/png');
       if (punched) {
         onApply(punched, false);
       }
       setIsProcessing(false);
     } else if (mode === 'recolor') {
-      const recolored = generateRecolorDataUrl() || workingImageUrl;
-      if (recolored) {
-        onApply(recolored, false, naturalSize);
+      const result = canvasRef.current?.toDataURL('image/png');
+      if (result) {
+        onApply(result, false, naturalSize);
       }
       setIsProcessing(false);
     } else if (mode === 'punch_slot') {
@@ -1100,8 +1081,13 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
   if (!isOpen) return null;
 
   // Scale for overlay positioning
+  const canvasEl = canvasRef.current;
+  const canvasRect = canvasEl?.getBoundingClientRect();
   const displayScale =
-    naturalSize.width > 0 && displayDim.width > 0 ? displayDim.width / naturalSize.width : 1;
+    naturalSize.width > 0 && canvasRect && canvasRect.width > 0
+      ? canvasRect.width / naturalSize.width
+      : 1;
+
   const dispX = Math.round(cropRect.x * displayScale);
   const dispY = Math.round(cropRect.y * displayScale);
   const dispW = Math.round(cropRect.width * displayScale);
@@ -1126,7 +1112,8 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
                 {mode === 'punch_color' && 'Đục lỗ nền theo màu (chấm vào màu cần xóa và khử răng cưa viền).'}
                 {mode === 'punch_slot' && 'Đục lỗ các ô ảnh theo khung slot hiện tại (mở rộng 3px tránh lem viền).'}
                 {mode === 'crop' && 'Cắt ảnh (Crop) theo kích thước pixel hoặc tỷ lệ chuẩn cho photobooth.'}
-                {mode === 'recolor' && recolorTool === 'brush' && 'Cọ tô màu: Chấm lấy màu từ ảnh hoặc bảng màu, rồi giữ chuột tô trực tiếp lên ảnh!'}
+                {mode === 'recolor' && recolorTool === 'brush' && 'Cọ tô màu kiểu Photoshop: Hút màu từ ảnh (hoặc giữ phím Alt), rồi giữ chuột tô trực tiếp lên ảnh!'}
+                {mode === 'recolor' && recolorTool === 'eraser' && 'Cục tẩy: Nhấn và giữ chuột rê để xóa vùng ảnh.'}
                 {mode === 'recolor' && recolorTool === 'bucket' && 'Thùng sơn: Bấm vào một vùng trên ảnh để đổ màu liền kề.'}
                 {mode === 'recolor' && recolorTool === 'replace' && 'Thay thế màu: Chọn màu gốc trên ảnh và thay đổi tất cả điểm màu tương đồng.'}
               </p>
@@ -1139,8 +1126,8 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
               <button
                 type="button"
                 onClick={handleUndo}
-                disabled={historyIndex === 0}
-                title="Hoàn tác nét vẽ / bước trước (Undo)"
+                disabled={!canUndo}
+                title="Hoàn tác nét vẽ / bước trước (Ctrl+Z)"
                 className="rounded p-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-30 disabled:pointer-events-none"
               >
                 <Undo2 className="h-4 w-4" />
@@ -1148,8 +1135,8 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
               <button
                 type="button"
                 onClick={handleRedo}
-                disabled={historyIndex >= history.length - 1}
-                title="Làm lại nét vẽ / bước sau (Redo)"
+                disabled={!canRedo}
+                title="Làm lại nét vẽ / bước sau (Ctrl+Y)"
                 className="rounded p-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-30 disabled:pointer-events-none"
               >
                 <Redo2 className="h-4 w-4" />
@@ -1157,7 +1144,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
               <button
                 type="button"
                 onClick={handleResetToOriginal}
-                disabled={history.length <= 1}
+                disabled={!canUndo && !canRedo}
                 title="Khôi phục ảnh gốc ban đầu"
                 className="rounded p-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-30 disabled:pointer-events-none"
               >
@@ -1184,10 +1171,6 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
               onClick={() => {
                 setMode('recolor');
                 setRecolorTool('brush');
-                if (sourceDataRef.current) {
-                  canvasRef.current?.getContext('2d')?.putImageData(sourceDataRef.current, 0, 0);
-                }
-                setTimeout(updateDisplayDimensions, 30);
               }}
               className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${
                 mode === 'recolor' ? 'bg-rose-700 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'
@@ -1199,13 +1182,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
 
             <button
               type="button"
-              onClick={() => {
-                setMode('crop');
-                if (sourceDataRef.current) {
-                  canvasRef.current?.getContext('2d')?.putImageData(sourceDataRef.current, 0, 0);
-                }
-                setTimeout(updateDisplayDimensions, 30);
-              }}
+              onClick={() => setMode('crop')}
               className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${
                 mode === 'crop' ? 'bg-rose-700 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'
               }`}
@@ -1216,12 +1193,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
 
             <button
               type="button"
-              onClick={() => {
-                setMode('punch_color');
-                if (sourceDataRef.current) {
-                  canvasRef.current?.getContext('2d')?.putImageData(sourceDataRef.current, 0, 0);
-                }
-              }}
+              onClick={() => setMode('punch_color')}
               className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${
                 mode === 'punch_color' ? 'bg-rose-700 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'
               }`}
@@ -1234,7 +1206,11 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
               type="button"
               onClick={() => {
                 setMode('punch_slot');
-                if (loadedImageRef.current) drawSlotPreview(loadedImageRef.current);
+                if (canvasRef.current) {
+                  const img = new Image();
+                  img.src = canvasRef.current.toDataURL();
+                  img.onload = () => drawSlotPreview(img);
+                }
               }}
               disabled={slots.length === 0}
               title={slots.length === 0 ? 'Cần ít nhất 1 ô ảnh slot' : undefined}
@@ -1267,13 +1243,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
             />
 
             {/* Main Interactive Canvas & Overlays Wrapper */}
-            <div
-              className={`relative select-none ${mode !== 'punch_slot' ? 'inline-block' : 'hidden'}`}
-              style={{
-                width: displayDim.width > 0 ? `${displayDim.width}px` : 'auto',
-                height: displayDim.height > 0 ? `${displayDim.height}px` : 'auto'
-              }}
-            >
+            <div className={`relative select-none ${mode !== 'punch_slot' ? 'inline-block' : 'hidden'}`}>
               <canvas
                 ref={canvasRef}
                 onPointerDown={handleCanvasPointerDown}
@@ -1283,16 +1253,16 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
                 className={`block max-h-[380px] w-auto max-w-full rounded shadow-sm select-none touch-none ${
                   isEyedropperActive || mode === 'punch_color'
                     ? 'cursor-crosshair'
-                    : mode === 'recolor' && recolorTool === 'brush'
-                    ? 'cursor-none'
+                    : mode === 'recolor' && (recolorTool === 'brush' || recolorTool === 'eraser')
+                    ? 'cursor-crosshair'
                     : mode === 'recolor'
                     ? 'cursor-pointer'
                     : 'cursor-default'
                 }`}
               />
 
-              {/* Photoshop-style floating brush circle cursor */}
-              {mode === 'recolor' && recolorTool === 'brush' && !isEyedropperActive && cursorPos && (
+              {/* Photoshop-style precision brush circle cursor */}
+              {mode === 'recolor' && (recolorTool === 'brush' || recolorTool === 'eraser') && !isEyedropperActive && cursorPos && (
                 <div
                   className="pointer-events-none absolute rounded-full border border-white shadow-[0_0_0_1px_rgba(0,0,0,0.8)]"
                   style={{
@@ -1302,11 +1272,13 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
                     height: `${Math.max(4, brushSize * displayScale)}px`,
                     transform: 'translate(-50%, -50%)'
                   }}
-                />
+                >
+                  <div className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.8)]" />
+                </div>
               )}
 
               {/* Crop Overlay */}
-              {mode === 'crop' && displayDim.width > 0 && (
+              {mode === 'crop' && (
                 <div className="absolute inset-0 pointer-events-none overflow-hidden rounded">
                   {/* 4 dark scrim areas */}
                   <div className="absolute top-0 left-0 right-0 bg-black/60 pointer-events-none" style={{ height: `${dispY}px` }} />
@@ -1388,7 +1360,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
             <div className="flex flex-col gap-3">
               {/* Tool sub-mode selector + Color selector */}
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-2.5">
-                {/* 3 Tools: Brush (Giữ chuột tô), Bucket (Đổ màu), Replace (Thay thế) */}
+                {/* 4 Tools: Brush (Giữ chuột tô), Eraser (Cục tẩy), Bucket (Đổ màu), Replace (Thay thế) */}
                 <div className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-slate-50 p-1">
                   <button
                     type="button"
@@ -1410,6 +1382,23 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
                   <button
                     type="button"
                     onClick={() => {
+                      setRecolorTool('eraser');
+                      setIsSamplingColor(false);
+                      setActiveEyedropper(null);
+                    }}
+                    className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${
+                      recolorTool === 'eraser'
+                        ? 'bg-rose-700 text-white shadow-sm'
+                        : 'text-slate-700 hover:bg-slate-200/70'
+                    }`}
+                  >
+                    <Eraser className="h-3.5 w-3.5" />
+                    Cục tẩy
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
                       setRecolorTool('bucket');
                       setIsSamplingColor(false);
                       setActiveEyedropper(null);
@@ -1421,7 +1410,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
                     }`}
                   >
                     <PaintBucket className="h-3.5 w-3.5" />
-                    Đổ màu vùng (Thùng sơn)
+                    Đổ màu vùng
                   </button>
 
                   <button
@@ -1438,7 +1427,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
                     }`}
                   >
                     <Pipette className="h-3.5 w-3.5" />
-                    Thay thế màu (Toàn ảnh)
+                    Thay thế màu
                   </button>
                 </div>
 
@@ -1452,13 +1441,13 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
                     }}
                     className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-bold transition-all ${
                       isSamplingColor || isAltSampling
-                        ? 'border-rose-600 bg-rose-50 text-rose-800 ring-2 ring-rose-500'
+                        ? 'border-rose-600 bg-rose-50 text-rose-800 ring-2 ring-rose-500 animate-pulse'
                         : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
                     }`}
                     title="Bấm nút này rồi bấm vào ảnh để lấy màu, hoặc giữ phím Alt khi rê chuột"
                   >
                     <Pipette className="h-3.5 w-3.5 text-rose-700" />
-                    {isSamplingColor || isAltSampling ? 'Đang chấm màu trên ảnh...' : 'Lấy màu từ ảnh (Alt)'}
+                    {isSamplingColor || isAltSampling ? '👉 Chấm vào màu trên ảnh...' : 'Hút màu từ ảnh (Alt)'}
                   </button>
 
                   <div className="flex items-center gap-1.5">
@@ -1506,12 +1495,12 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
               </div>
 
               {/* Sub-tool specific options */}
-              {recolorTool === 'brush' && (
+              {(recolorTool === 'brush' || recolorTool === 'eraser') && (
                 <div className="flex flex-wrap items-center gap-4">
                   {/* Brush Size */}
                   <div className="flex flex-1 min-w-[170px] items-center gap-2">
                     <label htmlFor="brush-size" className="text-xs font-bold text-slate-700 whitespace-nowrap">
-                      Cỡ cọ:
+                      Cỡ cọ ([ ]):
                     </label>
                     <input
                       id="brush-size"
@@ -1559,28 +1548,30 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
                     <span className="w-8 text-right text-xs font-bold text-slate-700">{brushSoftness}%</span>
                   </div>
 
-                  {/* Blend Mode */}
-                  <div className="flex items-center gap-1.5">
-                    <label htmlFor="recolor-blend" className="text-xs font-bold text-slate-700 whitespace-nowrap">
-                      Chế độ:
-                    </label>
-                    <select
-                      id="recolor-blend"
-                      value={recolorBlendMode}
-                      onChange={(e) => setRecolorBlendMode(e.target.value as 'color' | 'solid')}
-                      className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm"
-                    >
-                      <option value="color">Giữ sáng tối & vân ảnh (Photoshop Color)</option>
-                      <option value="solid">Tô màu phẳng (Solid Color)</option>
-                    </select>
-                  </div>
+                  {/* Blend Mode for Brush */}
+                  {recolorTool === 'brush' && (
+                    <div className="flex items-center gap-1.5">
+                      <label htmlFor="recolor-blend" className="text-xs font-bold text-slate-700 whitespace-nowrap">
+                        Chế độ tô:
+                      </label>
+                      <select
+                        id="recolor-blend"
+                        value={recolorBlendMode}
+                        onChange={(e) => setRecolorBlendMode(e.target.value as 'solid' | 'color')}
+                        className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm"
+                      >
+                        <option value="solid">Tô phủ màu (Normal - Mặc định)</option>
+                        <option value="color">Đổi tông màu (Photoshop Color)</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
               )}
 
               {recolorTool === 'bucket' && (
                 <div className="flex flex-wrap items-center gap-4">
                   <p className="text-xs text-slate-600 font-medium">
-                    👉 Bấm vào bất kỳ điểm nào trên ảnh để đổ màu toàn bộ vùng liền kề đó.
+                    👉 Bấm chuột vào bất kỳ điểm nào trên ảnh để đổ màu toàn bộ vùng liền kề đó.
                   </p>
 
                   <div className="flex flex-1 min-w-[200px] items-center gap-2">
@@ -1597,21 +1588,6 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
                       className="flex-1 accent-rose-700"
                     />
                     <span className="w-9 text-right text-xs font-bold text-slate-700">{recolorTolerance}%</span>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <label htmlFor="bucket-blend" className="text-xs font-bold text-slate-700 whitespace-nowrap">
-                      Chế độ:
-                    </label>
-                    <select
-                      id="bucket-blend"
-                      value={recolorBlendMode}
-                      onChange={(e) => setRecolorBlendMode(e.target.value as 'color' | 'solid')}
-                      className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-bold text-slate-800 shadow-sm"
-                    >
-                      <option value="color">Giữ sáng tối & vân ảnh (Photoshop Color)</option>
-                      <option value="solid">Tô màu phẳng (Solid Color)</option>
-                    </select>
                   </div>
                 </div>
               )}
@@ -1896,9 +1872,7 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
         {/* Footer actions */}
         <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50/70 px-6 py-3.5">
           <div className="text-xs text-slate-500">
-            {history.length > 1 && (
-              <span>Đang ở bước {historyIndex + 1} / {history.length}</span>
-            )}
+            {canUndo && <span className="text-slate-700 font-semibold">Đã vẽ nét mới (Ctrl+Z để hoàn tác)</span>}
           </div>
 
           <div className="flex items-center gap-2">
@@ -1910,24 +1884,13 @@ export const SelectRegionModal: React.FC<SelectRegionModalProps> = ({
               Hủy
             </button>
 
-            {/* Apply this step button to keep editing */}
-            {(mode === 'crop' || (mode === 'punch_color' && punchPickedColor) || (mode === 'recolor' && recolorTool === 'replace' && pickedSourceColor)) && (
-              <button
-                type="button"
-                onClick={handleApplyCurrentStep}
-                className="rounded-lg border border-rose-300 bg-rose-50 px-3.5 py-2 text-xs font-bold text-rose-800 hover:bg-rose-100 shadow-sm"
-              >
-                Áp dụng bước này (Tiếp tục sửa)
-              </button>
-            )}
-
             {/* Final Apply Button */}
             <button
               type="button"
               onClick={handleFinalApply}
               disabled={
                 isProcessing ||
-                (mode === 'punch_color' && !punchPickedColor && history.length <= 1) ||
+                (mode === 'punch_color' && !punchPickedColor && !canUndo) ||
                 (mode === 'punch_slot' && slots.length === 0)
               }
               className="inline-flex items-center gap-2 rounded-lg bg-rose-700 px-4 py-2 text-xs font-bold text-white hover:bg-rose-800 shadow-sm disabled:opacity-50"
