@@ -372,11 +372,11 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           <button
             type="button"
             onClick={onSelectRegion}
-            title="Đục lỗ trên ảnh (theo màu hoặc theo khung slot)"
+            title="Đục lỗ, cắt ảnh crop theo kích thước, tô đổi màu như Photoshop"
             className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
           >
             <Scissors className="h-4 w-4 text-rose-700" aria-hidden="true" />
-            Đục lỗ
+            Đục lỗ / Chỉnh ảnh
           </button>
         )}
 

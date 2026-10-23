@@ -13,6 +13,7 @@ import {
   Layers,
   MousePointer,
   QrCode,
+  Scissors,
   Sparkles,
   Trash2,
   Type,
@@ -50,6 +51,7 @@ interface InspectorProps {
   isSavingTemplate?: boolean;
   onUpdateTemplateInDb?: () => void;
   onSaveNewTemplateToDb?: () => void;
+  onOpenImageEditor?: () => void;
 }
 
 
@@ -88,7 +90,8 @@ export const Inspector: React.FC<InspectorProps> = ({
   elementsCount = 0,
   canvasWidth = 1200,
   canvasHeight = 1800,
-  onClose
+  onClose,
+  onOpenImageEditor
 }) => {
 
   if (selectedIds && selectedIds.length > 1) {
@@ -532,6 +535,16 @@ export const Inspector: React.FC<InspectorProps> = ({
                 >
                   Căn ảnh vừa khung
                 </button>
+                {onOpenImageEditor && (
+                  <button
+                    type="button"
+                    onClick={onOpenImageEditor}
+                    className="w-full inline-flex items-center justify-center gap-1.5 rounded-md border border-rose-300 bg-rose-50 px-3 py-2 text-xs font-black text-rose-800 hover:bg-rose-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700"
+                  >
+                    <Scissors className="h-3.5 w-3.5 text-rose-700" />
+                    Đục lỗ / Cắt crop / Tô màu
+                  </button>
+                )}
               </section>
             )}
 

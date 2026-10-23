@@ -9,7 +9,7 @@ import { CreateFrameModal, NewFrameConfig } from './components/CreateFrameModal'
 import { FrameLibrary } from './components/FrameLibrary';
 import { FramePreviewStep } from './components/FramePreviewStep';
 import { SaveFrameModal } from './components/SaveFrameModal';
-import { SelectRegionModal } from './components/SelectRegionModal';
+import { SelectRegionModal, RegionModalMode } from './components/SelectRegionModal';
 import { TransparentSlotPickerModal } from './components/TransparentSlotPickerModal';
 import { AdminPasswordModal } from './components/AdminPasswordModal';
 import { FrameSlot } from './types/canvas';
@@ -45,6 +45,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
   const [isCreateFrameOpen, setIsCreateFrameOpen] = useState(false);
   const [isSaveFrameOpen, setIsSaveFrameOpen] = useState(false);
   const [isSelectRegionOpen, setIsSelectRegionOpen] = useState(false);
+  const [selectRegionInitialMode, setSelectRegionInitialMode] = useState<RegionModalMode>('punch_color');
   const [isTransparentSlotPickerOpen, setIsTransparentSlotPickerOpen] = useState(false);
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false);
   const [isUsingSystemTemplate, setIsUsingSystemTemplate] = useState(false);
@@ -445,11 +446,12 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
     return selectedElement ? selectedElement.content : cs.bgImageUrl;
   };
 
-  const handleOpenSelectRegion = () => {
+  const handleOpenSelectRegion = (initialMode: RegionModalMode = 'punch_color') => {
     if (!getSelectRegionTargetImage()) {
-      showToast('Vui lòng chọn một ảnh trên giao diện hoặc tải lên ảnh nền để đục lỗ', 'error');
+      showToast('Vui lòng chọn một ảnh trên giao diện hoặc tải lên ảnh nền để chỉnh sửa', 'error');
       return;
     }
+    setSelectRegionInitialMode(initialMode);
     setIsSelectRegionOpen(true);
   };
 
@@ -470,47 +472,86 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
     setIsTransparentSlotPickerOpen(false);
   };
 
-  const handleApplySelectRegion = (dataUrl: string, resetToCanvasSize: boolean) => {
+  const handleApplySelectRegion = (
+    dataUrl: string,
+    resetToCanvasSize: boolean,
+    dimensions?: { width: number; height: number }
+  ) => {
     const selectedElement = getSelectRegionTargetElement();
     if (selectedElement) {
-      // Sync bgImageUrl if we are punching holes in the background element
       if (selectedElement.content === cs.bgImageUrl || selectedElement.id.startsWith('background_frame')) {
         cs.setBgImageUrl(dataUrl);
       }
       
       layers.setElements((prev) =>
-        prev.map((el) =>
-          el.id === selectedElement.id
-            ? resetToCanvasSize
-              ? {
-                  ...el,
-                  content: dataUrl,
-                  x: 0,
-                  y: 0,
-                  width: cs.width,
-                  height: cs.height,
-                  rotation: 0,
-                  aspectRatio: cs.width / cs.height
-                }
-              : { ...el, content: dataUrl }
-            : el
-        )
+        prev.map((el) => {
+          if (el.id !== selectedElement.id) return el;
+          if (resetToCanvasSize) {
+            return {
+              ...el,
+              content: dataUrl,
+              x: 0,
+              y: 0,
+              width: cs.width,
+              height: cs.height,
+              rotation: 0,
+              aspectRatio: cs.width / cs.height
+            };
+          }
+          if (dimensions) {
+            const ar = dimensions.width / Math.max(1, dimensions.height);
+            let w = dimensions.width;
+            let h = dimensions.height;
+            if (w > cs.width || h > cs.height) {
+              const fitScale = Math.min(cs.width / w, cs.height / h);
+              w = Math.round(w * fitScale);
+              h = Math.round(h * fitScale);
+            }
+            return {
+              ...el,
+              content: dataUrl,
+              width: w,
+              height: h,
+              aspectRatio: ar
+            };
+          }
+          return { ...el, content: dataUrl };
+        })
       );
-      showToast('Đã đục lỗ ảnh đang chọn thành công!', 'success');
+      showToast('Đã chỉnh sửa ảnh thành công!', 'success');
     } else if (cs.bgImageUrl) {
       const previousBg = cs.bgImageUrl;
       cs.setBgImageUrl(dataUrl);
       if (resetToCanvasSize) cs.setBackgroundType('color');
       layers.setElements((prev) =>
-        prev.map((el) =>
-          el.type === 'image' && el.content === previousBg
-            ? resetToCanvasSize
-              ? { ...el, content: dataUrl, x: 0, y: 0, width: cs.width, height: cs.height, aspectRatio: cs.width / cs.height }
-              : { ...el, content: dataUrl }
-            : el
-        )
+        prev.map((el) => {
+          if (el.type !== 'image' || el.content !== previousBg) return el;
+          if (resetToCanvasSize) {
+            return {
+              ...el,
+              content: dataUrl,
+              x: 0,
+              y: 0,
+              width: cs.width,
+              height: cs.height,
+              aspectRatio: cs.width / cs.height
+            };
+          }
+          if (dimensions) {
+            const ar = dimensions.width / Math.max(1, dimensions.height);
+            let w = dimensions.width;
+            let h = dimensions.height;
+            if (w > cs.width || h > cs.height) {
+              const fitScale = Math.min(cs.width / w, cs.height / h);
+              w = Math.round(w * fitScale);
+              h = Math.round(h * fitScale);
+            }
+            return { ...el, content: dataUrl, width: w, height: h, aspectRatio: ar };
+          }
+          return { ...el, content: dataUrl };
+        })
       );
-      showToast('Đã đục lỗ ảnh nền thành công!', 'success');
+      showToast('Đã chỉnh sửa ảnh nền thành công!', 'success');
     }
     setIsSelectRegionOpen(false);
   };
@@ -678,6 +719,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
           onPaste={layers.handlePaste}
           onMoveLayerOrder={layers.handleMoveLayerOrder}
           onAlignElement={layers.handleAlignElement}
+          onOpenImageEditor={() => handleOpenSelectRegion('crop')}
 
           isExporting={exp.isExporting}
           onExportPNG={exp.handleExportPNG}
@@ -787,6 +829,7 @@ export function App({ initialView = 'editor' }: { initialView?: AppView }) {
         canvasHeight={cs.height}
         slots={layers.slots}
         targetElement={getSelectRegionTargetElement()}
+        initialMode={selectRegionInitialMode}
         onClose={() => setIsSelectRegionOpen(false)}
         onApply={handleApplySelectRegion}
       />
