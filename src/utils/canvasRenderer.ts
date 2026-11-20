@@ -1,3 +1,4 @@
+import { fabric } from 'fabric';
 import { FrameSlot, FrameElement } from '../types/canvas';
 import JSZip from 'jszip';
 import { formatDate, generateDslrboothId } from '../components/dslrbooth/utils';
@@ -79,18 +80,100 @@ export async function renderImageElements(
 }
 
 /**
+ * Builds the font descriptor + Fabric options for a text element.
+ * MUST stay in sync with how CanvasEditor creates its fabric.IText objects, so that the
+ * exported text lands exactly where the designer sees it.
+ */
+function getTextRenderStyle(elem: FrameElement) {
+  const style = elem.style || {};
+  const strokeWidth = style.strokeWidth || 0;
+  const textColor = style.color || '#ffffff';
+  return {
+    fontSize: style.fontSize || 24,
+    fontFamily: style.fontFamily || 'Outfit',
+    fontWeight: style.fontWeight || 'normal',
+    fontStyle: style.fontStyle || 'normal',
+    strokeWidth,
+    textColor,
+    strokeColor: strokeWidth > 0 ? (style.stroke || textColor) : undefined,
+  };
+}
+
+/**
+ * Canvas text does not trigger loading of web fonts that were never used in the DOM
+ * (`document.fonts.ready` resolves immediately for them), so the export would measure and
+ * draw with a fallback font. Explicitly load every face we are about to draw.
+ */
+async function ensureTextFontsLoaded(textElements: FrameElement[]): Promise<void> {
+  if (typeof document === 'undefined' || !document.fonts) return;
+
+  const families = new Set<string>();
+  await Promise.all(textElements.map(async (elem) => {
+    const s = getTextRenderStyle(elem);
+    const family = /['",]/.test(s.fontFamily) ? s.fontFamily : `"${s.fontFamily}"`;
+    families.add(s.fontFamily);
+    try {
+      await document.fonts.load(`${s.fontStyle} ${s.fontWeight} ${s.fontSize}px ${family}`, elem.content || ' ');
+    } catch {
+      // Unknown / failed font: Fabric falls back to the default font, same as the editor.
+    }
+  }));
+
+  try {
+    await document.fonts.ready;
+  } catch {}
+
+  // Fabric caches glyph widths per font family; drop entries measured before the face was loaded.
+  const clearFontCache = (fabric.util as any).clearFabricFontCache as ((family?: string) => void) | undefined;
+  families.forEach((family) => clearFontCache?.(family));
+}
+
+/**
+ * Draws a text element with Fabric's own text engine - the same one the editor uses - so
+ * baseline, line height, multi-line layout, stroke and rotation pivot all match the design.
+ * (element.x / element.y is Fabric's top-left `left/top`; element.width / height are only a
+ * snapshot and can be stale or a placeholder, so they must not be used to position text.)
+ */
+function drawTextElement(ctx: CanvasRenderingContext2D, elem: FrameElement): void {
+  if (!elem.content) return;
+  const s = getTextRenderStyle(elem);
+  const textObject = new fabric.Text(elem.content, {
+    left: elem.x,
+    top: elem.y,
+    originX: 'left',
+    originY: 'top',
+    angle: elem.rotation || 0,
+    fontSize: s.fontSize,
+    fontFamily: s.fontFamily,
+    fontWeight: s.fontWeight,
+    fontStyle: s.fontStyle as any,
+    fill: s.textColor,
+    stroke: s.strokeColor,
+    strokeWidth: s.strokeWidth,
+    strokeUniform: true,
+    paintFirst: 'stroke',
+    objectCaching: false,
+    shadow: undefined,
+  } as any);
+  textObject.render(ctx);
+}
+
+/**
  * Renders all visible elements sequentially to preserve z-order.
  */
 export async function renderAllElements(
   ctx: CanvasRenderingContext2D,
   elements: FrameElement[]
 ): Promise<void> {
-  if (typeof document !== 'undefined' && document.fonts) {
-    try {
-      await document.fonts.ready;
-    } catch {}
-  }
-  for (const elem of elements.filter(e => e.visible !== false)) {
+  const visibleElements = elements.filter(e => e.visible !== false);
+  await ensureTextFontsLoaded(visibleElements.filter(e => e.type === 'text'));
+
+  for (const elem of visibleElements) {
+    if (elem.type === 'text') {
+      drawTextElement(ctx, elem);
+      continue;
+    }
+
     ctx.save();
     const theta = (elem.rotation || 0) * Math.PI / 180;
     const cx = elem.x + (elem.width / 2) * Math.cos(theta) - (elem.height / 2) * Math.sin(theta);
@@ -98,32 +181,7 @@ export async function renderAllElements(
     ctx.translate(cx, cy);
     ctx.rotate(theta);
 
-    if (elem.type === 'text') {
-      const fontSize = elem.style?.fontSize || 24;
-      const fontFamily = elem.style?.fontFamily || 'Outfit';
-      const fontWeight = elem.style?.fontWeight || 'normal';
-      const fontStyle = elem.style?.fontStyle || 'normal';
-      const strokeWidth = elem.style?.strokeWidth || 0;
-      const textColor = elem.style?.color || '#ffffff';
-      const strokeColor = strokeWidth > 0 ? (elem.style?.stroke || textColor) : undefined;
-
-      const stylePrefix = fontStyle !== 'normal' ? `${fontStyle} ` : '';
-      ctx.font = `${stylePrefix}${fontWeight} ${fontSize}px ${fontFamily}, Outfit, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      if (strokeWidth > 0 && strokeColor) {
-        ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = strokeWidth * 2;
-        ctx.lineJoin = 'round';
-        ctx.miterLimit = 2;
-        ctx.strokeText(elem.content, 0, 0);
-      }
-
-      ctx.fillStyle = textColor;
-      ctx.fillText(elem.content, 0, 0);
-      ctx.restore();
-    } else if (elem.type === 'icon' || elem.type === 'image') {
+    if (elem.type === 'icon' || elem.type === 'image') {
       await new Promise<void>((resolve) => {
         const img = new Image();
         img.crossOrigin = 'anonymous';
@@ -136,7 +194,9 @@ export async function renderAllElements(
           ctx.restore();
           resolve();
         };
-        img.src = elem.content;
+        // Same URL resolution as the editor (Fabric) uses, otherwise /assets/... and Drive
+        // links fail to load here and the image silently disappears from the export.
+        img.src = resolveAssetUrl(elem.content);
       });
     } else if (elem.type === 'qr') {
       ctx.fillStyle = '#ffffff';
