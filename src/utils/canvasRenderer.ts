@@ -1,7 +1,6 @@
 import { fabric } from 'fabric';
 import { FrameSlot, FrameElement } from '../types/canvas';
 import JSZip from 'jszip';
-import { formatDate, generateDslrboothId } from '../components/dslrbooth/utils';
 import QRCode from 'qrcode';
 import { resolveAssetUrl } from './storage';
 
@@ -308,6 +307,21 @@ export async function generateClientBase64(
 }
 
 /**
+ * Escapes a value for use inside a double-quoted XML attribute.
+ */
+function escapeXmlAttribute(value: string): string {
+  return value
+    // Ký tự điều khiển không hợp lệ trong XML 1.0 (trừ tab / xuống dòng)
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+    .replace(/\r?\n|\t/g, ' ');
+}
+
+/**
  * Generates a DSLRbooth ZIP file (preview.png + template.xml + optional overlay.png / background.jpg).
  * Đồng bộ chuẩn dslrBooth:
  * - Không sinh background.jpg nếu nền chỉ là màu đơn sắc (dùng BackgroundColor="#AARRGGBB" của thẻ Template).
@@ -373,6 +387,10 @@ export async function generateDslrboothZip(
       overCtx.save();
       overCtx.scale(exportScale, exportScale);
       await renderAllElements(overCtx, nonQrElements);
+      // Ô ảnh luôn phải là "cửa sổ" trong suốt, giống xuất PNG của editor (CanvasEditor cắt hết
+      // mọi lớp tại ô ảnh). Nếu không, khung ảnh đặc / sticker đè lên ô sẽ che mất ảnh chụp ở
+      // phần mềm ghép ảnh nằm dưới overlay (dslrBooth, LumiBooth...).
+      punchSlotHoles(overCtx, slots, false);
       overCtx.restore();
     }
     const overBlob = await new Promise<Blob | null>(res => overlayCanvas.toBlob(res, 'image/png'));
@@ -418,8 +436,6 @@ export async function generateDslrboothZip(
   if (prevBlob) zip.file('preview.png', prevBlob);
 
   // 4. template.xml — chuẩn DSLRbooth (UTF-8 BOM, CRLF, đúng thứ tự ZIndex, loại bỏ thuộc tính thừa)
-  const xmlDate = formatDate();
-  const xmlId = generateDslrboothId();
   const visibleSlots = slots.filter(s => s.visible !== false);
   const qrElements = elements.filter(e => e.type === 'qr' && e.visible !== false);
 
@@ -446,12 +462,19 @@ export async function generateDslrboothZip(
     }
   }
 
-  // Tên template chuẩn hóa (không ép prefix dslrbooth_ nếu frameName đã sạch)
-  const cleanName = (frameName || 'Template').trim();
+  // Tên template chuẩn hóa (không ép prefix dslrbooth_ nếu frameName đã sạch).
+  // Phải escape XML: tên có & " < > (vd "Cô dâu & Chú rể") sẽ làm hỏng template.xml và import thất bại.
+  const cleanName = escapeXmlAttribute((frameName || 'Template').trim());
 
+  // Thẻ <Template> chỉ giữ thuộc tính dslrBooth thật sự cần (giống template mẫu chính thức):
+  // - Id / OriginalDevice / LastSavedDate: dslrBooth tự sinh lại khi import ZIP.
+  // - Dimensions: là đơn vị hiển thị (px/inch/cm), KHÔNG phải khổ giấy; một số phần mềm đọc nhầm
+  //   "0" thành khổ 4x6 làm méo canvas khi khung không phải 4x6.
+  // - print_2_per_page / PrintToSecondaryPrinter / IsLegacy: mặc định khi thiếu đã là giá trị cũ.
+  // - Resolution giữ lại để dslrBooth hiển thị đúng đơn vị inch/cm.
   // BOM (EF BB BF) bắt buộc cho .NET XML parser của DSLRbooth
   let xmlStr = `\uFEFF<?xml version="1.0" encoding="UTF-8"?>\r\n`;
-  xmlStr += `<Template Name="${cleanName}" Width="${exportWidth}" Height="${exportHeight}" Dimensions="0" Resolution="${Math.round(resolution)}" BackgroundColor="${argbBackground}" print_2_per_page="False" PrintToSecondaryPrinter="False" LastSavedDate="${xmlDate}" Id="${xmlId}" IsLegacy="False" OriginalDevice="DESKTOP-PHOTOBOOTH">\r\n`;
+  xmlStr += `<Template Name="${cleanName}" Width="${exportWidth}" Height="${exportHeight}" Resolution="${Math.round(resolution)}" BackgroundColor="${argbBackground}">\r\n`;
   xmlStr += `  <Elements>\r\n`;
 
   // Ghi XML theo thứ tự ZIndex giảm dần (cao nhất ghi trước) chuẩn dslrBooth
@@ -465,12 +488,15 @@ export async function generateDslrboothZip(
     const qrLeft = qcx - qr.width / 2;
     const qrTop = qcy - qr.height / 2;
     const qrRotation = Math.round(((qr.rotation || 0) % 360 + 360) % 360);
-    xmlStr += `    <QrCode Name="QR Code ${idx + 1}" UseUploadUrl="True" Width="${scaled(qr.width)}" Height="${scaled(qr.height)}" BackgroundColor="#00FFFFFF" ZIndex="${qrZIndex}" Left="${scaled(qrLeft)}" Top="${scaled(qrTop)}" Rotation="${qrRotation}" />\r\n`;
+    // UseUploadUrl="True" và BackgroundColor trong suốt là mặc định của dslrBooth nên không ghi lại;
+    // QR luôn được dslrBooth tự sinh theo link upload của từng phiên chụp.
+    const qrRotationAttr = qrRotation !== 0 ? ` Rotation="${qrRotation}"` : '';
+    xmlStr += `    <QrCode Name="QR Code ${idx + 1}" Width="${scaled(qr.width)}" Height="${scaled(qr.height)}" ZIndex="${qrZIndex}" Left="${scaled(qrLeft)}" Top="${scaled(qrTop)}"${qrRotationAttr} />\r\n`;
   });
 
   // B. Overlay (nếu có phần tử trang trí)
   if (hasOverlay) {
-    xmlStr += `    <Image Name="overlay" Width="${exportWidth}" Height="${exportHeight}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" Rotation="0" />\r\n`;
+    xmlStr += `    <Image Name="overlay" Width="${exportWidth}" Height="${exportHeight}" Top="0" Left="0" ImagePath="overlay.png" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${overlayZIndex}" />\r\n`;
   }
 
   // C. Photos (ZIndex giảm dần)
@@ -496,7 +522,7 @@ export async function generateDslrboothZip(
 
   // D. Background (nếu có ảnh nền thực sự, ZIndex thấp nhất)
   if (hasRealBackgroundImage) {
-    xmlStr += `    <Image Name="Background" Width="${exportWidth}" Height="${exportHeight}" Top="0" Left="0" ImagePath="background.jpg" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${bgZIndex}" Rotation="0" />\r\n`;
+    xmlStr += `    <Image Name="Background" Width="${exportWidth}" Height="${exportHeight}" Top="0" Left="0" ImagePath="background.jpg" KeepAspect="True" Thickness="0" StrokeColor="#FF000000" ZIndex="${bgZIndex}" />\r\n`;
   }
 
   xmlStr += `  </Elements>\r\n`;
